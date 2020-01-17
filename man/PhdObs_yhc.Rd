@@ -6,7 +6,7 @@
 \usage{
 PhdObs_yhc(data, tree, datatype = "abundance", t, type = "PD",
   profile = "q", q = seq(0, 2, by = 0.25), tprofile_times = NULL,
-  nboot = 50, conf = 0.95, knots = 100, reftime = NULL)
+  nboot = 50, conf = 0.95, knots = NULL, reftime = NULL)
 }
 \arguments{
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr
@@ -35,7 +35,7 @@ the computation of s.e. and confidence intervals will be skipped, default is 50.
 
 \item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
 
-\item{knots}{an integer specifying the number of points of \code{time} used to calculate AUC (Area Under Curve). Enter NULL to skip calculation, default is 100.\cr}
+\item{knots}{an integer specifying the number of points of \code{time} used to calculate AUC (Area Under Curve). Use NULL or 0 to skip calculation, default is NULL.\cr}
 
 \item{reftime}{a positive number specifying the reference time.}
 }

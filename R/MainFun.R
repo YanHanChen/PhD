@@ -261,7 +261,7 @@ PhdAsy_yhc <- function(data, tree, datatype = "abundance", t, q = seq(0, 2, by =
 #' @param tprofile_times a nonnegative vector specifying the reference time points for which phylogenetic profiles will be computed.\cr
 #' @param nboot an integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case,
 #' the computation of s.e. and confidence intervals will be skipped, default is 50.
-#' @param knots an integer specifying the number of points of \code{time} used to calculate AUC (Area Under Curve). Enter NULL to skip calculation, default is 100.\cr
+#' @param knots an integer specifying the number of points of \code{time} used to calculate AUC (Area Under Curve). Use NULL or 0 to skip calculation, default is NULL.\cr
 #' @param conf a positive number < 1 specifying the level of confidence interval, default is 0.95.
 #' @param reftime a positive number specifying the reference time.
 #' @import chaoUtility
@@ -296,7 +296,7 @@ PhdAsy_yhc <- function(data, tree, datatype = "abundance", t, q = seq(0, 2, by =
 #' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
 #' @export
 PhdObs_yhc <- function(data, tree, datatype = "abundance", t, type = "PD", profile = "q", q = seq(0, 2, by = 0.25), tprofile_times = NULL, nboot = 50,
-                       conf = 0.95,knots = 100,reftime = NULL){
+                       conf = 0.95,knots = NULL,reftime = NULL){
   dat = list()
   name <- rownames(data)
   if (length(q) == 1) stop("length of q should be greater than one", call. = FALSE)
@@ -365,12 +365,12 @@ PhdObs_yhc <- function(data, tree, datatype = "abundance", t, type = "PD", profi
     }
     if(profile == "time") {
       if (is.null(tprofile_times)) {
-        tprofile_times <- c(seq(0.01, H_max, length.out = 10), Q) %>% unique() %>% sort
+        tprofile_times <- seq(0.01, H_max, length.out = 15) %>% unique() %>% sort
       } else {
-        tprofile_times <- c(tprofile_times, 0.01, H_max, Q) %>% unique() %>% sort
+        tprofile_times <- c(tprofile_times, 0.01, H_max) %>% unique() %>% sort
       }
       temp <- Phdttable_yhc(datalist = mydata, phylotr = mytree, times = tprofile_times,cal = type, datatype, nboot, conf)
-      if (is.null(knots)) {
+      if (is.null(knots)|knots==0) {
         ans <- list(summary = infos, fortime_table = temp[[1]], fortime_figure = Plott_yhc(temp[[1]], type, temp[[2]]))
       } else {
         AUC <- AUC_one_table_yhc(datalist = mydata,phylotr = mytree,knot = knots,cal = type,datatype = datatype,nboot, conf,reft_max = max(tprofile_times))

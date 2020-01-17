@@ -212,7 +212,7 @@ AUC_one_table_yhc <- function(datalist, phylotr, knot, cal, datatype, nboot, con
         Lis_b <- sapply(1:ncol(aL$BLbyT), function(l){
           tmp <- c(aL$BLbyT[1:length(x_no0),l],Boots$Li[(length(x_no0)+1):(length(x_no0)+f0)],
                    aL$BLbyT[-(1:length(x_no0)),l])
-          tmp[tmp>times[l]] <- times[l]
+          tmp[tmp>times_AUC[l]] <- times_AUC[l]
           tmp
         })
       }
