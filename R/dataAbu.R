@@ -1,0 +1,12 @@
+#' Abundance Data for Function inextPD
+#'
+#' This data set describes the phylogeny of 46 plants on dunes (Holocene) of the central western coast of Italy as reported by Carboni et al. (2010).
+#' It includes three types of dunes: emboryo dunes (ED), mobile dunes (MD) and transtion dunes (TD), which contains 17, 39, 42 distinct plants respectively.
+#' @usage data(data.abu)
+#' @format A list includes two objects:
+#' \describe{
+#'   \item{data}{is a data frame with 46 plants abundance data and three sites: ED, MD and TD.}
+#'   \item{tree}{is a character string giving the phylogenetic tree in Newick format.}
+#' }
+#' @source Carboni, M., Santoro, R., & Acosta, A. T. R. (2010). Are some communities of the coastal dune zonation more susceptible to alien plant invasion?. Journal of Plant Ecology, 3(2), 139-147.
+"data.abu"

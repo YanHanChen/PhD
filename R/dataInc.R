@@ -1,0 +1,15 @@
+#' Incidence Data for Function inextPD
+#'
+#' This data set describes the phylogeny of 41 birds as reported by Jetz et al. (2012).
+#' It gives the two sites of species incidence data to these 41 species in November 2012 at Barrington Tops National Park, Australia.
+#' It also includes two sites of birds: the North Site and the South Site, which contains 12 and 17 sampling points respectively(each sampling point is regarded as a sampling unit).
+#'
+#' @usage data(data.inc)
+#' @format A list includes three objects:
+#' \describe{
+#'   \item{data}{is a pooled data frame with 41 birds incidence data and 29 sampling points.}
+#'   \item{tree}{is a character string giving the phylogenetic tree in Newick format.}
+#'   \item{t}{is a vector giving the numbers of sampling points in each site.}
+#' }
+#' @source Jetz, W., Thomas, G.H., Joy, J.B., Hartmann, K. & Mooers A.O. (2012). The global diversity of birds in space and time. Nature, 491, 444-448.
+"data.inc"

@@ -54,6 +54,7 @@ double RPD(NumericMatrix x , int n  , int m , int q) {
   for (int i = 0; i < nrow; i++) {
     tbar += x(i, 0)*x(i, 1)/n;
   }
+  //Rcpp::Rcout << "tbar in cpp: " << tbar << std::endl;
   for (int k = 0; k < m ; k++) {
     for (int i = 0; i < nrow; i++) {
       if ( x(i,0) >= k+1 && x(i,0) <= n-m+k+1 )
@@ -66,6 +67,7 @@ double RPD(NumericMatrix x , int n  , int m , int q) {
       }
     }
   }
+  //Rcpp::Rcout << "ghat: " << ghat << std::endl;
   double out=0;
   if(q == 0){
     for(int j = 0; j < m; j++) {
