@@ -61,7 +61,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // RPD
-double RPD(NumericMatrix x, int n, int m, int q);
+NumericVector RPD(NumericMatrix x, int n, int m, NumericVector q);
 RcppExport SEXP _PhDyhc_RPD(SEXP xSEXP, SEXP nSEXP, SEXP mSEXP, SEXP qSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -69,7 +69,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
     Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< int >::type q(qSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type q(qSEXP);
     rcpp_result_gen = Rcpp::wrap(RPD(x, n, m, q));
     return rcpp_result_gen;
 END_RCPP

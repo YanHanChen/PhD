@@ -47,10 +47,12 @@ double delta(NumericMatrix del_tmpaL, double k, double n){
 }
 
 // [[Rcpp::export]]
-double RPD(NumericMatrix x , int n  , int m , int q) {
+NumericVector RPD(NumericMatrix x , int n  , int m , NumericVector q) {
   int nrow = x.nrow();
   double tbar=0;
   NumericVector ghat(m);
+  int qlength = q.length();
+  NumericVector out(qlength);
   for (int i = 0; i < nrow; i++) {
     tbar += x(i, 0)*x(i, 1)/n;
   }
@@ -68,23 +70,30 @@ double RPD(NumericMatrix x , int n  , int m , int q) {
     }
   }
   //Rcpp::Rcout << "ghat: " << ghat << std::endl;
-  double out=0;
-  if(q == 0){
-    for(int j = 0; j < m; j++) {
-      out += ghat[j];
+  for (int j = 0; j < qlength; j++ ){
+    for(int k = 0; k < m; k++){
+      if(q[j] == 0){
+        out[j] = ghat[k] + out[j];
+      }
+      if(q[j] == 1){
+        //Rcout << "q1 in cpp: " <<log ( (k+1) )<< std::endl;
+        out[j] = -( (k+1) / (m*tbar) ) * log ( (k+1) / (m*tbar) ) * ghat[k] + out[j];
+      }
+      if(q[j] == 2){
+        out[j] = pow( ( (k+1) / (m*tbar) ),2) * ghat[k] + out[j];
+      }
     }
   }
-  if(q == 1){
-    for (int j = 0; j < m; j++) {
-      out += -( (j+1) / (m*tbar) ) * log ( (j+1) / (m*tbar) ) * ghat[j]  ;
+  for(int j = 0; j < qlength; j++ ){
+    if(q[j] == 0){
+      out[j] = out[j] ;
     }
-    out = exp(out) ;
-  }
-  if(q == 2){
-    for (int j = 0; j < m; j++) {
-      out += pow( ( (j+1) / (m*tbar) ),2) * ghat[j] ;
+    if(q[j] == 1){
+      out[j] = exp(out[j]);
     }
-    out = 1 / out ;
+    if(q[j] == 2){
+      out[j] = 1 / out[j];
+    }
   }
   return out ;
 }

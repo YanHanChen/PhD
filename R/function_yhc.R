@@ -35,14 +35,14 @@ PD.qprofile_yhc=function(Abun, aL, q, reft, cal, datatype,forboot=FALSE, nforboo
 Phdqtable_yhc <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
   # Note 200117: currently, the reference time is automatically fixed at tree height of pooled species.
   qtile <- qnorm(1-(1-conf)/2)
-  if (datatype=="incidence_raw") {
-    chaotree <- phylo2phytree(phylotr)
-    H_max <- chaotree$treeH
-    da <- lapply(datalist, rowSums) %>% do.call(cbind, .) %>% rowSums()
-    aLTable <- phyExpandData(x = da,labels = names(da),phy = chaotree,datatype = datatype)[,c(4,3,7)]
-    PD2 <- PD.qprofile_yhc(Abun = da, chaotree = chaotree, aL = aLTable,q = 2, reft = H_max, cal =  "PD", datatype)
-    Q <- H_max-(H_max^2)/PD2
-  }
+  # if (datatype=="incidence_raw") {
+  #   chaotree <- phylo2phytree(phylotr)
+  #   H_max <- chaotree$treeH
+  #   da <- lapply(datalist, rowSums) %>% do.call(cbind, .) %>% rowSums()
+  #   aLTable <- phyExpandData(x = da,labels = names(da),phy = chaotree,datatype = datatype)[,c(4,3,7)]
+  #   PD2 <- PD.qprofile_yhc(Abun = da, chaotree = chaotree, aL = aLTable,q = 2, reft = H_max, cal =  "PD", datatype)
+  #   Q <- H_max-(H_max^2)/PD2
+  # }
   if (datatype=="abundance") {
     H_max <- get.rooted.tree.height(phylotr)
     da <- do.call(cbind, datalist) %>% rowSums()
@@ -125,14 +125,14 @@ PD.Tprofile_yhc=function(Abun, ai, Lis, q, times, cal, datatype,forboot=FALSE, n
 Phdttable_yhc <- function(datalist, phylotr, times, cal, datatype, nboot, conf){
   # Note 200117: currently, the reference time is automatically fixed at tree height of pooled species.
   qtile <- qnorm(1-(1-conf)/2)
-  if (datatype=="incidence_raw") {
-    chaotree <- phylo2phytree(phylotr)
-    H_max <- chaotree$treeH
-    da <- lapply(datalist, rowSums) %>% do.call(cbind, .) %>% rowSums()
-    aLTable <- phyExpandData(x = da,labels = names(da),phy = chaotree,datatype = datatype)[,c(4,3,7)]
-    PD2 <- PD.qprofile_yhc(Abun = da, chaotree = chaotree, aL = aLTable,q = 2, reft = H_max, cal =  "PD", datatype)
-    Q <- H_max-(H_max^2)/PD2
-  }
+  # if (datatype=="incidence_raw") {
+  #   chaotree <- phylo2phytree(phylotr)
+  #   H_max <- chaotree$treeH
+  #   da <- lapply(datalist, rowSums) %>% do.call(cbind, .) %>% rowSums()
+  #   aLTable <- phyExpandData(x = da,labels = names(da),phy = chaotree,datatype = datatype)[,c(4,3,7)]
+  #   PD2 <- PD.qprofile_yhc(Abun = da, chaotree = chaotree, aL = aLTable,q = 2, reft = H_max, cal =  "PD", datatype)
+  #   Q <- H_max-(H_max^2)/PD2
+  # }
   if (datatype=="abundance") {
     H_max <- get.rooted.tree.height(phylotr)
     da <- do.call(cbind, datalist) %>% rowSums()
@@ -593,9 +593,8 @@ iNEXTPD_yhc = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NU
       aL <- aL$treeNabu %>% select(branch.abun,branch.length)
       x_no0 <- datalist[[i]]
       x_no0 <- x_no0[x_no0>0]
-      qPDm = sapply(Q,function(Qq){
-        PhD.m.est_yhc(Abun = x_no0,aL = aL,m = m[[i]],Q = Qq,reft = reft, datatype)
-      }) %>% as.numeric() #%>% tibble(order=rep(Q,each=length(m[[i]])),qPD=.)
+      qPDm <- PhD.m.est_yhc(Abun = x_no0,aL = aL,m = m[[i]],Q = Q,reft = reft, datatype, forboot=TRUE) %>%
+        t() %>% as.numeric()
       covm = Coverage_yhc(x_no0, datatype, m[[i]])
       Boots <- Boots.one_yhc(data=x_no0,phylo = phylotr,aL,datatype,nboot,reft = reft)
       Li_b <- Boots$Li
@@ -605,9 +604,8 @@ iNEXTPD_yhc = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NU
         x_b <- Boots$boot_data[,B]
         x_b_tmp <- x_b[1:(length(x_no0)+f0)]
         aL_b <- tibble(branch.abun = x_b[x_b>0], branch.length=Li_b[x_b>0])
-        qPDm_b <- sapply(Q,function(Qq){
-          PhD.m.est_yhc(Abun = x_b_tmp[x_b_tmp>0],aL=aL_b,m=m[[i]],Q=Qq,reft,datatype,forboot = T,nforboot = sum(datalist[[i]]))
-        }) %>% as.numeric()
+        qPDm_b <-  PhD.m.est_yhc(Abun = x_b_tmp[x_b_tmp>0],aL=aL_b,m=m[[i]],Q=Q,reft,datatype,forboot = T,nforboot = sum(datalist[[i]])) %>%
+          t() %>% as.numeric()
         covm_b = Coverage_yhc(x_b_tmp[x_b_tmp>0], datatype, m[[i]])
         # btime <- Sys.time()
         # print(paste0("Est boot sample",B,": ",btime-atime))
@@ -630,9 +628,8 @@ iNEXTPD_yhc = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NU
       aL <- aL$treeNabu %>% select(branch.abun,branch.length)
       x_no0 <- datalist[[i]]
       x_no0 <- x_no0[x_no0>0]
-      qPDm = sapply(Q,function(Qq){
-        PhD.m.est_yhc(Abun = x_no0,aL = aL,m = m[[i]],Q = Qq,reft = reft, datatype, forboot=TRUE)
-      }) %>% as.numeric() #%>% tibble(order=rep(Q,each=length(m[[i]])),qPD=.)
+      qPDm <- PhD.m.est_yhc(Abun = x_no0,aL = aL,m = m[[i]],Q = Q,reft = reft, datatype, forboot=TRUE) %>%
+        t() %>% as.numeric()
       covm = Coverage_yhc(x_no0, datatype, m[[i]])
       # Boots <- Boots.one_yhc(data=x_no0,phylo = phylotr,aL,datatype,nboot,reft = reft)
       # Li_b <- Boots$Li
@@ -662,14 +659,24 @@ PhD.m.est_yhc = function(Abun, aL, m, Q, reft, datatype, forboot=FALSE, nforboot
   #asymptotic value
   asy <- PhD.q.est_yhc(Abun,aL,Q,reft,forboot=forboot,nforboot = n)$est
   #beta
-  if(asy == obs) beta = 0
-  if(asy != obs) beta =(obs-RPD_m)/(asy-RPD_m)
+  beta <- rep(0,length(Q))
+  beta0plus <- which(asy != obs)
+  beta[beta0plus] <- (obs[beta0plus]-RPD_m[beta0plus])/(asy[beta0plus]-RPD_m[beta0plus])
+  # if(asy == obs) beta = 0
+  # if(asy != obs) beta =(obs-RPD_m)/(asy-RPD_m)
   #Extrapolation
   EPD = function(m,Q){
     m = m-n
-    if( Q == 0 | Q == 1 ) EPD = obs+(asy-obs)*(1-(1-beta)^m)
-    if( Q == 2 ) EPD = 1/sum( (aL_matrix[,2]/(t_bar)^2)*((1/(n+m))*(aL_matrix[,1]/n)+((n+m-1)/(n+m))*(aL_matrix[,1]*(aL_matrix[,1]-1)/(n*(n-1)))) )
-    return(EPD)
+    out <- sapply(1:length(Q), function(i){
+      if( Q[i] == 0 | Q[i] == 1 ) {
+        obs[i]+(asy[i]-obs[i])*(1-(1-beta[i])^m)
+      }else if( Q[i] == 2 ){
+        1/sum( (aL_matrix[,2]/(t_bar)^2)*((1/(n+m))*(aL_matrix[,1]/n)+((n+m-1)/(n+m))*(aL_matrix[,1]*(aL_matrix[,1]-1)/(n*(n-1)))) )
+      }
+    })
+    # if( Q == 0 | Q == 1 ) EPD = obs+(asy-obs)*(1-(1-beta)^m)
+    # if( Q == 2 ) EPD = 1/sum( (aL_matrix[,2]/(t_bar)^2)*((1/(n+m))*(aL_matrix[,1]/n)+((n+m-1)/(n+m))*(aL_matrix[,1]*(aL_matrix[,1]-1)/(n*(n-1)))) )
+    return(out)
   }
   Sub = function(m){
     if(m<n){

@@ -4,8 +4,8 @@
 \alias{inextPD_yhc}
 \title{Interpolation and extrapolation of phylogenetic diversity}
 \usage{
-inextPD_yhc(data, tree, datatype = "abundance", t, q = 0,
-  endpoint = NULL, knots = 40, size = NULL, plot.type = 1,
+inextPD_yhc(data, tree, datatype = "abundance", t, q = c(0, 1, 2),
+  endpoint = NULL, knots = 40, size = NULL, plot.type = 1:3,
   conf = 0.95, nboot = 50, reftime = NULL)
 }
 \arguments{
@@ -55,11 +55,16 @@ a list of four objects: \cr\cr
 }
 \examples{
 \donttest{
-# Type (1) abundance data
+Type (1) abundance data
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
 out <- inextPD_yhc(data = data, tree = tree,datatype = "abundance",q = 0, plot.type = 1:3)
+Type (2) incidence data
+data(data.inc)
+data <- data.inc$data
+tree <- data.inc$tree
+t_ <- data.inc$t
 }
 }
 \references{
