@@ -4,7 +4,7 @@
 \alias{PhdAsy_yhc}
 \title{Asymptotic phylogenetic diversity profile for each community}
 \usage{
-PhdAsy_yhc(data, tree, datatype = "abundance", t, q = seq(0, 2, by =
+PhdAsy_yhc(data, tree, datatype = "abundance", t_, q = seq(0, 2, by =
   0.25), conf = 0.95, nboot = 50, reftime = NULL)
 }
 \arguments{
@@ -16,7 +16,7 @@ See \code{\link{inextPD_yhc}} for data details.}
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is "abundance". \cr}
 
-\item{t}{a vector of nonnegative integers specifying the sampling units in each community.
+\item{t_}{a vector of nonnegative integers specifying the sampling units in each community.
 Ignored if \code{datatype = "abundance"}.}
 
 \item{q}{a nonnegative vector specifying the diversity order of Hill numbers. For phylogenetic diversity profiles,
@@ -46,6 +46,12 @@ data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
 out <- PhdAsy_yhc(data = data, tree = tree, q = seq(0, 2, by = 0.25))
+# Type (2) incidence data
+data(data.inc)
+data <- data.inc$data
+tree <- data.inc$tree
+t_ <- data.inc$t
+out <- PhdAsy_yhc(data = data, tree = tree,datatype = "incidence_raw", t_ = t_, q = seq(0, 2, by = 0.25))
 }
 }
 \references{

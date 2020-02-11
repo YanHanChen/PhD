@@ -4,9 +4,9 @@
 \alias{PhdObs_yhc}
 \title{Observed q profile and time profile of phylogenetic diversity or phylogenetic Hill numbers for each community}
 \usage{
-PhdObs_yhc(data, tree, datatype = "abundance", t, type = "PD",
+PhdObs_yhc(data, tree, datatype = "abundance", t_, type = "PD",
   profile = "q", q = seq(0, 2, by = 0.25), tprofile_times = NULL,
-  nboot = 50, conf = 0.95, knots = NULL, reftime = NULL)
+  nboot = 50, conf = 0.95, knots = 0, reftime = NULL)
 }
 \arguments{
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr
@@ -17,7 +17,8 @@ See \code{\link{inextPD_yhc}} for data details.}
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is "abundance". \cr}
 
-\item{t}{a vector of nonnegative integers specifying the sampling units in each community.
+\item{t_}{a named vector of nonnegative integers specifying the sampling units in each community. If the names are absent, each community will be
+automatically assigned siteX as community names.
 Ignored if \code{datatype = "abundance"}.}
 
 \item{type}{two types for calculating phylogenetic profiles in Chiu, C.-H., Jost, L. and Chao(2014): Phylogenetic Diversity(\code{type = "PD"}) and
@@ -35,7 +36,7 @@ the computation of s.e. and confidence intervals will be skipped, default is 50.
 
 \item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
 
-\item{knots}{an integer specifying the number of points of \code{time} used to calculate AUC (Area Under Curve). Use NULL or 0 to skip calculation, default is NULL.\cr}
+\item{knots}{an integer specifying the number of points of \code{time} used to calculate AUC (Area Under Curve). Use 0 to skip calculation, default is 0\cr}
 
 \item{reftime}{a positive number specifying the reference time.}
 }
@@ -63,6 +64,12 @@ data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
 out <- PhdObs_yhc(data = data, tree = tree, datatype = "abundance", type = "PD", profile = "q", q = seq(0, 2, by = 0.25))
+# Type (2) incidence data
+data(data.inc)
+data <- data.inc$data
+tree <- data.inc$tree
+t_ <- data.inc$t
+out <- PhdObs_yhc(data = data, tree = tree, datatype = "incidence_raw", type = "PD", profile = "q", q = seq(0, 2, by = 0.25))
 }
 }
 \references{
