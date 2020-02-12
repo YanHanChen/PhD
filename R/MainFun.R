@@ -92,7 +92,7 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
     mydata = lapply(dat, function(X) X[pool.name, ])
     tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
     mytree <- drop.tip(tree,tip)
-    H_max <- get.rooted.tree.height(mytree)$treeH
+    H_max <- get.rooted.tree.height(mytree)
   }
   if (datatype=="abundance") {
     pool.name = unique(unlist(lapply(dat, function(x) names(x)[x>0] )))
@@ -243,7 +243,7 @@ PhdAsy_yhc <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by 
   }
   tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
   mytree <- drop.tip(tree,tip)
-  H_max <- get.rooted.tree.height(mytree)$treeH
+  H_max <- get.rooted.tree.height(mytree)
   if(is.null(reftime)) {reft <- H_max
   }else if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
   }else {reft <- reftime}
@@ -363,7 +363,7 @@ PhdObs_yhc <- function(data, tree, datatype = "abundance", t_, type = "PD", prof
   }
   tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
   mytree <- drop.tip(tree,tip)
-  H_max <- get.rooted.tree.height(mytree)$treeH
+  H_max <- get.rooted.tree.height(mytree)
   if(is.null(reftime)) {reft <- H_max
   }else if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
   }else {reft <- reftime}
