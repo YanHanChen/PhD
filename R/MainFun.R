@@ -403,3 +403,7 @@ PhdObs_yhc <- function(data, tree, datatype = "abundance", t_, type = "PD", prof
   temp <- tryCatch(FUN(e), error = function(e){return()})
   return(temp)
 }
+
+#' @useDynLib PhDyhc
+#' @importFrom Rcpp sourceCpp
+NULL
