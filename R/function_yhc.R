@@ -199,7 +199,7 @@ Phdttable_yhc <- function(datalist, phylotr, times, cal, datatype, nboot, conf){
     H_max <- get.rooted.tree.height(phylotr)
     da <- do.call(cbind, datalist) %>% rowSums()
   }
-  if(abs(H_max - reft)<=1e-4) H_max <- reft
+  # if(abs(H_max - reft)<=1e-4) H_max <- reft
   # Note 200204: currently, to compute Q, we treat incidence data as abundance and absolutely pool
   aL <- phyBranchAL_Abu(phylo = phylotr,data = da,"abundance",refT = H_max)$treeNabu %>%
     select(branch.abun,branch.length,tgroup)

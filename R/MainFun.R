@@ -211,7 +211,7 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
 PhdAsy_yhc <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.25), conf = 0.95, nboot = 50, reftime = NULL){
   dat = list()
   if(is.null(rownames(data))) stop("The rownames (species names) of data can't be empty. Species names in data must match those in the phylogenetic tree")
-  pool.name <- rownames(data[rowSums(data)>0,])
+  pool.name <- rownames(data[rowSums(data)>0,,drop=FALSE])
   if (length(q) == 1) stop("length of q should be greater than one", call. = FALSE)
   if (sum(q<0)>=1) stop("q must be a positive number", call. = FALSE)
   if ((datatype != "incidence_raw") & (datatype != "abundance")) stop("invalid datatype", call. = FALSE)
@@ -400,7 +400,8 @@ PhdObs_yhc <- function(data, tree, datatype = "abundance", t_, type = "PD", prof
       return(ans)
     }
   }
-  temp <- tryCatch(FUN(e), error = function(e){return()})
+  temp <- FUN(3)
+  #temp <- tryCatch(FUN(e), error = function(e){return()})
   return(temp)
 }
 
