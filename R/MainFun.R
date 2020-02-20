@@ -68,7 +68,7 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
   if ((nboot < 0) | (is.numeric(nboot)==F)) stop('nboot must be a nonnegative integer, We use "nboot" = 50 to calculate!', call. = FALSE)
 
   dat = list()
-  name <- rownames(data)
+  name <- rownames(data[rowSums(data)>0,,drop=FALSE])
   if(datatype=="incidence_raw"){
     if(ncol(data) != sum(t_)) stop("Number of columns does not euqal to the sum of key in sampling units", call. = FALSE)
     n <- 0
@@ -334,7 +334,7 @@ PhdObs_yhc <- function(data, tree, datatype = "abundance", t_, type = "PD", prof
     }
   }
   if(is.null(rownames(data))) stop("The rownames (species names) of data can't be empty. Species names in data must match those in the phylogenetic tree")
-  pool.name <- rownames(data[rowSums(data)>0,])
+  pool.name <- rownames(data[rowSums(data)>0,,drop=FALSE])
   #if(is.null(tprofile_times)){ tprofile_times <- "unspecified" }
   if(datatype=="incidence_raw"){
     if(ncol(data) != sum(t_)) stop("Number of columns does not euqal to the sum of key(t_) in sampling units", call. = FALSE)
@@ -400,8 +400,8 @@ PhdObs_yhc <- function(data, tree, datatype = "abundance", t_, type = "PD", prof
       return(ans)
     }
   }
-  temp <- FUN(3)
-  #temp <- tryCatch(FUN(e), error = function(e){return()})
+  #temp <- FUN(3)
+  temp <- tryCatch(FUN(e), error = function(e){return()})
   return(temp)
 }
 
