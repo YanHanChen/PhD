@@ -689,7 +689,7 @@ Boots.one_yhc = function(phylo, aL, datatype, nboot,reft, BLs, splunits = NULL){
     c <- ifelse(f2>0, 1 - (f1/n)*((n-1)*f1/((n-1)*f1+2*f2)),
                 1 - (f1/n)*((n-1)*(f1-1)/((n-1)*(f1-1)+2)))
     lambda <- (1-c) / sum((data/n)*(1- (data/n) )^n)
-    ####Notice that the species order of data is different from that of aL####
+
     p_hat <- (data/n) * (1-lambda*(1- (data/n) )^n)
     p_hat0 <- rep( (1-c) / f0 , f0 );names(p_hat0) <- paste0("notob",1:length(p_hat0))
     g1 <- aL$branch.length[aL$branch.abun==1] %>% sum
@@ -707,23 +707,29 @@ Boots.one_yhc = function(phylo, aL, datatype, nboot,reft, BLs, splunits = NULL){
   }else if(datatype=='incidence_raw'){
     n <- splunits
     data <- unlist(aL$branch.abun[aL$tgroup=="Tip"])
+    names(data) <- rownames(BLs)[1:length(data)]
     u <- sum(data)
-    f1 <- sum(data==1)
-    f2 <- sum(data==2)
+    f1 <- sum(aL$branch.abun==1)
+    f2 <- sum(aL$branch.abun==2)
     f0 <- ceiling( ifelse( f2>0 , ((n-1) / n) * (((f1)^2) / (2*f2) ), ((n-1) / n) * (f1)*(f1-1) / 2 ) )
     c <- ifelse(f2>0, 1 - (f1/u)*((n-1)*f1/((n-1)*f1+2*f2)),
                 1 - (f1/u)*((n-1)*(f1-1)/((n-1)*(f1-1)+2)))
     lambda <- u/n*(1-c) / sum((data/n)*(1- (data/n) )^n)
+    p_hat <- (data/n) * (1-lambda*(1- (data/n) )^n)
     p_hat0 <- rep( (u/n) * (1-c) / f0 , f0 );names(p_hat0) <- paste0("notob",1:length(p_hat0))
     g1 <- aL$branch.length[aL$branch.abun==1] %>% sum
     g2 <- aL$branch.length[aL$branch.abun==2] %>% sum
     g0_hat <- ifelse( g2>((g1*f2)/(2*f1)) , ((n-1)/n)*(g1^2/(2*g2)) , ((n-1)/n)*(g1*(f1-1)/(2*(f2+1))) )
-    data_iB <- unlist(aL$branch.abun)
-    pL_b <- (data_iB/n) * (1-lambda*(1- (data_iB/n) )^n)
+    pL_b <- phy_BranchAL_IncBootP(phylo = phylo, pdata = p_hat, refT = reft[1])
+    pL_b <- pL_b$treeNincBP
+    pL_b[length(p_hat)+1,"branch.incBP"] <- 1
+    #pL_b$treeNincBP$branch.length <- pL_b$BLbyT[,1] # delete for now since length is a list instead of a matrix.
+    #data_iB <- unlist(aL$branch.abun)
+    #pL_b <- (data_iB/n) * (1-lambda*(1- (data_iB/n) )^n)
     Li <- BLs %>% as.matrix()
     Li <- rbind(Li[1:length(data),,drop=F],matrix(g0_hat/f0,nrow = f0,ncol = ncol(Li)),
                 Li[-(1:length(data)),,drop=F])
-    p_hat <- c(pL_b[1:length(data)],p_hat0,pL_b[-(1:length(data))])
+    p_hat <- c(p_hat,p_hat0,unlist(pL_b[-(1:length(data)),"branch.incBP"]))
     boot_data <- sapply(p_hat,function(p) rbinom(n = nboot,size = n,prob = p)) %>% t()
   }
   return(list(boot_data=boot_data,Li = Li, f0 = f0))
