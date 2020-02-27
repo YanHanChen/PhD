@@ -2,22 +2,22 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 Dq0 <- function(n, f1, f2, g1, g2, A) {
-    .Call('_PhDyhc_Dq0', PACKAGE = 'PhDyhc', n, f1, f2, g1, g2, A)
+    .Call('_PhD_Dq0', PACKAGE = 'PhD', n, f1, f2, g1, g2, A)
 }
 
 Dq1_1 <- function(n, g1, A) {
-    .Call('_PhDyhc_Dq1_1', PACKAGE = 'PhDyhc', n, g1, A)
+    .Call('_PhD_Dq1_1', PACKAGE = 'PhD', n, g1, A)
 }
 
 Dq2 <- function(tmpaL, n, t_bar) {
-    .Call('_PhDyhc_Dq2', PACKAGE = 'PhDyhc', tmpaL, n, t_bar)
+    .Call('_PhD_Dq2', PACKAGE = 'PhD', tmpaL, n, t_bar)
 }
 
 delta <- function(del_tmpaL, k, n) {
-    .Call('_PhDyhc_delta', PACKAGE = 'PhDyhc', del_tmpaL, k, n)
+    .Call('_PhD_delta', PACKAGE = 'PhD', del_tmpaL, k, n)
 }
 
 RPD <- function(x, n, m, q) {
-    .Call('_PhDyhc_RPD', PACKAGE = 'PhDyhc', x, n, m, q)
+    .Call('_PhD_RPD', PACKAGE = 'PhD', x, n, m, q)
 }
 

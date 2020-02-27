@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // Dq0
 double Dq0(double n, double f1, double f2, double g1, double g2, double A);
-RcppExport SEXP _PhDyhc_Dq0(SEXP nSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP g1SEXP, SEXP g2SEXP, SEXP ASEXP) {
+RcppExport SEXP _PhD_Dq0(SEXP nSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP g1SEXP, SEXP g2SEXP, SEXP ASEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -23,7 +23,7 @@ END_RCPP
 }
 // Dq1_1
 double Dq1_1(double n, double g1, double A);
-RcppExport SEXP _PhDyhc_Dq1_1(SEXP nSEXP, SEXP g1SEXP, SEXP ASEXP) {
+RcppExport SEXP _PhD_Dq1_1(SEXP nSEXP, SEXP g1SEXP, SEXP ASEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -36,7 +36,7 @@ END_RCPP
 }
 // Dq2
 double Dq2(NumericMatrix tmpaL, double n, double t_bar);
-RcppExport SEXP _PhDyhc_Dq2(SEXP tmpaLSEXP, SEXP nSEXP, SEXP t_barSEXP) {
+RcppExport SEXP _PhD_Dq2(SEXP tmpaLSEXP, SEXP nSEXP, SEXP t_barSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -49,7 +49,7 @@ END_RCPP
 }
 // delta
 double delta(NumericMatrix del_tmpaL, double k, double n);
-RcppExport SEXP _PhDyhc_delta(SEXP del_tmpaLSEXP, SEXP kSEXP, SEXP nSEXP) {
+RcppExport SEXP _PhD_delta(SEXP del_tmpaLSEXP, SEXP kSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -62,7 +62,7 @@ END_RCPP
 }
 // RPD
 NumericVector RPD(NumericMatrix x, int n, int m, NumericVector q);
-RcppExport SEXP _PhDyhc_RPD(SEXP xSEXP, SEXP nSEXP, SEXP mSEXP, SEXP qSEXP) {
+RcppExport SEXP _PhD_RPD(SEXP xSEXP, SEXP nSEXP, SEXP mSEXP, SEXP qSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -76,15 +76,15 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_PhDyhc_Dq0", (DL_FUNC) &_PhDyhc_Dq0, 6},
-    {"_PhDyhc_Dq1_1", (DL_FUNC) &_PhDyhc_Dq1_1, 3},
-    {"_PhDyhc_Dq2", (DL_FUNC) &_PhDyhc_Dq2, 3},
-    {"_PhDyhc_delta", (DL_FUNC) &_PhDyhc_delta, 3},
-    {"_PhDyhc_RPD", (DL_FUNC) &_PhDyhc_RPD, 4},
+    {"_PhD_Dq0", (DL_FUNC) &_PhD_Dq0, 6},
+    {"_PhD_Dq1_1", (DL_FUNC) &_PhD_Dq1_1, 3},
+    {"_PhD_Dq2", (DL_FUNC) &_PhD_Dq2, 3},
+    {"_PhD_delta", (DL_FUNC) &_PhD_delta, 3},
+    {"_PhD_RPD", (DL_FUNC) &_PhD_RPD, 4},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_PhDyhc(DllInfo *dll) {
+RcppExport void R_init_PhD(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

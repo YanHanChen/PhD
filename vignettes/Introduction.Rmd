@@ -1,0 +1,32 @@
+---
+title: "A Quick Introduction to PhD via Examples"
+output: rmarkdown::html_vignette
+date: "`r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{A Quick Introduction to PhD via Examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE, message = FALSE,
+  comment = "#>"
+)
+library(PhDyhc)
+library(ggplot2)
+data(data.abu)
+data(data.inc)
+```
+`PhD`(Phylogenetic Diversity) is a R package providing functions for rarefaction/extrapolation and asymptotic estimation of phylogenetic diversity.(+ also emprircal, phylogenetic Hill numbers) 3 main functions are provided:
+
+1. `inextPD`: the phylogenetic version of `iNEXT`, focusing on the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity for q = 0, 1 and 2. See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background and methods.
+
+2. `PhdAsy`: provides the estimated asymptotic phylogenetic q profile. 
+3. `PhdObs`: provides the empirical q and time profix
+
+
+```{r setup}
+library(PhD)
+```
