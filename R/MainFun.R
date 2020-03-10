@@ -1,6 +1,6 @@
 #' Interpolation and extrapolation of phylogenetic diversity
 #'
-#' \code{inextPD_yhc}: Interpolation and extrapolation of phylogenetic diversities based on a framework of Hill numbers with order q.
+#' \code{iNEXTPD}: Interpolation and extrapolation of phylogenetic diversities based on a framework of Hill numbers with order q.
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr Type (1) abundance data: When there are N assemblages, the
 #' observed species abundances should be arranged as a species (in rows) by assemblage (in columns) matrix. The first row
 #' (including N entries) lists the assemblage labels or site names for the N assemblages.\cr Type (2) incidence data:
@@ -34,7 +34,7 @@
 #' @importFrom phyclust get.rooted.tree.height
 #' @return a list of four objects: \cr\cr
 #' \code{$summary} summary of data. \cr\cr
-#' \code{$refernce.point} root of phylogeny tree for the species in the pooled assemblage. \cr\cr
+#' \code{$reference_time} root of phylogeny tree for the species in the pooled assemblage. \cr\cr
 #' \code{$inext} table of various estimates for interpolated or extrapolated samples and their confidence intervals. \cr\cr
 #' \code{$figure} showing chosen \code{plot.type} of sampling curves. \cr\cr
 #' @examples
@@ -43,19 +43,19 @@
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- inextPD_yhc(data = data, tree = tree,datatype = "abundance",q = c(0,1,2), plot.type = 1:3)
+#' out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2), plot.type = 1:3)
 #' # Type (2) incidence data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' t_ <- data.inc$t
-#' out <- inextPD_yhc(data = data, tree = tree,datatype = "incidence_raw",t_ = t_,q = c(0,1,2), plot.type = 1:3)
+#' out <- iNEXTPD(data = data, tree = tree,datatype = "incidence_raw",t_ = t_,q = c(0,1,2), plot.type = 1:3)
 #' }
 #' @references
 #' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609.\cr\cr
 #' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
 #' @export
-inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoint = NULL, knots = 40, size = NULL, plot.type = 1:3, conf = 0.95, nboot = 50,reftime=NULL) {
+iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoint = NULL, knots = 40, size = NULL, plot.type = 1:3, conf = 0.95, nboot = 50,reftime=NULL) {
   DATATYPE <- c("abundance", "incidence_raw")
   if(is.na(pmatch(datatype, DATATYPE)) == T)
     stop("invalid datatype", call. = FALSE)
@@ -66,9 +66,12 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
 
   if ((conf < 0) | (conf > 1) | (is.numeric(conf)==F)) stop('conf (confidence level) must be a numerical value between 0 and 1, We use "conf" = 0.95 to calculate!', call. = FALSE)
   if ((nboot < 0) | (is.numeric(nboot)==F)) stop('nboot must be a nonnegative integer, We use "nboot" = 50 to calculate!', call. = FALSE)
+  if(is.null(rownames(data) ))
+    stop("Row names of data must be the species names that match tip names in tree and thus can't be empty.", call. = FALSE)
 
   dat = list()
-  name <- rownames(data[rowSums(data)>0,,drop=FALSE])
+  data <- data[rowSums(data)>0,,drop=FALSE]
+  name <- rownames(data)
   if(datatype=="incidence_raw"){
     if(ncol(data) != sum(t_)) stop("Number of columns does not euqal to the sum of key in sampling units", call. = FALSE)
     n <- 0
@@ -95,7 +98,7 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
     H_max <- get.rooted.tree.height(mytree)
   }
   if (datatype=="abundance") {
-    pool.name = unique(unlist(lapply(dat, function(x) names(x)[x>0] )))
+    pool.name = unique(unlist(lapply(dat, function(x) names(x)[x>0] )))#200304 bugs coccurs when input contains rowsums==0.
     mydata = lapply(dat, function(X) X[pool.name])
     tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
     mytree <- drop.tip(tree,tip)
@@ -109,7 +112,7 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
   #atime <- Sys.time()
   if(class(mydata) == "list"){
     infos <- sapply(mydata, function(x){
-      datainf_yhc(data = x, datatype, phylotr = mytree,reft = reft)})
+      datainf(data = x, datatype, phylotr = mytree,reft = reft)})
   }else{
     return(NULL)
   }
@@ -127,7 +130,7 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
     if(class(mydata)=="list"){
       Q = as.numeric(q)
       if(is.null(endpoint) == T) endpoint = end
-      temp = iNEXTPD_yhc(datalist=mydata,phylotr=mytree,datatype,Q,nboot,conf,size,knots,endpoint,reft)
+      temp = inextPD(datalist=mydata,phylotr=mytree,datatype,Q,nboot,conf,size,knots,endpoint,reft)
       temp$qPD.LCL[temp$qPD.LCL<0] <- 0;temp$SC.LCL[temp$SC.LCL<0] <- 0
       temp$SC.UCL[temp$SC.UCL>1] <- 1
       return(temp)
@@ -144,7 +147,7 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
   TYPE <- 1:3
   FUN2 <- function(e){
     if(is.na(sum(pmatch(plot.type, TYPE))) == F){
-      temp2 <- lapply(plot.type, function(j) RE_plot_yhc(RE.table, datatype, j))
+      temp2 <- lapply(plot.type, function(j) RE_plot(RE.table, datatype, j))
       allname <- c("RE.plot.size", "RE.plot.C", "RE.plot.sizeC")
       names(temp2) <- allname[plot.type]
       temp2
@@ -156,8 +159,8 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
   RE.plot <- tryCatch(FUN2(e), error = function(e){return()})
   #btime <- Sys.time()
   #print(paste0('plot time:',btime-atime))
-  ans <- list(summary = infos,refernce_time = reft, inext = RE.table, figure = RE.plot)
-  #class(ans) <- c("inextPD")
+  ans <- list(summary = infos,reference_time = reft, inext = RE.table, figure = RE.plot)
+  #class(ans) <- c("iNEXTPD")
   ans
 
 }
@@ -166,7 +169,7 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
 #'
 #' \code{PhdAsy}: An estimated asymptotic phylogenetic diversity profile for each community based on a framework of Hill numbers with order q and statistical method proposed in Chao et al. (2015) and Hsieh and Chao (2017).\cr
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr
-#' See \code{\link{inextPD_yhc}} for data details.
+#' See \code{\link{iNEXTPD}} for data details.
 #' @param tree a phylogenetic tree of class phylo among the observed species in the pooled assemblage. \cr
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is "abundance". \cr
@@ -188,7 +191,7 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
 #' @importFrom phyclust get.rooted.tree.height
 #' @return  a list of four objects: \cr\cr
 #' \code{$summary} summary of data. \cr\cr
-#' \code{$refernce.point} root of the species in the pooled assemblage. \cr\cr
+#' \code{$reference_time} root of the species in the pooled assemblage. \cr\cr
 #' \code{$asy} a table showing all numerical values of diversity estimates and their s.e and confidence intervals. \cr\cr
 #' \code{$figure} phylogenetic diversity profiles. \cr\cr
 #' @examples
@@ -197,18 +200,18 @@ inextPD_yhc <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), en
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- PhdAsy_yhc(data = data, tree = tree, q = seq(0, 2, by = 0.25))
+#' out <- PhdAsy(data = data, tree = tree, q = seq(0, 2, by = 0.25))
 #' # Type (2) incidence data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' t_ <- data.inc$t
-#' out <- PhdAsy_yhc(data = data, tree = tree,datatype = "incidence_raw", t_ = t_, q = seq(0, 2, by = 0.25))
+#' out <- PhdAsy(data = data, tree = tree,datatype = "incidence_raw", t_ = t_, q = seq(0, 2, by = 0.25))
 #' }
 #' @references
 #' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
 #' @export
-PhdAsy_yhc <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.25), conf = 0.95, nboot = 50, reftime = NULL){
+PhdAsy <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.25), conf = 0.95, nboot = 50, reftime = NULL){
   dat = list()
   if(is.null(rownames(data))) stop("The rownames (species names) of data can't be empty. Species names in data must match those in the phylogenetic tree")
   pool.name <- rownames(data[rowSums(data)>0,,drop=FALSE])
@@ -248,9 +251,9 @@ PhdAsy_yhc <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by 
   }else if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
   }else {reft <- reftime}
 
-  FUN = function(a){
-    temp = AsyPD_yhc(datalist = mydata, datatype, phylotr = mytree, q, nboot, conf, reft)# mytree is pooled tree of class phylo
-    ans <- list(summary = temp[[2]], refernce.point = reft, asy = temp[[1]], figure = Asy_plot_yhc(temp[[1]], 1))
+  FUN = function(e){
+    temp = AsyPD(datalist = mydata, datatype, phylotr = mytree, q, nboot, conf, reft)# mytree is pooled tree of class phylo
+    ans <- list(summary = temp[[2]], reference_time = reft, asy = temp[[1]], figure = Asy_plot(temp[[1]], 1))
     #class(ans) <- c("PhdAsy")
     return(ans)
   }
@@ -263,7 +266,7 @@ PhdAsy_yhc <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by 
 #'
 #' \code{PhdObs}: Observed phylogenetic diversity or phylogenetic Hill numbers profile for each community based on a framework of Hill numbers with order q and reference time.\cr
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr
-#' See \code{\link{inextPD_yhc}} for data details.
+#' See \code{\link{iNEXTPD}} for data details.
 #' @param tree a phylogenetic tree in the Newick format among the observed species in the pooled assemblage. \cr
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is "abundance". \cr
@@ -271,16 +274,16 @@ PhdAsy_yhc <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by 
 #' automatically assigned siteX as community names.
 #' Ignored if \code{datatype = "abundance"}.
 #' @param type two types for calculating phylogenetic profiles in Chiu, C.-H., Jost, L. and Chao(2014): Phylogenetic Diversity(\code{type = "PD"}) and
-#' Phylogenetic Hill numbers(\code{type = "D"}).
-#' @param profile two kinds of profiles to show phylogenetic profiles based on chosen \code{type}: q profile(\code{profile = "q"}) and time profile(\code{profile = "time"}). \cr
+#' Phylogenetic Hill numbers(\code{type = "D"}). Default is \code{"PD"}.
+#' @param profile two kinds of profiles to show phylogenetic profiles based on chosen \code{type}: q profile(\code{profile = "q"}) and time profile(\code{profile = "time"}). Default is \code{"q"} \cr
 #' @param q a nonnegative vector specifying the diversity order of Hill numbers. For phylogenetic diversity profiles,
 #' \code{q} need to be a vector of length more than one, default is seq(0, 2, by = 0.25) \cr
-#' @param tprofile_times a nonnegative vector specifying the reference time points for which phylogenetic profiles will be computed.\cr
+#' @param tprofile_times a nonnegative vector specifying the reference time points for which phylogenetic profiles will be computed. If \code{NULL}, will be automatically chosen from 0.01 to \code{tree} depth.\cr
 #' @param nboot an integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case,
 #' the computation of s.e. and confidence intervals will be skipped, default is 50.
 #' @param knots an integer specifying the number of points of \code{time} used to calculate AUC (Area Under Curve). Use 0 to skip calculation, default is 0\cr
 #' @param conf a positive number < 1 specifying the level of confidence interval, default is 0.95.
-#' @param reftime a positive number specifying the reference time.
+#' @param reftime a positive number specifying the reference time. If \code{NULL}, will be defaulted to the \code{tree} depth.
 #' @import chaoUtility
 #' @import ggplot2
 #' @import dplyr
@@ -307,18 +310,18 @@ PhdAsy_yhc <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by 
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- PhdObs_yhc(data = data, tree = tree, datatype = "abundance", type = "PD", profile = "q", q = seq(0, 2, by = 0.25))
+#' out <- PhdObs(data = data, tree = tree, datatype = "abundance", type = "PD", profile = "q", q = seq(0, 2, by = 0.25))
 #' # Type (2) incidence data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' t_ <- data.inc$t
-#' out <- PhdObs_yhc(data = data, tree = tree, datatype = "incidence_raw", type = "PD", profile = "q", q = seq(0, 2, by = 0.25))
+#' out <- PhdObs(data = data, tree = tree, datatype = "incidence_raw", type = "PD", profile = "q", q = seq(0, 2, by = 0.25))
 #' }
 #' @references
 #' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
 #' @export
-PhdObs_yhc <- function(data, tree, datatype = "abundance", t_, type = "PD", profile = "q", q = seq(0, 2, by = 0.25), tprofile_times = NULL,
+PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile = "q", q = seq(0, 2, by = 0.25), tprofile_times = NULL,
                        nboot = 50,conf = 0.95,knots = 0,reftime = NULL){
   dat = list()
   if (length(q) == 1) stop("length of q should be greater than one", call. = FALSE)
@@ -372,14 +375,14 @@ PhdObs_yhc <- function(data, tree, datatype = "abundance", t_, type = "PD", prof
     ###########data information
     if(class(mydata) == "list"){
       infos <- sapply(mydata, function(x){
-        datainf_yhc(data = x, datatype, phylotr = mytree,reft = reft)})
+        datainf(data = x, datatype, phylotr = mytree,reft = reft)})
     }else{
       return(NULL)
     }
     ###########profiles
     if(profile == "q") {
-      temp <- Phdqtable_yhc(datalist = mydata, phylotr = mytree, q, cal = type, datatype, nboot, conf, reft)
-      ans <- list(summary = infos, forq_table = temp, forq_figure = Plotq_yhc(temp, type))
+      temp <- Phdqtable(datalist = mydata, phylotr = mytree, q, cal = type, datatype, nboot, conf, reft)
+      ans <- list(summary = infos, forq_table = temp, forq_figure = Plotq(temp, type))
       class(ans) <- c("PhdObs")
       return(ans)
     }
@@ -389,12 +392,12 @@ PhdObs_yhc <- function(data, tree, datatype = "abundance", t_, type = "PD", prof
       } else {
         tprofile_times <- c(tprofile_times, 0.01, H_max) %>% unique() %>% sort
       }
-      temp <- Phdttable_yhc(datalist = mydata, phylotr = mytree, times = tprofile_times,cal = type, datatype, nboot, conf)
+      temp <- Phdttable(datalist = mydata, phylotr = mytree, times = tprofile_times,cal = type, datatype, nboot, conf)
       if (knots==0) {
-        ans <- list(summary = infos, fortime_table = temp[[1]], fortime_figure = Plott_yhc(temp[[1]], type, temp[[2]]))
+        ans <- list(summary = infos, fortime_table = temp[[1]], fortime_figure = Plott(temp[[1]], type, temp[[2]]))
       } else {
-        AUC <- AUC_one_table_yhc(datalist = mydata,phylotr = mytree,knot = knots,cal = type,datatype = datatype,nboot, conf,reft_max = max(tprofile_times))
-        ans <- list(summary = infos, fortime_table = temp[[1]], fortime_figure = Plott_yhc(temp[[1]], type, temp[[2]]), AUC_table = AUC)
+        AUC <- AUC_one_table(datalist = mydata,phylotr = mytree,knot = knots,cal = type,datatype = datatype,nboot, conf,reft_max = max(tprofile_times))
+        ans <- list(summary = infos, fortime_table = temp[[1]], fortime_figure = Plott(temp[[1]], type, temp[[2]]), AUC_table = AUC)
       }
       #class(ans) <- c("PhdObs")
       return(ans)
@@ -405,6 +408,6 @@ PhdObs_yhc <- function(data, tree, datatype = "abundance", t_, type = "PD", prof
   return(temp)
 }
 
-#' @useDynLib PhDyhc
+#' @useDynLib PhD
 #' @importFrom Rcpp sourceCpp
 NULL

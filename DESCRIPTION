@@ -1,7 +1,7 @@
 Package: PhD
 Type: Package
 Title: Phylogenetic Diversity
-Version: 0.3.4
+Version: 0.3.7
 Author: Anne Chao and Chun-Huo Chiu
 Maintainer: Anne Chao <chao@stat.nthu.edu.tw>
 Description: Provides simple functions to compute and plot two
@@ -11,7 +11,8 @@ Description: Provides simple functions to compute and plot two
 License: GPL (>= 3)
 Suggests: knitr,
     rmarkdown,
-    ggpubr
+    ggpubr,
+    ade4
 Imports: 
     Rcpp,
     dplyr,

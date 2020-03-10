@@ -1,5 +1,6 @@
 ---
 title: "A Quick Introduction to PhD via Examples"
+author: "Anne Chao and Chun-Huo Chiu"
 output: rmarkdown::html_vignette
 date: "`r Sys.Date()`"
 vignette: >
@@ -8,25 +9,711 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r, include = FALSE, warning=FALSE,}
 knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE, message = FALSE,
-  comment = "#>"
+  comment = ""
 )
-library(PhDyhc)
+library(PhD)
 library(ggplot2)
+#library(kableExtra)
+library(knitr)
 data(data.abu)
 data(data.inc)
 ```
-`PhD`(Phylogenetic Diversity) is a R package providing functions for rarefaction/extrapolation and asymptotic estimation of phylogenetic diversity.(+ also emprircal, phylogenetic Hill numbers) 3 main functions are provided:
+`PhD` (**Ph**ylogenetic **D**iversity) is a R package providing the rarefaction/extrapolation and asymptotic estimation to achieve fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages (Hsieh and Chao, Systematic Biology, 2017). In this document, we provide a quick introduction demonstrating how to run `PhD`. The Detailed information about `PhD` functions is described in the PhD Manual, also available in [CRAN](https://cran.r-project.org/package=PhD). An online version of `PhDOnline` (<https://chao.shinyapps.io/PhDOnline/>) is developed for users without R background. The theoretical derivation of phylogenetic diversity measurements was proposed in Chao, A., Chiu C.-H. and Jost, L. (2010). `PhD` is an extension for [`iNextPD`](https://cran.r-project.org/package=iNextPD), which computes diversity estimates and its `conf` confidence intervals for the two types of rarefaction and extrapolation (R/E) based on two different sampling data sets, individual-based abundance data and quadrat-based incidence data.
 
-1. `inextPD`: the phylogenetic version of `iNEXT`, focusing on the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity for q = 0, 1 and 2. See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background and methods.
+Besides `iNEXTPD`, there are two main functions in the `PhD`, including `PhdAsy` and `PhdObs`.
 
-2. `PhdAsy`: provides the estimated asymptotic phylogenetic q profile. 
-3. `PhdObs`: provides the empirical q and time profix
+1. `iNEXTPD`: the phylogenetic extension of `iNEXT`, focusing on the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity(PD) for q = 0, 1 and 2. See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background and methods.
 
+2. `PhdAsy`: estimates asymptotic diversity profile with respect to order `q` <font size="1">$\ge$</font> 0 to infer true phylogenetic diversity(PD) profile at fixed reference time (tree depth by default). It is based on statistical estimation of the unknown true phylogenetic diversity; see Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.
 
-```{r setup}
+3. `PhdObs`: computes observed q profile and reference time profile of phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
+
+<br><font size="5">**SOFTWARE NEEDED TO RUN PhD IN R:**</font>
+--------------------------------------
+
+- Required: [R](https://cran.r-project.org/)
+- Suggested: [RStudio IDE](https://www.rstudio.com/products/RStudio/#Desktop)
+
+<br><font size="5">**HOW TO RUN PhD:**</font>
+-------------------
+
+The `PhD` package is available on [CRAN](https://cran.r-project.org/package=PhD) and can be downloaded with a standard R installation procedure using the following commands. Before installation, the additional visualization and computation extension packages (`chaoUtility`,`ape`, `dplyr`, `ggplot2`, `phyclust`, `Rcpp`) must be loaded. Please not that currently, package `chaoUtility` can only be available on github instead of CRAN and thus the installation procedure slightly differs from the one of standard R installation.
+
+```{r eval=FALSE}
+## install chaoUtility package from github
+install.packages('devtools')
+library(devtools)
+install_github('chaolab2019/chaoUtility')
+
+## install PhD package from CRAN
+install.packages("PhD")
+
+## Or instead, install the latest version from github
+install_github('AnneChao/PhD')
+
+## import packages
 library(PhD)
 ```
+<br><font size="5"><b>DATA FORMAT/INFORMATION</b></font> 
+-------------------
+In PhD package, all three main functions share the same required format of `data`. Two types data are supported.
+
+1. Individual‐based abundance data(`datatype="abundance"`): a S by N matrix/data.frame where N is the number of assemblages. The element in i-th row and k-th is the abundance of species i in assemblage k. Please note that the rownames of `data` must be the species names matching the species names in phylogeny tree and thus can't be empty. Users can use the following command to see an example data containing three assemblages.
+```{r eval=FALSE}
+# include abundance data along with its phylogeny tree
+data(data.abu)
+data.abu$data
+```
+
+2. Sampling‐unit‐based incidence raw data(`datatype="incidence_raw"`): the sampling unit is quadrat or transect, the observed species was only recorded as presence(detection)/absence(non-detection) data in each sampling unit. For single assemblage consisting of `t_` sampling units, `data` is a S by `t_` incidence matrix, where S is the number of species. When there are N assemblages, users must first merge N data matrices by species identity to obtain a large incidence matrix, where the rows of the matrix refer to all species presented in the pooled data. Likewise, the rownames of `data` must be the species names matching the species names in phylogeny tree and thus can't be empty. Users can use the following command to see an example data containing two assemblages.
+```{r eval=FALSE}
+# include incidence raw data along with its phylogeny tree
+data(data.inc)
+# an incidence matrix of 29 columns, where:
+# the first assemblage consists of the first 12 columns (sampling units) and
+# the second assemblage consists of the left 17 columns (sampling units).
+data.inc$data
+# the number of sampling units for two assemblages are 12 and 17, respectively.
+data.inc$t
+```
+
+<br><font size="5"><b>MAIN FUNCTIONS:</b></font>
+-------------------
+
+We describe the three main functions with default arguments below :
+
+1. <u><font size="3">**iNEXTPD()**</u></font>:
+
+```{r, eval=FALSE}
+iNEXTPD(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoint = NULL, knots = 40, 
+        size = NULL, plot.type = c(1,2,3), conf = 0.95, nboot = 50, reftime = NULL)
+```
+The arguments of this function are described below.
+
+<table style="width:100%;">
+<colgroup>
+<col width="20%">
+<col width="80%">
+</colgroup>
+<thead>
+<tr>
+<th align="center">Argument</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>data</code></td>
+<td align="left"> a `matrix`/`data.frame` of species abundances or incidence data. See the <b>DATA FORMAT/INFORMATION</b> section above for detailed required format.</td>
+</tr>
+<tr>
+<td align="center"><code>tree</code></td>
+<td align="left"> a `phylo` object describing the Newick phylogeny tree for all observed species in the pooled assemblage.</td>
+</tr>
+<tr>
+<td align="center"><code>datatype</code></td>
+<td align="left"> the data type of input data: individual-based abundance data (`datatype = "abundance"`), or sampling-unit-based incidence matrix (`datatype = "incidence_raw"`). Default is `abundance`.</td>
+</tr>
+<tr>
+<td align="center"><code>t_</code></td>
+<td align="left"> Needed only when `datatype = "incidence_raw"`, a sequence of nonnegative integers specifying the sampling units in each community. Ignored if `datatype = "abundance"`.</td>
+</tr>
+<tr>
+<td align="center"><code>q</code></td>
+<td align="left"> a sequence of nonnegative integers specifying the diversity order of PD, there are three measures: Faith's PD (`q = 0`), a simple transformation of phylogenetic entropy (`q = 1`) and a simple transformation of Rao's quadratic entropy (`q = 2`). Default is `c(0,1,2)`.</td>
+</tr>
+<tr>
+<td align="center"><code>endpoints</code></td>
+<td align="left"> a positive interger specifying the sample size that is the endpoint for R/E calculatione. If `NULL`, `endpoint` = double of the reference sample sizes. Will be ignored if `size` is given. Default is `NULL`.</td>
+</tr>
+<tr>
+<td align="center"><code>knots</code></td>
+<td align="left"> a positive integer specifying the number of knots between 1 and the `endpoint`. Default is 40.</td>
+</tr>
+<tr>
+<td align="center"><code>size</code></td>
+<td align="left"> a sequence of positive integers specifying the sample sizes for which PD estimates will be calculated. If `NULL`, then PD estimates will be calculated for those sample sizes determined by the specified/default `endpoint` and `knots`.</td>
+</tr>
+<tr>
+<td align="center"><code>plot.type</code></td>
+<td align="left"> a positive integer vector specifying types of curves. Three types of plots: sample-size-based rarefaction and extrapolation curve (`plot.type = 1`); coverage-based rarefaction and extrapolation curve (`plot.type = 2`); sample completeness curve (`plot.type = 3`). Default is `c(1,2,3)`.</td>
+</tr>
+<tr>
+<td align="center"><code>conf</code></td>
+<td align="left"> a positive number < 1 specifying the level of confidence interval. Default is 0.95.</td>
+</tr>
+<tr>
+<td align="center"><code>nboot</code></td>
+<td align="left"> a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case, the computation of standard errors and confidence intervals will be skipped. Default is 50.</td>
+</tr>
+<tr>
+<td align="center"><code>reftime</code></td>
+<td align="left"> a positive value specifying the reference time for `tree`. If `NULL`, `reftime` = the tree depth of pooled assemblage. Default is `NULL`.</td>
+</tr>
+
+</tbody>
+</table>
+
+<br>
+
+The sequence of sample sizes for which PD R/E curve will be estimated is determined by `endpoint`, `knots` and `size`.
+If `size` is specified by users, then PD will be estimated for these sizes plus the reference sample size(total species abundances for abundance data; total sampling units for incidence data). 
+If `knots=K`, then the sequece would be K/2 evenly‐spaced knots (sample sizes) before reference sample size and K/2 from reference sample size to `endpoint`, where the `endpoint` is default to double reference sample size. By default, `knots=40`.
+If `endpoint` specified by users is smaller than the reference sample size, `iNEXTPD` only computes rarefaction estimates for approximately `knots` evenly spaced knots before the `endpoint`.
+
+
+2. <u><font size="3">**PhdAsy()**</u></font>:
+
+```{r, eval=FALSE}
+PhdAsy(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.25), conf = 0.95, 
+       nboot = 50, reftime = NULL)
+```
+
+The arguments of this function are described below.
+
+<table style="width:100%;">
+<colgroup>
+<col width="20%">
+<col width="80%">
+</colgroup>
+<thead>
+<tr>
+<th align="center">Argument</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>data</code></td>
+<td align="left"> a `matrix`/`data.frame` of species abundances or incidence data. See the description of function `iNEXTPD` for more details.</td>
+</tr>
+<tr>
+<td align="center"><code>tree</code></td>
+<td align="left"> a `phylo` object describing the Newick phylogeny tree for all observed species in the pooled assemblage.</td>
+</tr>
+<tr>
+<td align="center"><code>datatype</code></td>
+<td align="left"> the data type of input data: individual-based abundance data (`datatype = "abundance"`), or sampling-unit-based incidence matrix (`datatype = "incidence_raw"`). Default is `abundance`.</td>
+</tr>
+<tr>
+<td align="center"><code>t_</code></td>
+<td align="left"> Needed only when `datatype = "incidence_raw"`, a sequence of nonnegative integers specifying the sampling units in each community. Ignored if `datatype = "abundance"`.</td>
+</tr>
+<tr>
+<td align="center"><code>q</code></td>
+<td align="left"> a nonnegative sequence specifying the diversity orders of Hill numbers. Default is `seq(0, 2, by = 0.25)`.</td>
+</tr>
+<tr>
+<td align="center"><code>conf</code></td>
+<td align="left"> a positive number < 1 specifying the level of confidence interval. Default is 0.95.</td>
+</tr>
+<tr>
+<td align="center"><code>nboot</code></td>
+<td align="left"> a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case, the computation of standard errors and confidence intervals will be skipped. Default is 50.</td>
+</tr>
+<tr>
+<td align="center"><code>reftime</code></td>
+<td align="left"> a positive value specifying the reference time for `tree`. If `NULL`, `reftime` = the tree depth of pooled assemblage. Default is `NULL`.</td>
+</tr>
+
+</tbody>
+</table>
+
+<br>
+
+3. <u><font size="3">**PhdObs()**</u></font>:
+
+```{r, eval=FALSE}
+PhdObs(data, tree, datatype = "abundance", t_, type = "PD", profile = "q", 
+       q = seq(0, 2, by = 0.25), tprofile_times = NULL, nboot = 50, 
+       conf = 0.95, knots = 0, reftime = NULL)
+```
+
+The arguments of this function are described below.
+
+<table style="width:100%;">
+<colgroup>
+<col width="20%">
+<col width="80%">
+</colgroup>
+<thead>
+<tr>
+<th align="center">Argument</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>data</code></td>
+<td align="left"> a `matrix`/`data.frame` of species abundances or incidence data. See the description of function `iNEXTPD` for more details.</td>
+</tr>
+<tr>
+<td align="center"><code>tree</code></td>
+<td align="left"> a `phylo` object describing the Newick phylogeny tree for all observed species in the pooled assemblage.</td>
+</tr>
+<tr>
+<td align="center"><code>datatype</code></td>
+<td align="left">the data type of input data: individual-based abundance data (`datatype = "abundance"`), or sampling-unit-based incidence matrix (`datatype = "incidence_raw"`). Default is `abundance`.</td>
+</tr>
+<tr>
+<td align="center"><code>t_</code></td>
+<td align="left"> Needed only when `datatype = "incidence_raw"`, a sequence of nonnegative integers specifying the sampling units in each community. Ignored if `datatype = "abundance"`.</td>
+</tr>
+<tr>
+<td align="center"><code>type</code></td>
+<td align="left"> desired diversity type: `type = "PD"` for phylogenetic diversity and `type = "D"` for phylogenetic Hill numbers. See Chao et al. (2010) for details. Default is `"PD"`.</td>
+</tr>
+<tr>
+<td align="center"><code>profile</code></td>
+<td align="left"> desired profile type for chosen `type`, `profile = "q"` for order q profile and `profile = "time"` for reference time profile. Default is `"q"`.</td>
+</tr>
+<tr>
+<td align="center"><code>q</code></td>
+<td align="left"> a nonnegative sequence specifying the diversity orders for q profile if `profile == "q"`. Will be ignored if `profile = "time"`. Default is `seq(0, 2, by = 0.25)`. </td>
+</tr>
+<tr>
+<td align="center"><code>tprofile_times</code></td>
+<td align="left"> a nonnegative sequence specifying the reference time points for time profile if `profile = "time"`. Will be ignored if `profile = "q"`. If `NULL`, appropriate time pionts will be used based on the `tree` depth. Default is `NULL`.</td>
+</tr>
+<tr>
+<td align="center"><code>nboot</code></td>
+<td align="left"> a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case, the computation of standard errors and confidence intervals will be skipped. Default is 50.</td>
+</tr>
+<tr>
+<td align="center"><code>conf</code></td>
+<td align="left"> a positive number < 1 specifying the level of confidence interval. Default is 0.95.</td>
+</tr>
+<tr>
+<td align="center"><code>knots</code></td>
+<td align="left"> a positive integer specifying the number of reference time points used to calculate AUC (Area Under Curve) of time profile if `profile = "time"`. Larger `knots` would yield more pricise integration but will take more time in calculation. Enter 0 to skip calculation. Will be ignored if `profile = "q"`. Default is 0. </td>
+</tr>
+<tr>
+<td align="center"><code>reftime</code></td>
+<td align="left"> a positive value specifying the max reference time of q profile if `profile = "q"`. If `NULL`, `reftime` = the `tree` depth. Default is `NULL`.</td>
+</tr>
+
+
+</tbody>
+</table>
+
+<br>
+
+
+<br><font size="5"><b>PhD VIA EXAMPLES: Aundance data</b></font>
+-------------------
+
+Here, we use an abundance demo data as an illustrating example. If `datatype = "incidence_raw"`, slight modification of argument setting is needed; see the description of three main functions for detail. Some argument setting and output for incidence data also will be explained in later text.
+
+Plants phylogeny and survey dataset is included in `PhD` package (`data(data.abu)`). The phylogeny tree (<code>\$tree</code>) of 46 plant species in this data set is constructed by the website phylomatic (http://phylodiversity.net/phylomatic/). This data includes three types of dunes habitats: emboryo dunes (ED), mobile dunes (MD) and transtion dunes (TD), which contains 17, 39, 42 distinct plants respectively. 
+Throughout the illustration, we won't specify the argument `reftime` so that it is automatically fixed at 325, the tree depth of the pooled assemblage, by default.
+
+To demonstrate this data, the following commands display basic data visualization:
+
+```{r, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
+library(ade4)
+library(ape)
+library(dplyr)
+```
+
+```{r, fig.width=7, fig.height=7, fig.align="center"}
+data(data.abu)
+str(data.abu)
+table.phylog(data.abu$data, ade4::newick2phylog(ape::write.tree(data.abu$tree)), 
+             csize=4, f.phylog=0.7, clabel.row = .81)
+```
+
+We now apply three main functions to the abundance data to see the outputs:
+
+### 1. `iNEXTPD()`: 
+
+```{r,}
+dunes_iNEXT <- iNEXTPD(data = data.abu$data, tree = data.abu$tree, datatype = "abundance")
+```
+
+The `iNEXTPD()` function returns a list containing four objects: 
+
+* `$summary`: data information summary including reference sample size (`n`), number of observed species (`S.obs`), observed branch length (Faith's PD) (`PD.obs`), the first two species frequency counts (`f1*`, `f2*`) and their branch length sums, respectively (`g1`, `g2`).
+
+```{r,}
+dunes_iNEXT$summary
+```
+
+* `$reference_time`: the reference time for the caculation. If `reftime` is not specified by users or `NULL`, `$reference_time` is the tree depth of pooled assemblage by default.
+
+```{r,}
+# here reference_time is the tree depth of pooled assemblage, by default.
+dunes_iNEXT$reference_time
+```
+
+* `$inext`: a table of PD estimates and sample completeness for interpolated or extrapolated sample sizes along with their confidence intervals (if `nboot > 0`).
+
+```{r,}
+# only show first 10 estimate, call View(dunes_iNEXT$inext) to see full table.
+dunes_iNEXT$inext
+```
+
+* `$figure`: plots of the estimated curves based on `$inext` using `ggplot2` package. Different choice of `plot.type` will yied different types of plot:
+1. sample-size-based R/E curve (`plot.type = 1`): the curve of PD estimates with confidence intervals (if `nboot > 0`) as a function of sample size.
+2. coverage-based R/E curve (`plot.type = 2`): the curve of the PD estimates with confidence intervals (if `nboot > 0`) as a function of sample coverage.
+3. sample completeness curve (`plot.type = 3`): the curve of sample coverage with respect to sample size.
+Here, by default `plot.type = c(1,2,3)`, `$figure` would provide all three types of plots.
+
+```{r, eval= FALSE}
+# plot.type = 1
+dunes_iNEXT$figure$RE.plot.size
+```
+
+```{r,echo = FALSE ,fig.width=7, fig.height=7, fig.align="center"}
+dunes_iNEXT$figure$RE.plot.size + theme(text=element_text(size=14))
+```
+
+```{r, eval= FALSE}
+# plot.type = 2
+dunes_iNEXT$figure$RE.plot.C
+```
+
+```{r,echo = FALSE ,fig.width=7, fig.height=7, fig.align="center"}
+dunes_iNEXT$figure$RE.plot.C + theme(text=element_text(size=14))
+```
+
+```{r, eval= FALSE}
+# plot.type = 3
+dunes_iNEXT$figure$RE.plot.sizeC
+```
+
+```{r,echo = FALSE ,fig.width=7, fig.height=7, fig.align="center"}
+dunes_iNEXT$figure$RE.plot.sizeC + theme(text=element_text(size=14))
+```
+
+
+### 2. `PhdAsy()`
+
+```{r,}
+dunes_Asy <- PhdAsy(data = data.abu$data, tree = data.abu$tree)
+```
+
+The `PhdAsy()` function returns a list containing four objects: 
+
+* `$summary`: data information summary identical to the one provided by `iNEXTPD()`.
+
+```{r,}
+dunes_Asy$summary
+```
+
+* `$reference_time`: the reference time for the caculation. If `reftime` is not specified by users or `NULL`, `$reference_time` is the tree depth of pooled assemblage by default.
+
+```{r,}
+# here reference_time is the tree depth of pooled assemblage, by default.
+dunes_Asy$reference_time
+```
+
+* `$asy`: table of estimated asymptotic PD  q profile at fixed `reftime` along with their confidence intervals (if `nboot > 0`). It is based on statistical estimation of the unknown true phylogenetic diversity; see Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.
+
+```{r,}
+# only show estimate for q = 0, 1, 2, call View(dunes_Asy$asy) to see full table.
+dunes_Asy$asy %>% filter(Order %in% c(0,1,2))
+```
+
+* `$figure`: plot of the estimated q profile based on `$asy` using `ggplot2` package.
+
+```{r, eval= FALSE}
+dunes_Asy$figure
+```
+
+```{r,echo = FALSE, fig.width=7, fig.height=7, fig.align="center"}
+dunes_Asy$figure + theme(text=element_text(size=14))
+```
+
+### 3. `PhdObs()`
+
+For `PhdObs`, we demonstrate both observed order q profile and reference time profile of PD(`type = "PD"`). 
+
+First, observed order q profile(`profile = "q"`) of PD based on different reference time points:
+
+```{r,}
+dunes_Obs_q <- PhdObs(data = data.abu$data, tree = data.abu$tree, datatype = "abundance", 
+                    q = seq(0, 2, by = 0.25))
+```
+
+In the case `profile = "q"`, `PhdObs` returns a list containing three objects:
+
+* `$summary`: data information summary identical to the one provided by `iNEXTPD()`.
+
+```{r,}
+dunes_Obs_q$summary
+```
+
+* `forq_table`: table of observed PD q profile along with their confidence intervals (if `nboot > 0`) based on two reference time points: root and Rao's quadratic entropy (Q, see Chao et al. 2010 for details)
+
+```{r,}
+# only show estimate for q = 0, 1, 2, call View(dunes_Obs_q$forq_table) to see full table.
+dunes_Obs_q$forq_table %>% filter(q %in% c(0,1,2))
+```
+
+* `$forq_figure`: plot of the q profile based on `$forq_table` using `ggplot2` package.
+
+```{r, eval= FALSE}
+dunes_Obs_q$forq_figure
+```
+
+```{r,echo = FALSE, fig.width=7, fig.height=7, fig.align="center"}
+dunes_Obs_q$forq_figure + theme(text=element_text(size=14))
+```
+
+Second, observed reference time profile(`profile = "time"`) of PD based on different order q:
+
+```{r,}
+dunes_Obs_time <- PhdObs(data = data.abu$data, tree = data.abu$tree, datatype = "abundance", 
+                    profile = "time", knots = 100)
+```
+
+Note: in this example, we do not specify the time points. In this case, `tprofile_times` will be automatically set from 0.01 to `tree` depth.
+
+In the case `profile = "time"` and `knots = 100`, `PhdObs` returns a list containing four objects:
+
+* `$summary`: data information summary identical to the one provided by `iNEXTPD()`.
+
+```{r,}
+dunes_Obs_time$summary
+```
+
+* `fortime_table`: table of observed PD reference time profile along with their confidence intervals (if `nboot > 0`) based on q = 0,1,2.
+
+```{r,}
+# only show estimate for q = 0, 1, 2, call View(dunes_Obs_time$fortime_table) to see full table.
+dunes_Obs_time$fortime_table %>% filter(q %in% c(0,1,2))
+```
+
+* `$fortime_figure`: plot of the reference time profile based on `$fortime_table` using `ggplot2` package.
+
+```{r, eval= FALSE}
+dunes_Obs_time$fortime_figure
+```
+
+```{r,echo = FALSE, fig.width=7, fig.height=7, fig.align="center"}
+dunes_Obs_time$fortime_figure + theme(text=element_text(size=14))
+```
+
+* `AUC_table`: table of the area under curve (AUC) of reference time profile along with their confidence intervals (if `nboot > 0`) based on q = 0,1,2.
+
+```{r,}
+dunes_Obs_time$AUC_table 
+```
+
+Note: here if we didn't specify `knots = 100`, AUC won't be calculated by default and thus the outcome list contains only three objects.
+
+Note: for `PhdObs()`, users can change the default `type = "PD"` to `type = "D"` to see the corresponding phylogenetic Hill numbers (`D`) of the above example. For the difference of `PD` and `D`, please see Chao et al. 2010 for details.
+
+
+<br><font size="5"><b>PhD VIA EXAMPLES: Incidence data</b></font>
+-------------------
+
+For incidence data (`datatype="incidence_raw"`), all three main functions in `PhD` can only accept incidence raw data (a species by sampling units matrix consisting of 0 and 1). 
+Also, different from abundance data, users have to specify a sequence `t_` of N positve integer describing the number of sampling units for each of N assemblages. See the <b>DATA FORMAT/INFORMATION</b> section above for detailed required format.
+
+Bird phylogeny and survey incidence dataset is included in `PhD` package (`data(data.inc)`). This data set describes the phylogeny (`$tree`) of 41 birds as reported by Jetz et al. (2012). It also gives the two sites (North.site and South.site) of species incidence (`$data`) data to these 41 species in November 2012 at Barrington Tops National Park, Australia. In `$data` matrix, the first 12 columns (sampling units) belongs to North.site and the left 17 columns (sampling units) belongs to South.site, which is described in `$t`.
+
+Here, the procedures of applying three main functions to incidence data is similar to those for abundance case and their outcomes also differ slightly.
+
+### 1. `iNEXTPD()`: 
+
+```{r,}
+birds_iNEXT <- iNEXTPD(data = data.inc$data, tree = data.inc$tree, 
+                       datatype = "incidence_raw",t_ = data.inc$t)
+```
+
+The `iNEXTPD()` function returns a list containing four objects: 
+
+* `$summary`: data information summary including reference sampling unit (`T`), number of observed species (`S.obs`), observed branch length (Faith's PD) (`PD.obs`), the first two species incidence frequency counts (`Q1*`, `Q1*`) and their branch length sums, respectively (`R1`, `R2`).
+
+```{r,}
+birds_iNEXT$summary
+```
+
+* `$reference_time`: the reference time for the caculation. If `reftime` is not specified by users or `NULL`, `$reference_time` is the tree depth of pooled assemblage by default.
+
+```{r,}
+# here reference_time is the tree depth of pooled assemblage, by default.
+birds_iNEXT$reference_time
+```
+
+* `$inext`: a table of PD estimates and sample completeness for interpolated or extrapolated sampling units along with their confidence intervals (if `nboot > 0`).
+
+```{r,}
+# only show first 10 estimate, call View(dunes_iNEXT$inext) to see full table.
+birds_iNEXT$inext
+```
+
+* `$figure`: plots of the estimated curves based on `$inext` using `ggplot2` package. Different choice of `plot.type` will yied different types of plot:
+1. sample-size-based R/E curve (`plot.type = 1`): the curve of PD estimates with confidence intervals (if `nboot > 0`) as a function of sample size.
+2. coverage-based R/E curve (`plot.type = 2`): the curve of the PD estimates with confidence intervals (if `nboot > 0`) as a function of sample coverage.
+3. sample completeness curve (`plot.type = 3`): the curve of sample coverage with respect to sample size.
+Here, by default `plot.type = c(1,2,3)`, `$figure` would provide all three types of plots.
+
+```{r, eval= FALSE}
+# plot.type = 1
+birds_iNEXT$figure$RE.plot.size
+```
+
+```{r,echo = FALSE ,fig.width=7, fig.height=7, fig.align="center"}
+birds_iNEXT$figure$RE.plot.size + theme(text=element_text(size=14))
+```
+
+```{r, eval= FALSE}
+# plot.type = 2
+birds_iNEXT$figure$RE.plot.C
+```
+
+```{r,echo = FALSE ,fig.width=7, fig.height=7, fig.align="center"}
+birds_iNEXT$figure$RE.plot.C + theme(text=element_text(size=14))
+```
+
+```{r, eval= FALSE}
+# plot.type = 3
+birds_iNEXT$figure$RE.plot.sizeC
+```
+
+```{r,echo = FALSE ,fig.width=7, fig.height=7, fig.align="center"}
+birds_iNEXT$figure$RE.plot.sizeC + theme(text=element_text(size=14))
+```
+
+
+### 2. `PhdAsy()`
+
+```{r,}
+birds_Asy <- PhdAsy(data = data.inc$data, tree = data.inc$tree, 
+                    datatype = "incidence_raw",t_ = data.inc$t)
+```
+
+The `PhdAsy()` function returns a list containing four objects: 
+
+* `$summary`: data information summary identical to the one provided by `iNEXTPD()`.
+
+```{r,}
+birds_Asy$summary
+```
+
+* `$reference_time`: the reference time for the caculation. If `reftime` is not specified by users or `NULL`, `$reference_time` is the tree depth of pooled assemblage by default.
+
+```{r,}
+# here reference_time is the tree depth of pooled assemblage, by default.
+birds_Asy$reference_time
+```
+
+* `$asy`: table of estimated asymptotic PD  q profile at fixed `reftime` along with their confidence intervals (if `nboot > 0`). It is based on statistical estimation of the unknown true phylogenetic diversity; see Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.
+
+```{r,}
+# only show estimate for q = 0, 1, 2, call View(dunes_Asy$asy) to see full table.
+birds_Asy$asy %>% filter(Order %in% c(0,1,2))
+```
+
+* `$figure`: plot of the estimated q profile based on `$asy` using `ggplot2` package.
+
+```{r, eval= FALSE}
+birds_Asy$figure
+```
+
+```{r,echo = FALSE, fig.width=7, fig.height=7, fig.align="center"}
+birds_Asy$figure + theme(text=element_text(size=14))
+```
+
+### 3. `PhdObs()`
+
+For `PhdObs`, we demonstrate both observed order q profile and reference time profile of PD(`type = "PD"`). 
+
+First, observed order q profile(`profile = "q"`) of PD based on different reference time points:
+
+```{r,}
+birds_Obs_q <- PhdObs(data = data.inc$data, tree = data.inc$tree, 
+                      datatype = "incidence_raw",t_ = data.inc$t, q = seq(0, 2, by = 0.25))
+```
+
+In the case `profile = "q"`, `PhdObs` returns a list containing three objects:
+
+* `$summary`: data information summary identical to the one provided by `iNEXTPD()`.
+
+```{r,}
+birds_Obs_q$summary
+```
+
+* `forq_table`: table of observed PD q profile along with their confidence intervals (if `nboot > 0`) based on two reference time points: root and Rao's quadratic entropy (Q, see Chao et al. 2010 for details)
+
+```{r,}
+# only show estimate for q = 0, 1, 2, call View(birds_Obs_q$forq_table) to see full table.
+birds_Obs_q$forq_table %>% filter(q %in% c(0,1,2))
+```
+
+* `$forq_figure`: plot of the q profile based on `$forq_table` using `ggplot2` package.
+
+```{r, eval= FALSE}
+birds_Obs_q$forq_figure
+```
+
+```{r,echo = FALSE, fig.width=7, fig.height=7, fig.align="center"}
+birds_Obs_q$forq_figure + theme(text=element_text(size=14))
+```
+
+Second, observed reference time profile(`profile = "time"`) of PD based on different order q:
+
+```{r,}
+birds_Obs_time <- PhdObs(data = data.inc$data, tree = data.inc$tree, 
+                         datatype = "incidence_raw",t_ = data.inc$t,
+                         profile = "time", knots = 100)
+```
+
+Note: in this example, we do not specify the time points. In this case, `tprofile_times` will be automatically set from 0.01 to `tree` depth.
+
+In the case `profile = "time"` and `knots = 100`, `PhdObs` returns a list containing four objects:
+
+* `$summary`: data information summary identical to the one provided by `iNEXTPD()`.
+
+```{r,}
+birds_Obs_time$summary
+```
+
+* `fortime_table`: table of observed PD reference time profile along with their confidence intervals (if `nboot > 0`) based on q = 0,1,2.
+
+```{r,}
+# only show estimate for q = 0, 1, 2, call View(birds_Obs_time$fortime_table) to see full table.
+birds_Obs_time$fortime_table %>% filter(q %in% c(0,1,2))
+```
+
+* `$fortime_figure`: plot of the reference time profile based on `$fortime_table` using `ggplot2` package.
+
+```{r, eval= FALSE}
+birds_Obs_time$fortime_figure
+```
+
+```{r,echo = FALSE, fig.width=7, fig.height=7, fig.align="center"}
+birds_Obs_time$fortime_figure + theme(text=element_text(size=14))
+```
+
+* `AUC_table`: table of the area under curve (AUC) of reference time profile along with their confidence intervals (if `nboot > 0`) based on q = 0,1,2.
+
+```{r,}
+birds_Obs_time$AUC_table 
+```
+
+Note: here if we didn't specify `knots = 100`, AUC won't be calculated by default and thus the outcome list contains only three objects.
+
+Note: for `PhdObs()`, users can change the default `type = "PD"` to `type = "D"` to see the corresponding phylogenetic Hill numbers (`D`) of the above example. For the difference of `PD` and `D`, please see Chao et al. 2010 for details.
+
+<br><font size="4"><b>License</b></font>
+-------------------
+The PhD package is licensed under the GPLv3. To help refine `PhD`, your comments or feedbacks would be welcome (please send them to Anne Chao).
+
+<br><font size="4"><b>How to cite</b></font>
+-------------------
+If you publish your work based on results from `PhD` (R package), please make reference to Chao et al. given in the following list.
+
+<br><font size="4"><b>Reference</b></font>
+-------------------
+- Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609.
+- Chiu, C.-H., Jost, L. and Chao, A. (2014). Phylogenetic beta diversity, similarity, and differentiation measures based on Hill numbers. Ecological Monographs, 84, 21-44.
+- Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.
+- Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
+

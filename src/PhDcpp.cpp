@@ -2,7 +2,7 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-double Dq0(double n, double f1, double f2, double g1,  double g2, double A) {
+double Dq0(double n, double f1, double f2, double g1,  double g2) {
   double ans;
   if(f1+f2 == 0) {ans = 0;
   } else if ( ((g1*f2)/(2*f1) < g2) | (f1==0)){
@@ -13,10 +13,10 @@ double Dq0(double n, double f1, double f2, double g1,  double g2, double A) {
   return(ans);
 }
 // [[Rcpp::export]]
-double Dq1_1(double n, double g1, double A) {
+double Dq1_2(double n, double g1, double A) {
   double q1 = 0;
   double h2 = 0;
-  if(A==1){
+  if(A==1||g1==0){
     h2 = 0;
   }else{
     for(int r = 1; r < n; r++){
@@ -36,6 +36,49 @@ double Dq2(NumericMatrix tmpaL, double n, double t_bar) {
   ans = pow(t_bar,2)/ans;
   return(ans);
 }
+
+// [[Rcpp::export]]
+double Dq_2nd(double n, double g1, double A, double q) {
+  double qq = 0;
+  double ans = 0;
+  if(A==1||g1==0){
+    ans = 0;
+  }else{
+    for(int r = 0; r < n; r++){
+      qq = qq + Rf_choose(q-1,r)*pow((A-1),r);
+      //Rcpp::Rcout << "qq: " << qq << std::endl;
+    }
+    ans = (g1/n)*(pow(1-A,(-n+1)))*(pow(A,q-1)-qq);
+  }
+  return(ans);
+}
+// [[Rcpp::export]]
+NumericVector Dq(NumericMatrix tmpaL, int n,NumericVector qs,double g1, double A, double t_bar){
+  int nrows = tmpaL.nrow(), z = 0 , qlength = qs.length();
+  double delta = 0.0;
+  //NumericMatrix deltas(nrows,n);
+  NumericMatrix ans_i(nrows,qlength);
+  for(int i = 0; i<nrows; i++){
+    z = tmpaL(i,0);
+    for(int k = 0; k<=n-z; k++){
+      delta = tmpaL(i,1)*Rf_dhyper( 1, z, n - z, k+1, false )/(k+1);
+      //deltas(i,k) = Rf_dhyper( 1, z, n - z, k+1, false )/(k+1);
+      for(int i_q = 0; i_q<qlength; i_q++){
+        ans_i(i,i_q) = ans_i(i,i_q) + tmpaL(i,2) * Rf_choose(k-qs[i_q],k)*delta;
+      }
+    }
+  }
+  NumericVector ans_1(qlength);
+  for(int i_q = 0; i_q<qlength; i_q++){
+    for(int i = 0; i<nrows; i++){
+      ans_1(i_q) = ans_1(i_q) + ans_i(i,i_q);
+    }
+    ans_1(i_q) = (ans_1(i_q) + Dq_2nd(n,g1,A,qs[i_q]))/pow(t_bar,qs[i_q]);
+    ans_1(i_q) = pow(ans_1(i_q),1/(1-qs[i_q]));
+  }
+  return(ans_1);
+}
+
 // [[Rcpp::export]]
 double delta(NumericMatrix del_tmpaL, double k, double n){
   double ans = 0;

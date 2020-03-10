@@ -6,8 +6,8 @@
 using namespace Rcpp;
 
 // Dq0
-double Dq0(double n, double f1, double f2, double g1, double g2, double A);
-RcppExport SEXP _PhD_Dq0(SEXP nSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP g1SEXP, SEXP g2SEXP, SEXP ASEXP) {
+double Dq0(double n, double f1, double f2, double g1, double g2);
+RcppExport SEXP _PhD_Dq0(SEXP nSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP g1SEXP, SEXP g2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -16,21 +16,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type f2(f2SEXP);
     Rcpp::traits::input_parameter< double >::type g1(g1SEXP);
     Rcpp::traits::input_parameter< double >::type g2(g2SEXP);
-    Rcpp::traits::input_parameter< double >::type A(ASEXP);
-    rcpp_result_gen = Rcpp::wrap(Dq0(n, f1, f2, g1, g2, A));
+    rcpp_result_gen = Rcpp::wrap(Dq0(n, f1, f2, g1, g2));
     return rcpp_result_gen;
 END_RCPP
 }
-// Dq1_1
-double Dq1_1(double n, double g1, double A);
-RcppExport SEXP _PhD_Dq1_1(SEXP nSEXP, SEXP g1SEXP, SEXP ASEXP) {
+// Dq1_2
+double Dq1_2(double n, double g1, double A);
+RcppExport SEXP _PhD_Dq1_2(SEXP nSEXP, SEXP g1SEXP, SEXP ASEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< double >::type n(nSEXP);
     Rcpp::traits::input_parameter< double >::type g1(g1SEXP);
     Rcpp::traits::input_parameter< double >::type A(ASEXP);
-    rcpp_result_gen = Rcpp::wrap(Dq1_1(n, g1, A));
+    rcpp_result_gen = Rcpp::wrap(Dq1_2(n, g1, A));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -44,6 +43,36 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type n(nSEXP);
     Rcpp::traits::input_parameter< double >::type t_bar(t_barSEXP);
     rcpp_result_gen = Rcpp::wrap(Dq2(tmpaL, n, t_bar));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Dq_2nd
+double Dq_2nd(double n, double g1, double A, double q);
+RcppExport SEXP _PhD_Dq_2nd(SEXP nSEXP, SEXP g1SEXP, SEXP ASEXP, SEXP qSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type n(nSEXP);
+    Rcpp::traits::input_parameter< double >::type g1(g1SEXP);
+    Rcpp::traits::input_parameter< double >::type A(ASEXP);
+    Rcpp::traits::input_parameter< double >::type q(qSEXP);
+    rcpp_result_gen = Rcpp::wrap(Dq_2nd(n, g1, A, q));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Dq
+NumericVector Dq(NumericMatrix tmpaL, int n, NumericVector qs, double g1, double A, double t_bar);
+RcppExport SEXP _PhD_Dq(SEXP tmpaLSEXP, SEXP nSEXP, SEXP qsSEXP, SEXP g1SEXP, SEXP ASEXP, SEXP t_barSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type tmpaL(tmpaLSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type qs(qsSEXP);
+    Rcpp::traits::input_parameter< double >::type g1(g1SEXP);
+    Rcpp::traits::input_parameter< double >::type A(ASEXP);
+    Rcpp::traits::input_parameter< double >::type t_bar(t_barSEXP);
+    rcpp_result_gen = Rcpp::wrap(Dq(tmpaL, n, qs, g1, A, t_bar));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -76,9 +105,11 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_PhD_Dq0", (DL_FUNC) &_PhD_Dq0, 6},
-    {"_PhD_Dq1_1", (DL_FUNC) &_PhD_Dq1_1, 3},
+    {"_PhD_Dq0", (DL_FUNC) &_PhD_Dq0, 5},
+    {"_PhD_Dq1_2", (DL_FUNC) &_PhD_Dq1_2, 3},
     {"_PhD_Dq2", (DL_FUNC) &_PhD_Dq2, 3},
+    {"_PhD_Dq_2nd", (DL_FUNC) &_PhD_Dq_2nd, 4},
+    {"_PhD_Dq", (DL_FUNC) &_PhD_Dq, 6},
     {"_PhD_delta", (DL_FUNC) &_PhD_delta, 3},
     {"_PhD_RPD", (DL_FUNC) &_PhD_RPD, 4},
     {NULL, NULL, 0}
