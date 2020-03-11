@@ -53,7 +53,8 @@ data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 t_ <- data.inc$t
-out <- PhdAsy(data = data, tree = tree, datatype = "incidence_raw", t_ = t_, q = seq(0, 2, by = 0.25))
+out <- PhdAsy(data = data, tree = tree, datatype = "incidence_raw",
+t_ = t_, q = seq(0, 2, by = 0.25))
 }
 }
 \references{

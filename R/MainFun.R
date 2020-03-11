@@ -60,7 +60,8 @@
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' t_ <- data.inc$t
-#' out <- iNEXTPD(data = data, tree = tree,datatype = "incidence_raw",t_ = t_,q = c(0,1,2), plot.type = 1:3)
+#' out <- iNEXTPD(data = data, tree = tree,datatype = "incidence_raw",
+#' t_ = t_,q = c(0,1,2), plot.type = 1:3)
 #' }
 #' @references
 #' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609.\cr\cr
@@ -222,7 +223,8 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' t_ <- data.inc$t
-#' out <- PhdAsy(data = data, tree = tree, datatype = "incidence_raw", t_ = t_, q = seq(0, 2, by = 0.25))
+#' out <- PhdAsy(data = data, tree = tree, datatype = "incidence_raw",
+#' t_ = t_, q = seq(0, 2, by = 0.25))
 #' }
 #' @references
 #' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr

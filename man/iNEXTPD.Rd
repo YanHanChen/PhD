@@ -76,7 +76,8 @@ data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 t_ <- data.inc$t
-out <- iNEXTPD(data = data, tree = tree,datatype = "incidence_raw",t_ = t_,q = c(0,1,2), plot.type = 1:3)
+out <- iNEXTPD(data = data, tree = tree,datatype = "incidence_raw",
+t_ = t_,q = c(0,1,2), plot.type = 1:3)
 }
 }
 \references{
