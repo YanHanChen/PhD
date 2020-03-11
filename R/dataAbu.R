@@ -1,4 +1,4 @@
-#' Abundance Data for Function inextPD
+#' Abundance Data
 #'
 #' This data set describes the phylogeny of 46 plants on dunes (Holocene) of the central western coast of Italy as reported by Carboni et al. (2010).
 #' It includes three types of dunes: emboryo dunes (ED), mobile dunes (MD) and transtion dunes (TD), which contains 17, 39, 42 distinct plants respectively.

@@ -3,7 +3,7 @@
 \docType{data}
 \name{data.abu}
 \alias{data.abu}
-\title{Abundance Data for Function inextPD}
+\title{Abundance Data}
 \format{A list includes two objects:
 \describe{
   \item{data}{is a data frame with 46 plants abundance data and three sites: ED, MD and TD.}

@@ -1,4 +1,4 @@
-#' Incidence Data for Function inextPD
+#' Incidence Data
 #'
 #' This data set describes the phylogeny of 41 birds as reported by Jetz et al. (2012).
 #' It gives the two sites of species incidence data to these 41 species in November 2012 at Barrington Tops National Park, Australia.

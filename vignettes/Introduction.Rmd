@@ -30,7 +30,7 @@ Besides `iNEXTPD`, there are two main functions in the `PhD`, including `PhdAsy`
 
 2. `PhdAsy`: estimates asymptotic diversity profile with respect to order `q` <font size="1">$\ge$</font> 0 to infer true phylogenetic diversity(PD) profile at fixed reference time (tree depth by default). It is based on statistical estimation of the unknown true phylogenetic diversity; see Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.
 
-3. `PhdObs`: computes observed q profile and reference time profile of phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
+3. `PhdObs`: computes observed q profile and reference time profile of phylogenetic diversity(PD) or phylogenetic Hill numbers(D); see Chao et al. (2010) for details of PD and D.
 
 <br><font size="5">**SOFTWARE NEEDED TO RUN PhD IN R:**</font>
 --------------------------------------
@@ -120,11 +120,11 @@ The arguments of this function are described below.
 </tr>
 <tr>
 <td align="center"><code>t_</code></td>
-<td align="left"> Needed only when `datatype = "incidence_raw"`, a sequence of nonnegative integers specifying the sampling units in each community. Ignored if `datatype = "abundance"`.</td>
+<td align="left"> needed only when `datatype = "incidence_raw"`, a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if `datatype = "abundance"`.</td>
 </tr>
 <tr>
 <td align="center"><code>q</code></td>
-<td align="left"> a sequence of nonnegative integers specifying the diversity order of PD, there are three measures: Faith's PD (`q = 0`), a simple transformation of phylogenetic entropy (`q = 1`) and a simple transformation of Rao's quadratic entropy (`q = 2`). Default is `c(0,1,2)`.</td>
+<td align="left"> a sequence of nonnegative integers specifying the diversity orders of PD, there are three measures: Faith's PD (`q = 0`), a simple transformation of phylogenetic entropy (`q = 1`) and a simple transformation of Rao's quadratic entropy (`q = 2`). Default is `c(0,1,2)`.</td>
 </tr>
 <tr>
 <td align="center"><code>endpoints</code></td>
@@ -148,7 +148,7 @@ The arguments of this function are described below.
 </tr>
 <tr>
 <td align="center"><code>nboot</code></td>
-<td align="left"> a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case, the computation of standard errors and confidence intervals will be skipped. Default is 50.</td>
+<td align="left"> a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.</td>
 </tr>
 <tr>
 <td align="center"><code>reftime</code></td>
@@ -201,11 +201,11 @@ The arguments of this function are described below.
 </tr>
 <tr>
 <td align="center"><code>t_</code></td>
-<td align="left"> Needed only when `datatype = "incidence_raw"`, a sequence of nonnegative integers specifying the sampling units in each community. Ignored if `datatype = "abundance"`.</td>
+<td align="left"> needed only when `datatype = "incidence_raw"`, a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if `datatype = "abundance"`.</td>
 </tr>
 <tr>
 <td align="center"><code>q</code></td>
-<td align="left"> a nonnegative sequence specifying the diversity orders of Hill numbers. Default is `seq(0, 2, by = 0.25)`.</td>
+<td align="left"> a nonnegative sequence specifying the diversity orders of PD. Default is `seq(0, 2, by = 0.25)`.</td>
 </tr>
 <tr>
 <td align="center"><code>conf</code></td>
@@ -213,7 +213,7 @@ The arguments of this function are described below.
 </tr>
 <tr>
 <td align="center"><code>nboot</code></td>
-<td align="left"> a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case, the computation of standard errors and confidence intervals will be skipped. Default is 50.</td>
+<td align="left"> a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.</td>
 </tr>
 <tr>
 <td align="center"><code>reftime</code></td>
@@ -261,7 +261,7 @@ The arguments of this function are described below.
 </tr>
 <tr>
 <td align="center"><code>t_</code></td>
-<td align="left"> Needed only when `datatype = "incidence_raw"`, a sequence of nonnegative integers specifying the sampling units in each community. Ignored if `datatype = "abundance"`.</td>
+<td align="left"> needed only when `datatype = "incidence_raw"`, a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if `datatype = "abundance"`.</td>
 </tr>
 <tr>
 <td align="center"><code>type</code></td>
@@ -281,7 +281,7 @@ The arguments of this function are described below.
 </tr>
 <tr>
 <td align="center"><code>nboot</code></td>
-<td align="left"> a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case, the computation of standard errors and confidence intervals will be skipped. Default is 50.</td>
+<td align="left"> a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.</td>
 </tr>
 <tr>
 <td align="center"><code>conf</code></td>

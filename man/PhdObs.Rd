@@ -2,7 +2,7 @@
 % Please edit documentation in R/MainFun.R
 \name{PhdObs}
 \alias{PhdObs}
-\title{Observed q profile and time profile of phylogenetic diversity or phylogenetic Hill numbers for each community}
+\title{Observed phylogenetic diversity or phylogenetic Hill numbers}
 \usage{
 PhdObs(data, tree, datatype = "abundance", t_, type = "PD",
   profile = "q", q = seq(0, 2, by = 0.25), tprofile_times = NULL,
@@ -12,50 +12,44 @@ PhdObs(data, tree, datatype = "abundance", t_, type = "PD",
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr
 See \code{\link{iNEXTPD}} for data details.}
 
-\item{tree}{a phylogenetic tree in the Newick format among the observed species in the pooled assemblage. \cr}
+\item{tree}{a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is "abundance". \cr}
+or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr}
 
-\item{t_}{a named vector of nonnegative integers specifying the sampling units in each community. If the names are absent, each community will be
+\item{t_}{needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if \code{datatype = "abundance"}.\cr
 automatically assigned siteX as community names.
 Ignored if \code{datatype = "abundance"}.}
 
-\item{type}{two types for calculating phylogenetic profiles in Chiu, C.-H., Jost, L. and Chao(2014): Phylogenetic Diversity(\code{type = "PD"}) and
-Phylogenetic Hill numbers(\code{type = "D"}). Default is \code{"PD"}.}
+\item{type}{desired diversity type: \code{type = "PD"} for phylogenetic diversity and \code{type = "D"} for phylogenetic Hill numbers. See Chao et al. (2010) for details. Default is \code{"PD"}.}
 
-\item{profile}{two kinds of profiles to show phylogenetic profiles based on chosen \code{type}: q profile(\code{profile = "q"}) and time profile(\code{profile = "time"}). Default is \code{"q"} \cr}
+\item{profile}{desired profile type for chosen type, \code{profile = "q"} for order q profile and \code{profile = "time"} for reference time profile. Default is \code{"q"}. \cr}
 
-\item{q}{a nonnegative vector specifying the diversity order of Hill numbers. For phylogenetic diversity profiles,
-\code{q} need to be a vector of length more than one, default is seq(0, 2, by = 0.25) \cr}
+\item{q}{a nonnegative sequence specifying the diversity orders for q profile if \code{profile == "q"}. Will be ignored if \code{profile = "time"}. Default is \code{seq(0, 2, by = 0.25)}.}
 
-\item{tprofile_times}{a nonnegative vector specifying the reference time points for which phylogenetic profiles will be computed. If \code{NULL}, will be automatically chosen from 0.01 to \code{tree} depth.\cr}
+\item{tprofile_times}{a nonnegative sequence specifying the reference time points for time profile
+if \code{profile = "time"}. Will be ignored if \code{profile = "q"}. If \code{NULL}, appropriate time pionts will be used based on the \code{tree} depth. Default is \code{NULL}.\cr}
 
-\item{nboot}{an integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case,
-the computation of s.e. and confidence intervals will be skipped, default is 50.}
+\item{nboot}{a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
+in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.}
 
 \item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
 
-\item{knots}{an integer specifying the number of points of \code{time} used to calculate AUC (Area Under Curve). Use 0 to skip calculation, default is 0\cr}
+\item{knots}{a positive integer specifying the number of reference time points used to calculate AUC (Area Under Curve) of time profile if \code{profile = "time"}.
+Larger knots would yield more pricise integration but will take more time in calculation. Enter 0 to skip calculation. Will be ignored if \code{profile = "q"}. Default is 0.\cr}
 
-\item{reftime}{a positive number specifying the reference time. If \code{NULL}, will be defaulted to the \code{tree} depth.}
+\item{reftime}{a positive value specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
 }
 \value{
-Based on chosen \code{knots}, there are two kinds of output:\cr\cr
-\itemize{
- \item{For \code{knots} an integer, a list of fourth objects:} \cr
+a list containing three or four objects based on chosen \code{profile}: \cr\cr
 \code{$summary} summary of data. \cr\cr
-\code{$fortime_table} or \code{$forq_table} a table of observed phylogenetic diversity for each \code{time} or order \code{q} based on \code{type} and \code{profile}. \cr\cr
-\code{$fortime_figure} or \code{$forq_figure} showing the curves for \code{$fortime_table} or \code{$forq_table} \cr\cr
-\code{$AUC_table} table of Area Under Curve (AUC) of time profile for each site from 0.01 to root. \cr\cr
- \item{For \code{knots = NULL}, a list of three objects:} \cr
-\code{$summary} for summarizing data information. \cr\cr
-\code{$fortime_table} or \code{$forq_table} a table of observed estimates for each \code{time} or order \code{q} based on \code{type} and \code{profile}. \cr\cr
-\code{$fortime_figure} or \code{$forq_figure} showing the curves for \code{$fortime_table} or \code{$forq_table} \cr\cr
-}
+\code{$fortime_table} or \code{$forq_table} a table of observed phylogenetic diversity(\code{type = "PD"}) or phylogenetic Hill numbers(\code{type = "D"}) for each \code{time} or order \code{q} based on \code{profile}. \cr\cr
+\code{$fortime_figure} or \code{$forq_figure} the curves for \code{$fortime_table} or \code{$forq_table} \cr\cr
+\code{$AUC_table} table of Area Under Curve (AUC) of time profile for each site from 0.01 to the tree depth. Won't be provided if \code{knots = 0} or \code{profile = "q"}.  \cr\cr
 }
 \description{
-\code{PhdObs}: Observed phylogenetic diversity or phylogenetic Hill numbers profile for each community based on a framework of Hill numbers with order q and reference time.\cr
+\code{PhdObs}: computes observed q profile and reference time profile of phylogenetic diversity(PD) or phylogenetic Hill numbers(D);
+see Chao et al. (2010) for details of PD and D.\cr
 }
 \examples{
 \donttest{
@@ -63,13 +57,15 @@ Based on chosen \code{knots}, there are two kinds of output:\cr\cr
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- PhdObs(data = data, tree = tree, datatype = "abundance", type = "PD", profile = "q", q = seq(0, 2, by = 0.25))
+out <- PhdObs(data = data, tree = tree, datatype = "abundance", type = "PD",
+ profile = "q", q = seq(0, 2, by = 0.25))
 # Type (2) incidence data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 t_ <- data.inc$t
-out <- PhdObs(data = data, tree = tree, datatype = "incidence_raw", type = "PD", profile = "q", q = seq(0, 2, by = 0.25))
+out <- PhdObs(data = data, tree = tree, datatype = "incidence_raw", type = "PD",
+profile = "q", q = seq(0, 2, by = 0.25))
 }
 }
 \references{

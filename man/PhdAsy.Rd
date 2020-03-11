@@ -2,7 +2,7 @@
 % Please edit documentation in R/MainFun.R
 \name{PhdAsy}
 \alias{PhdAsy}
-\title{Asymptotic phylogenetic diversity profile for each community}
+\title{Asymptotic phylogenetic diversity q profile}
 \usage{
 PhdAsy(data, tree, datatype = "abundance", t_, q = seq(0, 2, by =
   0.25), conf = 0.95, nboot = 50, reftime = NULL)
@@ -11,33 +11,35 @@ PhdAsy(data, tree, datatype = "abundance", t_, q = seq(0, 2, by =
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr
 See \code{\link{iNEXTPD}} for data details.}
 
-\item{tree}{a phylogenetic tree of class phylo among the observed species in the pooled assemblage. \cr}
+\item{tree}{a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is "abundance". \cr}
+or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr}
 
-\item{t_}{a vector of nonnegative integers specifying the sampling units in each community.
+\item{t_}{needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if \code{datatype = "abundance"}.\cr
 Ignored if \code{datatype = "abundance"}.}
 
-\item{q}{a nonnegative vector specifying the diversity order of Hill numbers. For phylogenetic diversity profiles,
-\code{q} need to be a vector of length more than one, default is seq(0, 2, by = 0.25) \cr}
+\item{q}{a nonnegative sequence specifying the diversity orders of PD. Default is seq(0, 2, by = 0.25). \cr}
 
 \item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr}
 
-\item{nboot}{an integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap; in this case,
-the computation of s.e. and confidence intervals will be skipped, default is 50.}
+\item{nboot}{a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
+in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.}
 
-\item{reftime}{a positive number specifying the reference time.}
+\item{reftime}{a positive value specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
 }
 \value{
 a list of four objects: \cr\cr
-\code{$summary} summary of data. \cr\cr
-\code{$reference_time} root of the species in the pooled assemblage. \cr\cr
-\code{$asy} a table showing all numerical values of diversity estimates and their s.e and confidence intervals. \cr\cr
-\code{$figure} phylogenetic diversity profiles. \cr\cr
+\code{$summary} summary of data; see \code{\link{iNEXTPD}} for summary details. \cr\cr
+\code{$reference_time} the reference time for the caculation; see \code{\link{iNEXTPD}} for details.  \cr\cr
+\code{$asy} table of estimated asymptotic PD q profile at fixed \code{reftime} along with their
+confidence intervals (if \code{nboot > 0}). It is based on statistical estimation of the unknown true phylogenetic diversity \cr\cr
+\code{$figure} plot of the estimated q profile based on \code{$asy} using \code{ggplot2} package. \cr\cr
 }
 \description{
-\code{PhdAsy}: An estimated asymptotic phylogenetic diversity profile for each community based on a framework of Hill numbers with order q and statistical method proposed in Chao et al. (2015) and Hsieh and Chao (2017).\cr
+\code{PhdAsy}: estimates asymptotic diversity profile with respect to order \code{q} to infer true phylogenetic diversity(PD) profile
+at fixed reference time (tree depth by default). It is based on statistical estimation of the unknown true phylogenetic diversity;
+see Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.\cr
 }
 \examples{
 \donttest{
@@ -51,9 +53,11 @@ data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 t_ <- data.inc$t
-out <- PhdAsy(data = data, tree = tree,datatype = "incidence_raw", t_ = t_, q = seq(0, 2, by = 0.25))
+out <- PhdAsy(data = data, tree = tree, datatype = "incidence_raw", t_ = t_, q = seq(0, 2, by = 0.25))
 }
 }
 \references{
 Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
+Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
+Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
 }

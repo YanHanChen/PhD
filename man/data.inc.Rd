@@ -3,7 +3,7 @@
 \docType{data}
 \name{data.inc}
 \alias{data.inc}
-\title{Incidence Data for Function inextPD}
+\title{Incidence Data}
 \format{A list includes three objects:
 \describe{
   \item{data}{is a pooled data frame with 41 birds incidence data and 29 sampling points.}
