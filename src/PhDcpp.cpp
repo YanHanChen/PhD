@@ -117,25 +117,25 @@ NumericVector RPD(NumericMatrix x , int n  , int m , NumericVector q) {
     for(int k = 0; k < m; k++){
       if(q[j] == 0){
         out[j] = ghat[k] + out[j];
-      }
-      if(q[j] == 1){
+      }else if(q[j] == 1){
         //Rcout << "q1 in cpp: " <<log ( (k+1) )<< std::endl;
         out[j] = -( (k+1) / (m*tbar) ) * log ( (k+1) / (m*tbar) ) * ghat[k] + out[j];
-      }
-      if(q[j] == 2){
+      }else if(q[j] == 2){
         out[j] = pow( ( (k+1) / (m*tbar) ),2) * ghat[k] + out[j];
+      }else{
+        out[j] = pow( ( (k+1) / (m*tbar) ),q[j]) * ghat[k] + out[j];
       }
     }
   }
   for(int j = 0; j < qlength; j++ ){
     if(q[j] == 0){
       out[j] = out[j] ;
-    }
-    if(q[j] == 1){
+    }else if(q[j] == 1){
       out[j] = exp(out[j]);
-    }
-    if(q[j] == 2){
+    }else if(q[j] == 2){
       out[j] = 1 / out[j];
+    }else{
+      out[j] = pow( (out[j]) , 1/(1-q[j]) );
     }
   }
   return out ;

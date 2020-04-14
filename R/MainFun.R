@@ -4,12 +4,12 @@
 #' See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background and methods.
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr Type (1) abundance data: a S by N matrix/data.frame
 #' where N is the number of assemblages. The element in i-th row and k-th is the abundance of species i in assemblage k. Please note
-#' that the rownames of data must be the species names matching the species names in phylogeny tree and thus can’t be empty.\cr
+#' that the rownames of data must be the species names matching the species names in phylogeny tree and thus can't be empty.\cr
 #' Type (2) incidence data: the sampling unit is quadrat or transect, the observed species was only recorded as presence(detection)/absence(non-detection)
 #' data in each sampling unit. For single assemblage consisting of t_ sampling units, data is a S by t_ incidence matrix,
 #' where S is the number of species. When there are N assemblages, users must first merge N data matrices by species identity to
 #' obtain a large incidence matrix, where the rows of the matrix refer to all species presented in the pooled data. Likewise,
-#' the rownames of data must be the species names matching the species names in phylogeny tree and thus can’t be empty. \cr
+#' the rownames of data must be the species names matching the species names in phylogeny tree and thus can't be empty. \cr
 #' @param tree a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage.\cr
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is \code{"abundance"}. \cr
@@ -154,8 +154,8 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
     }
   }
   #atime <- Sys.time()
-  # RE.table <- FUN(3)
-  RE.table <- tryCatch(FUN(e), error = function(e){return()})
+  RE.table <- FUN(3)
+  #RE.table <- tryCatch(FUN(e), error = function(e){return()})
   #btime <- Sys.time()
   #print(paste0('R/E time:',btime-atime))
   ###############output3
@@ -171,7 +171,8 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
     }
   }
   #atime <- Sys.time()
-  RE.plot <- tryCatch(FUN2(e), error = function(e){return()})
+  RE.table <- FUN2(3)
+  #RE.plot <- tryCatch(FUN2(e), error = function(e){return()})
   #btime <- Sys.time()
   #print(paste0('plot time:',btime-atime))
   ans <- list(summary = infos,reference_time = reft, inext = RE.table, figure = RE.plot)

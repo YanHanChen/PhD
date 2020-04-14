@@ -643,7 +643,7 @@ PhD.q.est = function(aL, q, reft, splunits=NULL, datatype, nforboot = NULL){ # r
   }
   tmpaL <- aL %>% group_by(branch.abun, branch.length) %>% summarise(n_node = n()) %>% as.matrix()
 
-  if(sum(abs(q-round(q))==0)>0) {
+  if(sum(abs(q-round(q))!=0)>0 | max(q)>2) {
     deltas <- sapply(0:(n-1), function(k){
       del_tmp <- tmpaL[tmpaL[,1]<=(n-k),,drop=FALSE]
       delta(del_tmpaL = del_tmp,k,n)
@@ -806,7 +806,6 @@ inextPD = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NULL, 
       }else{
         mi <- floor(c(seq(1,ns[i],length.out = floor(knots/2)),seq(ns[i]+1,endpoint,length.out = knots-floor(knots/2))))
       }
-      if(2*ns[i] < knots & 2*ns[i] > endpoint) m[[i]] <- 1:endpoint
     }else{
       mi <- size
       if( sum(size==ns[i]) == 0 ) mi <- sort(c(ns[i],mi))
@@ -924,7 +923,7 @@ PhD.m.est = function(aL, m, Q, reft,datatype, nforboot = NULL, splunits = NULL){
   EPD = function(m,Q){
     m = m-n
     out <- sapply(1:length(Q), function(i){
-      if( Q[i] == 0 | Q[i] == 1 ) {
+      if( Q[i]!=2 ) {
         obs[i]+(asy[i]-obs[i])*(1-(1-beta[i])^m)
       }else if( Q[i] == 2 ){
         1/sum( (aL_matrix[,2]/(t_bar)^2)*((1/(n+m))*(aL_matrix[,1]/n)+((n+m-1)/(n+m))*(aL_matrix[,1]*(aL_matrix[,1]-1)/(n*(n-1)))) )
