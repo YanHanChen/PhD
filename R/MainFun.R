@@ -171,7 +171,7 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
     }
   }
   #atime <- Sys.time()
-  RE.table <- FUN2(3)
+  RE.plot <- FUN2(3)
   #RE.plot <- tryCatch(FUN2(e), error = function(e){return()})
   #btime <- Sys.time()
   #print(paste0('plot time:',btime-atime))
