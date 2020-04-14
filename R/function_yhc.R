@@ -27,14 +27,14 @@ datainf <- function(data, datatype, phylotr,reft){
 
 }
 
-PD.qprofile=function(aL, q, reft, splunits = NULL, cal ,datatype, nforboot = NULL) {
+PD.qprofile=function(aL, q, splunits = NULL, cal ,datatype, nforboot = NULL) {
   #aL is a table of 3 columns: abundance, branch lengths and characters specifying the group of each node.
   pAbun <- unlist(aL[,1])
   bL <- unlist(aL[,2])
   if(datatype=="abundance"){
     Abun <- unlist(aL$branch.abun[aL$tgroup=="Tip"])
     n <- ifelse(is.null(nforboot),sum(Abun), nforboot)
-    t_bar <- ifelse(is.null(nforboot),reft, sum(pAbun / n * bL)) #just to save computation time
+    t_bar <- sum(pAbun / n * bL)
   }else if (datatype=="incidence_raw"){
     n <- splunits
     t_bar <- sum(pAbun / n * bL)
@@ -63,7 +63,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
   # Note 200204: currently, to compute Q, we treat incidence data as abundance and absolutely pool
   aL <- phyBranchAL_Abu(phylo = phylotr,data = da,"abundance",refT = H_max)$treeNabu %>%
     select(branch.abun,branch.length,tgroup)
-  PD2 <- PD.qprofile(aL,q = 2, reft = H_max, cal =  "PD",datatype =  "abundance")
+  PD2 <- PD.qprofile(aL,q = 2, cal =  "PD",datatype =  "abundance")
   Q <- H_max-(H_max^2)/PD2
   nms <- names(datalist)
   if(cal=="PD") refts <- unique(sort(c(Q,H_max,reft))) else refts <- unique(sort(c(1,Q,H_max,reft)))
@@ -75,7 +75,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
       emp <- sapply(1:ncol(aL$BLbyT), function(j){
         aL_table <- tibble(branch.abun = unlist(aL$treeNabu[,"branch.abun"]),branch.length = aL$BLbyT[,j],
                            tgroup = unlist(aL$treeNabu[,"tgroup"]))
-        PD.qprofile(aL = aL_table, q = q,reft = refts[j], cal = cal, datatype = datatype)
+        PD.qprofile(aL = aL_table, q = q, cal = cal, datatype = datatype)
       }) %>% c()
       if(nboot!=0){
         Boots <- Boots.one(phylo = phylotr,aL = aL$treeNabu,datatype,nboot,reft = refts, BLs = aL$BLbyT )
@@ -92,7 +92,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
             Li_refb <- Li_b_tmp[,j]
             Li_refb[Li_refb>refts[j]] <- refts[j]
             aL_table_b[,2] <- Li_refb
-            PD.qprofile(aL = aL_table_b, q = q,reft = refts[j],cal = cal, datatype = datatype, nforboot = n)
+            PD.qprofile(aL = aL_table_b, q = q,cal = cal, datatype = datatype, nforboot = n)
           }) %>% c()
           out_b
         }) %>% apply(., 1, sd)
@@ -112,7 +112,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
       emp <- sapply(1:ncol(aL$BLbyT), function(j){
         aL_table <- tibble(branch.abun = unlist(aL$treeNabu[,"branch.abun"]),branch.length = aL$BLbyT[,j],
                            tgroup = unlist(aL$treeNabu[,"tgroup"]))
-        PD.qprofile(aL = aL_table, q,reft = refts[j], cal, datatype,splunits=n)
+        PD.qprofile(aL = aL_table, q = q,cal = cal, datatype=datatype,splunits=n)
       }) %>% c()
       if(nboot!=0){
         Boots <- Boots.one(phylo = phylotr,aL = aL$treeNabu,datatype,nboot,reft = refts, BLs = aL$BLbyT,splunits = n)
@@ -129,7 +129,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
             Li_refb <- Li_b_tmp[,j]
             Li_refb[Li_refb>refts[j]] <- refts[j]
             aL_table_b[,2] <- Li_refb
-            PD.qprofile(aL = aL_table_b, q,reft = refts[j], splunits = n, cal, datatype)
+            PD.qprofile(aL = aL_table_b, q = q, splunits = n, cal = cal, datatype = datatype)
           }) %>% c()
           out_b
         }) %>% apply(., 1, sd)
@@ -203,7 +203,7 @@ Phdttable <- function(datalist, phylotr, times, cal, datatype, nboot, conf){
   # Note 200204: currently, to compute Q, we treat incidence data as abundance and absolutely pool
   aL <- phyBranchAL_Abu(phylo = phylotr,data = da,"abundance",refT = H_max)$treeNabu %>%
     select(branch.abun,branch.length,tgroup)
-  PD2 <- PD.qprofile(aL,q = 2, reft = H_max, cal =  "PD",datatype =  "abundance")
+  PD2 <- PD.qprofile(aL,q = 2, cal =  "PD",datatype =  "abundance")
   Q <- H_max-(H_max^2)/PD2
   nms <- names(datalist)
 
@@ -502,7 +502,7 @@ AsyPD <- function(datalist, datatype, phylotr, q, nboot, conf, reft){#change fin
       aL <- phyBranchAL_Abu(phylo = phylotr,data = x,datatype,refT = reft)
       aL$treeNabu$branch.length <- aL$BLbyT[,1]
       aL_table <- aL$treeNabu %>% select(branch.abun,branch.length,tgroup)
-      out <- PhD.q.est(aL = aL_table,q = q,reft = reft,datatype = datatype)
+      out <- PhD.q.est(aL = aL_table,q = q,datatype = datatype)
       est <- out[[1]]
       if(nboot!=0){
         Boots <- Boots.one(phylo = phylotr,aL = aL$treeNabu,datatype,nboot,reft = reft, BLs = aL$BLbyT )
@@ -515,7 +515,7 @@ AsyPD <- function(datalist, datatype, phylotr, q, nboot, conf, reft){#change fin
           isn0 <- aL_table_b[,1]>0
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
-          outb <- PhD.q.est(aL = aL_table_b,q = q,reft = reft,datatype = datatype,nforboot = n)[[1]]
+          outb <- PhD.q.est(aL = aL_table_b,q = q,datatype = datatype,nforboot = n)[[1]]
           return(outb)
         }) %>% apply(., 1, sd)
       }else{
@@ -534,7 +534,7 @@ AsyPD <- function(datalist, datatype, phylotr, q, nboot, conf, reft){#change fin
       aL <- phyBranchAL_Inc(phylo = phylotr,data = x,datatype,refT = reft)
       aL$treeNabu$branch.length <- aL$BLbyT[,1]
       aL_table <- aL$treeNabu %>% select(branch.abun,branch.length,tgroup)
-      out <- PhD.q.est(aL = aL_table,q = q,reft = reft,splunits = n,datatype = datatype)
+      out <- PhD.q.est(aL = aL_table,q = q,splunits = n,datatype = datatype)
       est <- out[[1]]
       if(nboot!=0){
         Boots <- Boots.one(phylo = phylotr,aL = aL$treeNabu,datatype = datatype,nboot = nboot,
@@ -548,7 +548,7 @@ AsyPD <- function(datalist, datatype, phylotr, q, nboot, conf, reft){#change fin
           isn0 <- aL_table_b[,1]>0
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
-          outb <- PhD.q.est(aL = aL_table_b,q = q,reft = reft,splunits = n,
+          outb <- PhD.q.est(aL = aL_table_b,q = q,splunits = n,
                                 datatype = datatype,nforboot = n)[[1]]
           return(outb)
         }) %>% apply(., 1, sd)
@@ -618,11 +618,11 @@ Asy_plot = function(output, type, method=NULL){##add title
   p <- p+ggtitle(title_)
   return(p)
 }
-PhD.q.est = function(aL, q, reft, splunits=NULL, datatype, nforboot = NULL){ # reft is a single value
+PhD.q.est = function(aL, q, splunits=NULL, datatype, nforboot = NULL){
   if(datatype=="abundance"){
     Abun <- unlist(aL$branch.abun[aL$tgroup=="Tip"])
     n <- ifelse(is.null(nforboot),sum(Abun), nforboot)
-    t_bar <- ifelse(is.null(nforboot),reft, sum(aL[,1] / n * aL[,2])) #just to save computation time
+    t_bar <-  sum(aL[,1] / n * aL[,2]) #just to save computation time
   }else if (datatype=="incidence_raw"){
     n <- splunits
     inci_freq <- unlist(aL$branch.abun[aL$tgroup=="Tip"])
@@ -819,7 +819,7 @@ inextPD = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NULL, 
       aL_table <- aL$treeNabu %>% select(branch.abun,branch.length,tgroup)
       x <- datalist[[i]] %>% .[.>0]
       n <- sum(x)
-      qPDm <- PhD.m.est(aL = aL_table,m = m[[i]],Q = Q,reft = reft, datatype = datatype,nforboot = NULL) %>%
+      qPDm <- PhD.m.est(aL = aL_table,m = m[[i]],Q = Q, datatype = datatype,nforboot = NULL) %>%
         t() %>% as.numeric()
       covm = Coverage(x, datatype, m[[i]])
       if(nboot!=0){
@@ -834,7 +834,7 @@ inextPD = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NULL, 
           isn0 <- aL_table_b[,1]>0
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
-          qPDm_b <-  PhD.m.est(aL=aL_table_b,m=m[[i]],Q=Q,reft,datatype,nforboot = n) %>%
+          qPDm_b <-  PhD.m.est(aL=aL_table_b,m=m[[i]],Q=Q,datatype=datatype,nforboot = n) %>%
             t() %>% as.numeric()
           covm_b = Coverage(unlist(aL_table_b$branch.abun[aL_table_b$tgroup=="Tip"]), datatype, m[[i]])
           # btime <- Sys.time()
@@ -860,7 +860,7 @@ inextPD = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NULL, 
       aL_table <- aL$treeNabu %>% select(branch.abun,branch.length,tgroup)
       x <- datalist[[i]] %>% .[rowSums(.)>0,colSums(.)>0]
       n <- ncol(x)
-      qPDm <- PhD.m.est(aL = aL_table,m = m[[i]],Q = Q,reft = reft, datatype = datatype,nforboot = NULL,splunits = n) %>%
+      qPDm <- PhD.m.est(aL = aL_table,m = m[[i]],Q = Q, datatype = datatype,nforboot = NULL,splunits = n) %>%
         t() %>% as.numeric()
       covm = Coverage(x, datatype, m[[i]])
       if(nboot!=0){
@@ -875,7 +875,7 @@ inextPD = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NULL, 
           isn0 <- aL_table_b[,1]>0
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
-          qPDm_b <-  PhD.m.est(aL=aL_table_b,m=m[[i]],Q=Q,reft,datatype,splunits = n) %>%
+          qPDm_b <-  PhD.m.est(aL=aL_table_b,m=m[[i]],Q=Q,datatype=datatype,splunits = n) %>%
             t() %>% as.numeric()
           covm_b = Coverage(unlist(aL_table_b$branch.abun[aL_table_b$tgroup=="Tip"]), datatype, m[[i]],n)
           # btime <- Sys.time()
@@ -897,11 +897,11 @@ inextPD = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NULL, 
   }
   return(Estoutput)
 }
-PhD.m.est = function(aL, m, Q, reft,datatype, nforboot = NULL, splunits = NULL){
+PhD.m.est = function(aL, m, Q,datatype, nforboot = NULL, splunits = NULL){
   if(datatype=="abundance"){
     Abun <- unlist(aL$branch.abun[aL$tgroup=="Tip"])
     n <- ifelse(is.null(nforboot),sum(Abun), nforboot)
-    t_bar <- ifelse(is.null(nforboot),reft, sum(aL[,1] / n * aL[,2])) #just to save computation time
+    t_bar <- sum(aL[,1] / n * aL[,2]) #just to save computation time
   }else if (datatype=="incidence_raw"){
     n <- splunits
     inci_freq <- unlist(aL$branch.abun[aL$tgroup=="Tip"])
@@ -909,10 +909,10 @@ PhD.m.est = function(aL, m, Q, reft,datatype, nforboot = NULL, splunits = NULL){
   }
   aL_matrix = as.matrix(aL[,c(1,2)])
   RPD_m = RPD(aL_matrix, n, n-1, Q)
-  obs <- PD.qprofile(aL = aL, q = Q, reft=reft, cal="PD" ,datatype = datatype , nforboot = nforboot, splunits = splunits)
+  obs <- PD.qprofile(aL = aL, q = Q, cal="PD" ,datatype = datatype , nforboot = nforboot, splunits = splunits)
   #obs = RPD(aL_matrix, n, n, Q)
   #asymptotic value
-  asy <- PhD.q.est(aL = aL,q = Q,reft = reft,datatype = datatype,nforboot = nforboot,splunits = splunits)$est
+  asy <- PhD.q.est(aL = aL,q = Q, datatype = datatype,nforboot = nforboot,splunits = splunits)$est
   #beta
   beta <- rep(0,length(Q))
   beta0plus <- which(asy != obs)
