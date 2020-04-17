@@ -85,7 +85,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
         aL_table_b <- tibble(branch.abun = 0, branch.length= Li_b[,1],tgroup = tgroup_B)
         ses <- sapply(1:nboot, function(B){
           aL_table_b[,1] <- Boots$boot_data[,B]
-          isn0 <- aL_table_b[,1]>0
+          isn0 <- as.vector(aL_table_b[,1]>0)
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
           out_b <- sapply(1:ncol(aL$BLbyT), function(j){
@@ -122,7 +122,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
         aL_table_b <- tibble(branch.abun = 0, branch.length= Li_b[,1],tgroup = tgroup_B)
         ses <- sapply(1:nboot, function(B){
           aL_table_b[,1] <- Boots$boot_data[,B]
-          isn0 <- aL_table_b[,1]>0
+          isn0 <- as.vector(aL_table_b[,1]>0)
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
           out_b <- sapply(1:ncol(aL$BLbyT), function(j){
@@ -228,7 +228,7 @@ Phdttable <- function(datalist, phylotr, times, cal, datatype, nboot, conf){
         tgroup_B <- c(rep("Tip",length(x)+f0),rep("Inode",nrow(Lis_b)-length(x)-f0))
         ses <- sapply(1:nboot, function(B){
           x_b <- Boots$boot_data[,B]
-          isn0 <- x_b>0
+          isn0 <- as.vector(x_b>0)
           Lis_b_tmp <- Lis_b[isn0,]
           tgroup_B_tmp <- tgroup_B[isn0]
           x_b <- x_b[isn0]
@@ -264,7 +264,7 @@ Phdttable <- function(datalist, phylotr, times, cal, datatype, nboot, conf){
         tgroup_B <- c(rep("Tip",nrow(x)+f0),rep("Inode",nrow(Lis_b)-nrow(x)-f0))
         ses <- sapply(1:nboot, function(B){
           x_b <- Boots$boot_data[,B]
-          isn0 <- x_b>0
+          isn0 <- as.vector(x_b>0)
           Lis_b_tmp <- Lis_b[isn0,]
           tgroup_B_tmp <- tgroup_B[isn0]
           x_b <- x_b[isn0]
@@ -318,7 +318,7 @@ AUC_one_table <- function(datalist, phylotr, knot, cal, datatype, nboot, conf, r
 
         ses <- sapply(1:nboot, function(B){
           x_b <- Boots$boot_data[,B]
-          isn0 <- x_b>0
+          isn0 <- as.vector(x_b>0)
           Lis_b_tmp <- Lis_b[isn0,]
           tgroup_B_tmp <- tgroup_B[isn0]
           x_b <- x_b[isn0]
@@ -359,7 +359,7 @@ AUC_one_table <- function(datalist, phylotr, knot, cal, datatype, nboot, conf, r
         tgroup_B <- c(rep("Tip",nrow(x)+f0),rep("Inode",nrow(Lis_b)-nrow(x)-f0))
         ses <- sapply(1:nboot, function(B){
           x_b <- Boots$boot_data[,B]
-          isn0 <- x_b>0
+          isn0 <- as.vector(x_b>0)
           Lis_b_tmp <- Lis_b[isn0,]
           tgroup_B_tmp <- tgroup_B[isn0]
           x_b <- x_b[isn0]
@@ -512,7 +512,7 @@ AsyPD <- function(datalist, datatype, phylotr, q, nboot, conf, reft){#change fin
         aL_table_b <- tibble(branch.abun = 0, branch.length= Li_b[,1],tgroup = tgroup_B)
         ses <- sapply(1:nboot, function(B){
           aL_table_b[,1] <- Boots$boot_data[,B]
-          isn0 <- aL_table_b[,1]>0
+          isn0 <- as.vector(aL_table_b[,1]>0)
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
           outb <- PhD.q.est(aL = aL_table_b,q = q,datatype = datatype,nforboot = n)[[1]]
@@ -545,7 +545,7 @@ AsyPD <- function(datalist, datatype, phylotr, q, nboot, conf, reft){#change fin
         aL_table_b <- tibble(branch.abun = 0, branch.length= Li_b[,1],tgroup = tgroup_B)
         ses <- sapply(1:nboot, function(B){
           aL_table_b[,1] <- Boots$boot_data[,B]
-          isn0 <- aL_table_b[,1]>0
+          isn0 <- as.vector(aL_table_b[,1]>0)
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
           outb <- PhD.q.est(aL = aL_table_b,q = q,splunits = n,
@@ -831,7 +831,7 @@ inextPD = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NULL, 
         ses <- sapply(1:nboot, function(B){
           # atime <- Sys.time()
           aL_table_b[,1] <- Boots$boot_data[,B]
-          isn0 <- aL_table_b[,1]>0
+          isn0 <- as.vector(aL_table_b[,1]>0)
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
           qPDm_b <-  PhD.m.est(aL=aL_table_b,m=m[[i]],Q=Q,datatype=datatype,nforboot = n) %>%
@@ -872,7 +872,7 @@ inextPD = function(datalist, phylotr, datatype, Q, nboot, conf=0.95, size=NULL, 
         ses <- sapply(1:nboot, function(B){
           # atime <- Sys.time()
           aL_table_b[,1] <- Boots$boot_data[,B]
-          isn0 <- aL_table_b[,1]>0
+          isn0 <- as.vector(aL_table_b[,1]>0)
           Li_b_tmp <- Li_b[isn0,]
           aL_table_b <- aL_table_b[isn0,]
           qPDm_b <-  PhD.m.est(aL=aL_table_b,m=m[[i]],Q=Q,datatype=datatype,splunits = n) %>%
