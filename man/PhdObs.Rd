@@ -64,7 +64,7 @@ data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 t_ <- data.inc$t
-out <- PhdObs(data = data, tree = tree, datatype = "incidence_raw", type = "PD",
+out <- PhdObs(data = data, tree = tree, datatype = "incidence_raw", t_ = t_,type = "PD",
 profile = "q", q = seq(0, 2, by = 0.25))
 }
 }

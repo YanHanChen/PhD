@@ -11,12 +11,12 @@ iNEXTPD(data, tree, datatype = "abundance", t_, q = c(0, 1, 2),
 \arguments{
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr Type (1) abundance data: a S by N matrix/data.frame
 where N is the number of assemblages. The element in i-th row and k-th is the abundance of species i in assemblage k. Please note
-that the rownames of data must be the species names matching the species names in phylogeny tree and thus can’t be empty.\cr
+that the rownames of data must be the species names matching the species names in phylogeny tree and thus can not be empty.\cr
 Type (2) incidence data: the sampling unit is quadrat or transect, the observed species was only recorded as presence(detection)/absence(non-detection)
 data in each sampling unit. For single assemblage consisting of t_ sampling units, data is a S by t_ incidence matrix,
 where S is the number of species. When there are N assemblages, users must first merge N data matrices by species identity to
 obtain a large incidence matrix, where the rows of the matrix refer to all species presented in the pooled data. Likewise,
-the rownames of data must be the species names matching the species names in phylogeny tree and thus can’t be empty. \cr}
+the rownames of data must be the species names matching the species names in phylogeny tree and thus can not be empty. \cr}
 
 \item{tree}{a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage.\cr}
 
@@ -48,7 +48,7 @@ in this case, the caculation of standard errors and confidence intervals will be
 \value{
 a list of four objects: \cr\cr
 \code{$summary} data information summary including reference sample size (\code{n}), number of observed species (\code{S.obs}),
-observed branch length (Faith’s PD) (\code{PD.obs}), the first two species frequency counts (\code{f1*}, \code{f2*}) and their branch length sums,
+observed branch length (Faith's PD) (\code{PD.obs}), the first two species frequency counts (\code{f1*}, \code{f2*}) and their branch length sums,
 respectively (\code{g1}, \code{g2}). \cr\cr
 \code{$reference_time} the reference time for the caculation. If \code{reftime} is not specified by users or \code{NULL}, \code{$reference_time}
 is the \code{tree} depth of pooled assemblage by default. \cr\cr

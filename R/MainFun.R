@@ -4,12 +4,12 @@
 #' See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background and methods.
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr Type (1) abundance data: a S by N matrix/data.frame
 #' where N is the number of assemblages. The element in i-th row and k-th is the abundance of species i in assemblage k. Please note
-#' that the rownames of data must be the species names matching the species names in phylogeny tree and thus can't be empty.\cr
+#' that the rownames of data must be the species names matching the species names in phylogeny tree and thus can not be empty.\cr
 #' Type (2) incidence data: the sampling unit is quadrat or transect, the observed species was only recorded as presence(detection)/absence(non-detection)
 #' data in each sampling unit. For single assemblage consisting of t_ sampling units, data is a S by t_ incidence matrix,
 #' where S is the number of species. When there are N assemblages, users must first merge N data matrices by species identity to
 #' obtain a large incidence matrix, where the rows of the matrix refer to all species presented in the pooled data. Likewise,
-#' the rownames of data must be the species names matching the species names in phylogeny tree and thus can't be empty. \cr
+#' the rownames of data must be the species names matching the species names in phylogeny tree and thus can not be empty. \cr
 #' @param tree a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage.\cr
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is \code{"abundance"}. \cr
@@ -37,7 +37,7 @@
 #' @importFrom phyclust get.rooted.tree.height
 #' @return a list of four objects: \cr\cr
 #' \code{$summary} data information summary including reference sample size (\code{n}), number of observed species (\code{S.obs}),
-#' observed branch length (Faith’s PD) (\code{PD.obs}), the first two species frequency counts (\code{f1*}, \code{f2*}) and their branch length sums,
+#' observed branch length (Faith's PD) (\code{PD.obs}), the first two species frequency counts (\code{f1*}, \code{f2*}) and their branch length sums,
 #' respectively (\code{g1}, \code{g2}). \cr\cr
 #' \code{$reference_time} the reference time for the caculation. If \code{reftime} is not specified by users or \code{NULL}, \code{$reference_time}
 #' is the \code{tree} depth of pooled assemblage by default. \cr\cr
@@ -78,47 +78,37 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
     stop("invlid class of order q, q should be a nonnegative integer value", call. = FALSE)
   # qq <- 0:2
   # if(is.na(pmatch(q, qq) == T) == T) stop("invalid order of q, we only compute q = 0, 1 or 2", call. = FALSE)
-
   if ((conf < 0) | (conf > 1) | (is.numeric(conf)==F)) stop('conf (confidence level) must be a numerical value between 0 and 1, We use "conf" = 0.95 to calculate!', call. = FALSE)
   if ((nboot < 0) | (is.numeric(nboot)==F)) stop('nboot must be a nonnegative integer, We use "nboot" = 50 to calculate!', call. = FALSE)
   if(class(data)=="numeric"|class(data)=="integer"|class(data)=="double" ) data <- as.matrix(data)
   if(is.null(rownames(data) ))
-    stop("Row names of data must be the species names that match tip names in tree and thus can't be empty.", call. = FALSE)
-  dat = list()
+    stop("Row names of data must be the species names that match tip names in tree and thus can not be empty.", call. = FALSE)
+
   data <- data[rowSums(data)>0,,drop=FALSE]
-  name <- rownames(data)
+  pool.name <- rownames(data)
+  mydata = list()
   if(datatype=="incidence_raw"){
     if(ncol(data) != sum(t_)) stop("Number of columns does not euqal to the sum of key in sampling units", call. = FALSE)
     n <- 0
     for(i in 1:length(t_)){
-      dat[[i]] <- data[,(n+1):(n+t_[i])]
+      mydata[[i]] <- data[,(n+1):(n+t_[i])]
       n <- n+t_[i]
     }
     if(is.null(names(t_))) {
-      names(dat) <- paste0("site",1:length(t_))
+      names(mydata) <- paste0("site",1:length(t_))
     }else{
-      names(dat) = names(t_)
+      names(mydata) = names(t_)
     }
   }else{
     if(is.null(colnames(data))) {colnames(data) <- paste0("site",1:ncol(data))}
-    dat <- lapply(1:ncol(data), function(i)  {x <- data[,i];names(x) <- name;x})
-    names(dat) = colnames(data)
+    mydata <- lapply(1:ncol(data), function(i)  {x <- data[,i];names(x) <- pool.name;x})
+    names(mydata) = colnames(data)
   }
   ###
-  if (datatype=="incidence_raw") {
-    pool.name = unique(unlist(sapply(dat, function(x)rownames(x)[rowSums(x)>0])))
-    mydata = lapply(dat, function(X) X[pool.name, ])
-    tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
-    mytree <- drop.tip(tree,tip)
-    H_max <- get.rooted.tree.height(mytree)
-  }
-  if (datatype=="abundance") {
-    pool.name = unique(unlist(lapply(dat, function(x) names(x)[x>0] )))#200304 bugs coccurs when input contains rowsums==0.
-    mydata = lapply(dat, function(X) X[pool.name])
-    tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
-    mytree <- drop.tip(tree,tip)
-    H_max <- get.rooted.tree.height(mytree)
-  }
+  tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
+  mytree <- drop.tip(tree,tip)
+  H_max <- get.rooted.tree.height(mytree)
+
   if(is.null(reftime)) {reft <- H_max
   }else if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
   }else {reft <- reftime}
@@ -233,48 +223,52 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
 #' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
 #' @export
 PhdAsy <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.25), conf = 0.95, nboot = 50, reftime = NULL){
-  dat = list()
-  if(is.null(rownames(data))) stop("The rownames (species names) of data can't be empty. Species names in data must match those in the phylogenetic tree")
-  pool.name <- rownames(data[rowSums(data)>0,,drop=FALSE])
+  if(is.null(rownames(data))) stop("The rownames (species names) of data can not be empty. Species names in data must match those in the phylogenetic tree")
   if (length(q) == 1) stop("length of q should be greater than one", call. = FALSE)
   if (sum(q<0)>=1) stop("q must be a positive number", call. = FALSE)
   if ((datatype != "incidence_raw") & (datatype != "abundance")) stop("invalid datatype", call. = FALSE)
   if ((conf < 0) | (conf < 0) | (is.numeric(conf)==F)) stop('conf"(confidence level) must be a numerical value between 0 and 1, We use "conf" = 0.95 to calculate!', call. = FALSE)
   if ((nboot < 0) | (is.numeric(nboot)==F)) stop('nboot must be a nonnegative integer, We use "nboot" = 50 to calculate!', call. = FALSE)
+
+  data <- data[rowSums(data)>0,,drop=FALSE]
+  pool.name <- rownames(data)
+  mydata = list()
   if(datatype=="incidence_raw"){
     if(ncol(data) != sum(t_)) stop("Number of columns does not euqal to the sum of key(t_) in sampling units", call. = FALSE)
     ntmp <- 0
     for(i in 1:length(t_)){
-      dat[[i]] <- data[,(ntmp+1):(ntmp+t_[i])]
+      mydata[[i]] <- data[,(ntmp+1):(ntmp+t_[i])]
       ntmp <- ntmp+t_[i]
     }
     if(is.null(names(t_))) {
-      names(dat) <- paste0("site",1:length(t_))
+      names(mydata) <- paste0("site",1:length(t_))
     }else{
-      names(dat) = names(t_)
+      names(mydata) = names(t_)
     }
   }else if (datatype == "abundance"){
     if(is.null(colnames(data))) {colnames(data) <- paste0("site",1:ncol(data))}
-    dat <- lapply(1:ncol(data), function(i)  {x <- data[pool.name,i];names(x) <- pool.name;x})
-    names(dat) = colnames(data)
+    mydata <- lapply(1:ncol(data), function(i)  {x <- data[,i];names(x) <- pool.name;x})
+    names(mydata) = colnames(data)
   }
   ###
-  if (datatype=="incidence_raw") {
-    mydata = lapply(dat, function(X) X[pool.name, ])
-  }
-  if (datatype=="abundance") {
-    mydata = lapply(dat, function(X) X[pool.name])
-  }
   tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
   mytree <- drop.tip(tree,tip)
   H_max <- get.rooted.tree.height(mytree)
+
   if(is.null(reftime)) {reft <- H_max
   }else if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
   }else {reft <- reftime}
 
+  if(class(mydata) == "list"){
+    infos <- sapply(mydata, function(x){
+      datainf(data = x, datatype, phylotr = mytree,reft = reft)})
+  }else{
+    return(NULL)
+  }
+
   FUN = function(e){
     temp = AsyPD(datalist = mydata, datatype, phylotr = mytree, q, nboot, conf, reft)# mytree is pooled tree of class phylo
-    ans <- list(summary = temp[[2]], reference_time = reft, asy = temp[[1]], figure = Asy_plot(temp[[1]], 1))
+    ans <- list(summary = infos, reference_time = reft, asy = temp, figure = Asy_plot(temp, 1))
     #class(ans) <- c("PhdAsy")
     return(ans)
   }
@@ -332,7 +326,7 @@ PhdAsy <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' t_ <- data.inc$t
-#' out <- PhdObs(data = data, tree = tree, datatype = "incidence_raw", type = "PD",
+#' out <- PhdObs(data = data, tree = tree, datatype = "incidence_raw", t_ = t_,type = "PD",
 #' profile = "q", q = seq(0, 2, by = 0.25))
 #' }
 #' @references
@@ -340,7 +334,6 @@ PhdAsy <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.
 #' @export
 PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile = "q", q = seq(0, 2, by = 0.25), tprofile_times = NULL,
                        nboot = 50,conf = 0.95,knots = 0,reftime = NULL){
-  dat = list()
   if (length(q) == 1) stop("length of q should be greater than one", call. = FALSE)
   if (sum(q<0)>=1) stop("q must be a positive number", call. = FALSE)
   if ((datatype != "incidence_raw") & (datatype != "abundance")) stop("invalid datatype", call. = FALSE)
@@ -353,37 +346,35 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
       stop('knot must be a nonnegative integer, We use "knots" = 50 to calculate!', call. = FALSE)
     }
   }
-  if(is.null(rownames(data))) stop("The rownames (species names) of data can't be empty. Species names in data must match those in the phylogenetic tree")
-  pool.name <- rownames(data[rowSums(data)>0,,drop=FALSE])
-  #if(is.null(tprofile_times)){ tprofile_times <- "unspecified" }
+  if(is.null(rownames(data))) stop("The rownames (species names) of data can not be empty. Species names in data must match those in the phylogenetic tree")
+
+  data <- data[rowSums(data)>0,,drop=FALSE]
+  pool.name <- rownames(data)
+  mydata = list()
+
   if(datatype=="incidence_raw"){
     if(ncol(data) != sum(t_)) stop("Number of columns does not euqal to the sum of key(t_) in sampling units", call. = FALSE)
     ntmp <- 0
     for(i in 1:length(t_)){
-      dat[[i]] <- data[,(ntmp+1):(ntmp+t_[i])]
+      mydata[[i]] <- data[,(ntmp+1):(ntmp+t_[i])]
       ntmp <- ntmp+t_[i]
     }
     if(is.null(names(t_))) {
-      names(dat) <- paste0("site",1:length(t_))
+      names(mydata) <- paste0("site",1:length(t_))
     }else{
-      names(dat) = names(t_)
+      names(mydata) = names(t_)
     }
   }else if (datatype == "abundance"){
     if(is.null(colnames(data))) {colnames(data) <- paste0("site",1:ncol(data))}
-    dat <- lapply(1:ncol(data), function(i)  {x <- data[pool.name,i];names(x) <- pool.name;x})
-    names(dat) = colnames(data)
+    mydata <- lapply(1:ncol(data), function(i)  {x <- data[,i];names(x) <- pool.name;x})
+    names(mydata) = colnames(data)
   }
 
   ###
-  if (datatype=="incidence_raw") {
-    mydata = lapply(dat, function(X) X[pool.name, ])
-  }
-  if (datatype=="abundance") {
-    mydata = lapply(dat, function(X) X[pool.name])
-  }
   tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
   mytree <- drop.tip(tree,tip)
   H_max <- get.rooted.tree.height(mytree)
+
   if(is.null(reftime)) {reft <- H_max
   }else if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
   }else {reft <- reftime}
@@ -423,6 +414,116 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
   #temp <- FUN(3)
   temp <- tryCatch(FUN(e), error = function(e){return()})
   return(temp)
+}
+
+
+#' Compute phylogenetic diversity with a particular sample coverage
+#'
+#' \code{EstimatePD}: computes phylogenetic diversity(PD) with a particular user-specified level of sample coverage.
+#' @param data a matrix/data.frame of species abundances/incidences data.\cr
+#' See \code{\link{iNEXTPD}} for data details.
+#' @param tree a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr
+#' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
+#' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr
+#' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if \code{datatype = "abundance"}.\cr
+#' Ignored if \code{datatype = "abundance"}.
+#' @param q a nonnegative sequence specifying the diversity orders of PD. Default is \code{c(0,1,2)}. \cr
+#' @param level a ppsitive vector < 1 specifying a particular value of sample coverage.
+#' If \code{NULL},then \code{level} will be chosen as the minimum coverage of all sites after extrapolating each site to its double sample sizes. Default is \code{NULL}.
+#' @param nboot a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
+#' in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.
+#' @param conf a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr
+#' @param reftime a positive value specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.
+#' @import chaoUtility
+#' @import dplyr
+#' @importFrom stats qnorm
+#' @importFrom stats sd
+#' @importFrom stats optimize
+#' @importFrom ape drop.tip
+#' @importFrom phyclust get.rooted.tree.height
+#' @return a \code{tibble} of phylogenetic diversity(PD) table including the sample size, sample coverage,
+#' method (Interpolated or Extrapolated), and diversity estimates with each q for the user-specified sample coverage. \cr\cr
+#' @examples
+#' \donttest{
+#' # Type (1) abundance data
+#' data(data.abu)
+#' data <- data.abu$data
+#' tree <- data.abu$tree
+#' out <- EstimatePD(data = data, tree = tree,datatype = "abundance")
+#' # Type (2) incidence data
+#' data(data.inc)
+#' data <- data.inc$data
+#' tree <- data.inc$tree
+#' t_ <- data.inc$t
+#' out <- EstimatePD(data = data, tree = tree,datatype = "incidence_raw",t_ = t_)
+#' }
+#' @references
+#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
+#' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
+#' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
+#' @export
+EstimatePD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), level = NULL, nboot = 50,conf = 0.95,reftime=NULL){
+  if(is.null(rownames(data))) stop("The rownames (species names) of data can not be empty. Species names in data must match those in the phylogenetic tree")
+  if (sum(q<0)>=1) stop("q must be a positive number", call. = FALSE)
+  if ((datatype != "incidence_raw") & (datatype != "abundance")) stop("invalid datatype", call. = FALSE)
+  if ((conf < 0) | (conf > 1) | (is.numeric(conf)==F)) stop('conf"(confidence level) must be a numerical value between 0 and 1, We use "conf" = 0.95 to calculate!', call. = FALSE)
+  if ((nboot < 0) | (is.numeric(nboot)==F)) stop('nboot must be a nonnegative integer, We use "nboot" = 50 to calculate!', call. = FALSE)
+  #if (length(level)>1) stop('Currently, we only accept one fixed level of coverage.')
+
+  data <- data[rowSums(data)>0,,drop=FALSE]
+  pool.name <- rownames(data)
+  mydata = list()
+  if(datatype=="incidence_raw"){
+    if(ncol(data) != sum(t_)) stop("Number of columns does not euqal to the sum of t_ (number of sampling units for each community).", call. = FALSE)
+    ntmp <- 0
+    for(i in 1:length(t_)){
+      mydata[[i]] <- data[,(ntmp+1):(ntmp+t_[i])]
+      ntmp <- ntmp+t_[i]
+    }
+    if(is.null(names(t_))) {
+      names(mydata) <- paste0("site",1:length(t_))
+    }else{
+      names(mydata) = names(t_)
+    }
+  }else if (datatype == "abundance"){
+    if(is.null(colnames(data))) {colnames(data) <- paste0("site",1:ncol(data))}
+    mydata <- lapply(1:ncol(data), function(i)  {x <- data[pool.name,i];names(x) <- pool.name;x})
+    names(mydata) = colnames(data)
+  }
+  ###
+
+  tip <- tree$tip.label[-match(pool.name,tree$tip.label)]
+  mytree <- drop.tip(tree,tip)
+  H_max <- get.rooted.tree.height(mytree)
+
+  if(is.null(reftime)) {reft <- H_max
+  }else if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
+  }else {reft <- reftime}
+
+  if(is.null(level)){
+    if(datatype=='abundance'){
+      level <- sapply(mydata,function(x){
+        ni <- sum(x)
+        Coverage(data = x,datatype = datatype,m = 2*ni,nt = ni)
+      })
+
+    }else if(datatype=='incidence_raw'){
+      level <- sapply(mydata,function(x){
+        ni <- ncol(x)
+        Coverage(data = x,datatype = datatype,m = 2*ni,nt = ni)
+      })
+    }
+    level <- min(level)
+  }
+
+  out <- invChatPD(datalist = mydata, phylotr = mytree, q = q, datatype = datatype,
+                   level=level, nboot = nboot, conf = conf, reft = reft)
+  out$qPD.LCL[out$qPD.LCL<0] <- 0
+  if((nboot>1)==FALSE){
+    out$qPD.LCL <- NA
+    out$qPD.UCL <- NA
+  }
+  out
 }
 
 #' @useDynLib PhD
