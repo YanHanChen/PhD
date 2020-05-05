@@ -1022,7 +1022,7 @@ invChatPD <- function(datalist, phylotr, q, datatype, level, nboot, conf, reft){
           aL_table_b <- aL_table_b[isn0,]
           est_b <- invChatPD_abu(aL_table = aL_table_b,q = q,C = level, n = n)$qPD
           return(est_b)
-        }) %>% apply(., 1, sd)
+        }) %>% matrix(.,nrow = length(q)) %>% apply(., 1, sd)
       }else{
         ses <- rep(0,nrow(est))
       }
@@ -1050,7 +1050,7 @@ invChatPD <- function(datalist, phylotr, q, datatype, level, nboot, conf, reft){
           aL_table_b <- aL_table_b[isn0,]
           est_b <- invChatPD_inc(aL_table = aL_table_b,q = q,C = level, n = n)$qPD
           return(est_b)
-        }) %>% apply(., 1, sd)
+        }) %>% matrix(.,nrow = length(q)) %>% apply(., 1, sd)
       }else{
         ses <- rep(0,nrow(est))
       }
@@ -1058,8 +1058,9 @@ invChatPD <- function(datalist, phylotr, q, datatype, level, nboot, conf, reft){
     }) %>% do.call(rbind,.)
   }
   Community = rep(names(datalist), each = length(q)*length(level))
-  out <- out %>% mutate(site = Community)
-  out <- out[, c(ncol(out), seq(1, (ncol(out) - 1)))]
+  goalSC = rep(rep(level,each = length(q)),length(datalist))
+  out <- out %>% mutate(goalSC = goalSC,site = Community)
+  out <- out[,c(ncol(out),1,2,3,5,4,6,7,8)]
   rownames(out) <- NULL
   out
 }
@@ -1095,6 +1096,7 @@ invChatPD_abu <- function(aL_table, q, Cs, n){
     }
     mm
   })
+  mm[mm==0] <- 1
   SC <- Coverage(x, 'abundance', mm, n)
   out <- PhD.m.est(aL = aL_table,m = mm,Q = q,datatype = 'abundance',nt = n)
   out <- as.vector(out)
@@ -1138,7 +1140,7 @@ invChatPD_inc <- function(aL_table, q, Cs, n){
     }
     mm
   })
-
+  mm[mm==0] <- 1
   SC <- Coverage(x, 'incidence', mm, n)
   out <- PhD.m.est(aL = aL_table,m = mm,Q = q,datatype = 'incidence_raw',nt = n)
   out <- as.vector(out)

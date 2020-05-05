@@ -441,8 +441,10 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
 #' @importFrom stats optimize
 #' @importFrom ape drop.tip
 #' @importFrom phyclust get.rooted.tree.height
-#' @return a \code{tibble} of phylogenetic diversity(PD) table including the sample size, sample coverage,
-#' method (Interpolated or Extrapolated), and diversity estimates with each q for the user-specified sample coverage. \cr\cr
+#' @return a \code{list} consisting of two objects:\cr\cr
+#' (1) \code{PD_Coverage}, phylogenetic diversity(PD) table including the sample size, sample coverage,
+#' method (Interpolated or Extrapolated), and diversity estimates with each \code{q} for the user-specified sample coverage. \cr\cr
+#' (2) \code{reftime} the reference time point of the analysis, default or specified by the user. \cr\cr
 #' @examples
 #' \donttest{
 #' # Type (1) abundance data
@@ -523,7 +525,7 @@ EstimatePD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), lev
     out$qPD.LCL <- NA
     out$qPD.UCL <- NA
   }
-  out
+  return(list(PD_Coverage = out,reftime = reft))
 }
 
 #' @useDynLib PhD

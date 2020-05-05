@@ -32,8 +32,10 @@ in this case, the caculation of standard errors and confidence intervals will be
 \item{reftime}{a positive value specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
 }
 \value{
-a \code{tibble} of phylogenetic diversity(PD) table including the sample size, sample coverage,
-method (Interpolated or Extrapolated), and diversity estimates with each q for the user-specified sample coverage. \cr\cr
+a \code{list} consisting of two objects:\cr\cr
+(1) \code{PD_Coverage}, phylogenetic diversity(PD) table including the sample size, sample coverage,
+method (Interpolated or Extrapolated), and diversity estimates with each \code{q} for the user-specified sample coverage. \cr\cr
+(2) \code{reftime} the reference time point of the analysis, default or specified by the user. \cr\cr
 }
 \description{
 \code{EstimatePD}: computes phylogenetic diversity(PD) with a particular user-specified level of sample coverage.
