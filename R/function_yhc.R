@@ -1059,8 +1059,8 @@ invChatPD <- function(datalist, phylotr, q, datatype, level, nboot, conf, reft){
   }
   Community = rep(names(datalist), each = length(q)*length(level))
   goalSC = rep(rep(level,each = length(q)),length(datalist))
-  out <- out %>% mutate(goalSC = goalSC,site = Community)
-  out <- out[,c(ncol(out),1,2,3,5,4,6,7,8)]
+  out <- out %>% mutate(goalSC = goalSC,site = Community,reftime = reft)
+  out <- out[,c(9,1,2,3,5,4,6,7,8,10)]
   rownames(out) <- NULL
   out
 }

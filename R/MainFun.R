@@ -417,9 +417,9 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
 }
 
 
-#' Compute phylogenetic diversity with a particular sample coverage
+#' Compute phylogenetic diversity with a particular sample coverages.
 #'
-#' \code{EstimatePD}: computes phylogenetic diversity(PD) with a particular user-specified level of sample coverage.
+#' \code{EstimatePD}: computes phylogenetic diversity(PD) with particular user-specified levels of sample coverage.
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr
 #' See \code{\link{iNEXTPD}} for data details.
 #' @param tree a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr
@@ -428,7 +428,7 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
 #' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if \code{datatype = "abundance"}.\cr
 #' Ignored if \code{datatype = "abundance"}.
 #' @param q a nonnegative sequence specifying the diversity orders of PD. Default is \code{c(0,1,2)}. \cr
-#' @param level a ppsitive vector < 1 specifying a particular value of sample coverage.
+#' @param level a positive sequence < 1 specifying a particular value of sample coverage.
 #' If \code{NULL},then \code{level} will be chosen as the minimum coverage of all sites after extrapolating each site to its double sample sizes. Default is \code{NULL}.
 #' @param nboot a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
 #' in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.
@@ -441,30 +441,28 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
 #' @importFrom stats optimize
 #' @importFrom ape drop.tip
 #' @importFrom phyclust get.rooted.tree.height
-#' @return a \code{list} consisting of two objects:\cr\cr
-#' (1) \code{PD_Coverage}, phylogenetic diversity(PD) table including the sample size, sample coverage,
-#' method (Interpolated or Extrapolated), and diversity estimates with each \code{q} for the user-specified sample coverage. \cr\cr
-#' (2) \code{reftime} the reference time point of the analysis, default or specified by the user. \cr\cr
+#' @return a \code{tibble} tabulating the PD estimates with each \code{q} for the user-specified sample coverages. In addition,
+#' the corresponding sample sizes and sample coverages are provided. \cr\cr
 #' @examples
 #' \donttest{
 #' # Type (1) abundance data
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- EstimatePD(data = data, tree = tree,datatype = "abundance")
+#' out <- estimatePD(data = data, tree = tree,datatype = "abundance")
 #' # Type (2) incidence data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' t_ <- data.inc$t
-#' out <- EstimatePD(data = data, tree = tree,datatype = "incidence_raw",t_ = t_)
+#' out <- estimatePD(data = data, tree = tree,datatype = "incidence_raw",t_ = t_)
 #' }
 #' @references
 #' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
 #' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
 #' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
 #' @export
-EstimatePD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), level = NULL, nboot = 50,conf = 0.95,reftime=NULL){
+estimatePD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), level = NULL, nboot = 50,conf = 0.95,reftime=NULL){
   if(is.null(rownames(data))) stop("The rownames (species names) of data can not be empty. Species names in data must match those in the phylogenetic tree")
   if (sum(q<0)>=1) stop("q must be a positive number", call. = FALSE)
   if ((datatype != "incidence_raw") & (datatype != "abundance")) stop("invalid datatype", call. = FALSE)
@@ -525,7 +523,7 @@ EstimatePD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), lev
     out$qPD.LCL <- NA
     out$qPD.UCL <- NA
   }
-  return(list(PD_Coverage = out,reftime = reft))
+  return(out)
 }
 
 #' @useDynLib PhD
