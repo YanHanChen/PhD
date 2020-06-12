@@ -449,7 +449,7 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
 
       temp <- Phdqtable(datalist = mydata, phylotr = mytree, q, cal = type, datatype, nboot, conf, reft)
       ans <- list(summary = infos, forq_table = temp, forq_figure = Plotq(temp, type))
-      class(ans) <- c("PhdObs")
+      #class(ans) <- c("PhdObs")
       return(ans)
     }
     if(profile == "time") {

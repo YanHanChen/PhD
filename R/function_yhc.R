@@ -207,7 +207,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
   odr <- rep(q,length(reft)*length(nms))
   reftime <- rep(rep(reft,each = length(q)),length(nms))
   nms_tmp <- rep(nms,each = length(q)*length(reft))
-  Outputforq <- tibble(q = odr, Empirical = out[,1],LCL = out[,2], UCL = out[,3],
+  Outputforq <- tibble(Order.q = odr, Empirical = out[,1],LCL = out[,2], UCL = out[,3],
                        reftime = reftime,Community = nms_tmp)
   Outputforq <- Outputforq %>% mutate (method = ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill numbers"))
   return(Outputforq)
@@ -330,7 +330,7 @@ Phdttable <- function(datalist, phylotr, times, cal, datatype, nboot, conf){
 
   Outputfort <- tibble(time = rep(times,length(q_int)*length(datalist)),
                        Empirical = out[,1],LCL = out[,2], UCL = out[,3],
-                       q = rep(rep(q_int, each=length(times)),length(datalist)),
+                       Order.q = rep(rep(q_int, each=length(times)),length(datalist)),
                        Community = rep(nms, each=length(times)*length(q_int)),
                        method=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill numbers"))
   out = list(fort = Outputfort, Q_Height=c(Q, H_max))
@@ -426,14 +426,14 @@ AUC_one_table <- function(datalist, phylotr, knot, cal, datatype, nboot, conf, r
   }
 
 
-  AUC <- tibble(q = rep(q_int,length(nms)), Empirical = AUC[,1],LCL = AUC[,2], UCL = AUC[,3],
+  AUC <- tibble(Order.q = rep(q_int,length(nms)), Empirical = AUC[,1],LCL = AUC[,2], UCL = AUC[,3],
                        Community = rep(nms,each = length(q_int)))
   AUC
 }
 Plott <- function(out, cal, Q_Height){
   fort <- out
-  fort$q = paste0("q = ", fort$q)
-  fort$q <- factor(fort$q)
+  fort$Order.q = paste0("q = ", fort$Order.q)
+  fort$Order.q <- factor(fort$Order.q)
   Community <- unique(fort$Community)
   Q = Q_Height[1]
   root = Q_Height[2]
@@ -441,10 +441,10 @@ Plott <- function(out, cal, Q_Height){
   # print(Q)
   if (cal=="PD") {
     if(length(Community)==1){
-      p2 <- ggplot(fort, aes(x=time, y=Empirical)) + geom_line(size=1.5,aes(color=q))+
-        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=q),linetype = 0,alpha=0.3)
+      p2 <- ggplot(fort, aes(x=time, y=Empirical)) + geom_line(size=1.5,aes(color=Order.q))+
+        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Order.q),linetype = 0,alpha=0.3)
       p2 <-  p2 +xlab("time")+ylab("Phylogenetic Diversity")+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(fort, time%in%c(Q, root)), aes(x=time, y=Empirical, color=q))+
+        geom_point(size=3, data=subset(fort, time%in%c(Q, root)), aes(x=time, y=Empirical, color=Order.q))+
         annotate('text',x=Q, y=0.1,label="Q" ,parse = TRUE,size=5, color = "gray") +
         annotate('text',x=root, y=0.1, label="root",parse = TRUE,size=5, color = "gray") +
         geom_vline(xintercept = c(Q,root), linetype = "longdash",size=0.5, color = "gray")
@@ -458,15 +458,15 @@ Plott <- function(out, cal, Q_Height){
         annotate('text',x=Q, y=0.1,label="Q" ,parse = TRUE,size=5, color = "gray") +
         annotate('text',x=root, y=0.1, label="root",parse = TRUE,size=5, color = "gray") +
         geom_vline(xintercept = c(Q,root), linetype = "longdash",size=0.5, color = "gray") +
-        facet_wrap(~q, scales = "free")
+        facet_wrap(~Order.q, scales = "free")
       p2 <-  p2 +xlab("time")+ylab("Phylogenetic Diversity")
     }
   } else {
     if(length(Community)==1){
-      p2 <- ggplot(fort, aes(x=time, y=Empirical)) + geom_line(size=1.5,aes(color=q))+
-        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=q),linetype = 0,alpha=0.3)
+      p2 <- ggplot(fort, aes(x=time, y=Empirical)) + geom_line(size=1.5,aes(color=Order.q))+
+        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Order.q),linetype = 0,alpha=0.3)
       p2 <-  p2 +xlab("time")+ylab("Phylogenetic Hill numbers")+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(fort, time%in%c(0.01, Q, root)), aes(x=time, y=Empirical, color=q))+
+        geom_point(size=3, data=subset(fort, time%in%c(0.01, Q, root)), aes(x=time, y=Empirical, color=Order.q))+
         annotate('text',x=Q, y=0.1,label="Q" ,parse = TRUE,size=5, color = "gray") +
         annotate('text',x=0.01, y=0.1,label=0.01 ,parse = TRUE,size=5, color = "gray") +
         annotate('text',x=root, y=0.1, label="root",parse = TRUE,size=5, color = "gray") +
@@ -482,7 +482,7 @@ Plott <- function(out, cal, Q_Height){
         annotate('text',x=0.01, y=0.1,label=0.01 ,parse = TRUE,size=5, color = "gray") +
         annotate('text',x=root, y=0.1, label="root",parse = TRUE,size=5, color = "gray") +
         geom_vline(xintercept = c(0.01, Q,root), linetype = "longdash",size=0.5, color = "gray") +
-        facet_wrap(~q, scales = "free")
+        facet_wrap(~Order.q, scales = "free")
       p2 <-  p2 +xlab("time")+ylab("Phylogenetic Hill numbers")
     }
   }
@@ -495,24 +495,24 @@ Plotq <- function(out, cal){
   # forq$reftime <- as.character(forq$reftime)
   # forq$reftime <- factor(forq$reftime, levels = unique(forq$reftime <- factor(forq$reftime)))
   Community <- unique(forq$Community)
-  q1 <- unique(forq$q[(forq$q %% 1)==0])
+  q1 <- unique(forq$Order.q[(forq$Order.q %% 1)==0])
   if (cal=="PD") {
     #haha=sapply(strsplit(as.character(forq$reftime), " = "), function(i) i) %>% as.vector() %>% unique()
     #Q=haha[2] %>% as.numeric()
     #root=haha[4] %>% as.numeric()
     if(length(Community)==1){
-      p1 <- ggplot(forq, aes(x=q, y=Empirical, color=reftime)) + geom_line(size=1.5)+
+      p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=reftime)) + geom_line(size=1.5)+
         geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=reftime),linetype = 0,alpha=0.3)
       #lai 1006
       p1 <-  p1 +xlab("Order q")+ylab("Phylogenetic Diversity") +theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(forq, q%in%q1), aes(x=q, y=Empirical, color=reftime))
+        geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=reftime))
     }else{
-      p1 <- ggplot(forq, aes(x=q, y=Empirical, color=Community, linetype=Community)) + geom_line(size=1.5)  +
+      p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=Community, linetype=Community)) + geom_line(size=1.5)  +
         geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Community),linetype = 0,alpha=0.3)+
         scale_color_manual(values = color_nogreen(length(unique(forq$Community))))+
         scale_fill_manual(values = color_nogreen(length(unique(forq$Community))))+
         theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(forq, q%in%q1), aes(x=q, y=Empirical, color=Community))+
+        geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=Community))+
         facet_wrap(~reftime, scales = "free")
       p1 <-  p1 +xlab("Order q")+ylab("Phylogenetic Diversity")
     }
@@ -521,17 +521,17 @@ Plotq <- function(out, cal){
     #Q=haha[[2]][2] %>% as.numeric()
     #root=haha[[3]][2] %>% as.numeric()
     if(length(Community)==1){
-      p1 <- ggplot(forq, aes(x=q, y=Empirical, color=reftime)) + geom_line(size=1.5)+
+      p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=reftime)) + geom_line(size=1.5)+
         geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=reftime),linetype = 0,alpha=0.3)
       p1 <-  p1 +xlab("Order q")+ylab("Phylogenetic Hill numbers") +theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(forq, q%in%q1), aes(x=q, y=Empirical, color=reftime))
+        geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=reftime))
     }else{
-      p1 <- ggplot(forq, aes(x=q, y=Empirical, color=Community, linetype=Community)) + geom_line(size=1.5)  +
+      p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=Community, linetype=Community)) + geom_line(size=1.5)  +
         geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Community),linetype = 0,alpha=0.3)+
         scale_color_manual(values = color_nogreen(length(unique(forq$Community))))+
         scale_fill_manual(values = color_nogreen(length(unique(forq$Community))))+
         theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(forq, q%in%q1), aes(x=q, y=Empirical, color=Community))+
+        geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=Community))+
         facet_wrap(~reftime, scales = "free")
       p1 <-  p1 +xlab("Order q")+ylab("Phylogenetic Hill numbers")
     }
@@ -568,7 +568,7 @@ AsyPD <- function(datalist, datatype, phylotr, q, nboot, conf, reft){#change fin
       }else{
         ses <- rep(NA,length(est))
       }
-      est <- tibble(Order = q, Estimate = est, se = ses, LCL = est - qtile*ses, UCL = est + qtile*ses)
+      est <- tibble(Order.q = q, Estimate = est, se = ses, LCL = est - qtile*ses, UCL = est + qtile*ses)
       est
     })
   }else if(datatype=="incidence_raw"){
@@ -598,7 +598,7 @@ AsyPD <- function(datalist, datatype, phylotr, q, nboot, conf, reft){#change fin
       }else{
         ses <- rep(NA,length(est))
       }
-      est <- tibble(Order = q, Estimate = est, se = ses, LCL = est - qtile*ses, UCL = est + qtile*ses)
+      est <- tibble(Order.q = q, Estimate = est, se = ses, LCL = est - qtile*ses, UCL = est + qtile*ses)
       est
     })
   }
@@ -868,7 +868,7 @@ inextPD = function(datalist, phylotr, datatype, q, nboot, conf=0.95, m, reft){
       orderq <- rep(q,each=length(m[[i]]))
       ses_cov <- ses[(length(ses)-length(m[[i]])+1):length(ses)]
       ses_pd <- ses[-((length(ses)-length(m[[i]])+1):length(ses))]
-      tibble(m=rep(m[[i]],length(q)),method=rep(method,length(q)),order=orderq,
+      tibble(m=rep(m[[i]],length(q)),method=rep(method,length(q)),Order.q=orderq,
              qPD=qPDm,qPD.LCL=qPDm-qtile*ses_pd,qPD.UCL=qPDm+qtile*ses_pd,
              SC=rep(covm,length(q)),SC.LCL=rep(covm-qtile*ses_cov,length(q)),SC.UCL=rep(covm+qtile*ses_cov,length(q)),
              Community = nms[i])
@@ -909,7 +909,7 @@ inextPD = function(datalist, phylotr, datatype, q, nboot, conf=0.95, m, reft){
       orderq <- rep(q,each=length(m[[i]]))
       ses_cov <- ses[(length(ses)-length(m[[i]])+1):length(ses)]
       ses_pd <- ses[-((length(ses)-length(m[[i]])+1):length(ses))]
-      tibble(t=rep(m[[i]],length(q)),method=rep(method,length(q)),order=orderq,
+      tibble(t=rep(m[[i]],length(q)),method=rep(method,length(q)),Order.q=orderq,
              qPD=qPDm,qPD.LCL=qPDm-qtile*ses_pd,qPD.UCL=qPDm+qtile*ses_pd,
              SC=rep(covm,length(q)),SC.LCL=rep(covm-qtile*ses_cov,length(q)),SC.UCL=rep(covm+qtile*ses_cov,length(q)),
              Community = nms[i])
@@ -1019,11 +1019,11 @@ RE_plot = function(data, datatype, type, method=NULL){
       output <- data[, c(7, 2, 4, 5, 6, 10,3)]
       xlab_ <- "Sample Coverage"
     }else if(type == 3){
-      output <- data[, c(1, 2, 7, 8, 9, 10,3)] %>% filter(order==1)
+      output <- data[, c(1, 2, 7, 8, 9, 10,3)] %>% filter(Order.q==1)
       xlab_ <- paste0("Number of ", x)
       ylab_ <- "Sample Coverage"
     }
-    colnames(output) <- c("x", "Method", "y", "LCL", "UCL", "Community","order")
+    colnames(output) <- c("x", "Method", "y", "LCL", "UCL", "Community","Order.q")
     output[, 2] <- as.character(output[, 2])
     output[, 6] <- as.character(output[, 6])
     output2 <- output
@@ -1038,7 +1038,7 @@ RE_plot = function(data, datatype, type, method=NULL){
         scale_linetype_manual(values = c("dashed", "solid"), name="Method",breaks=c("Interpolated", "Extrapolated"), labels=c("Interpolation", "Extrapolation"))+
         theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
         ggtitle(title)+guides(linetype=guide_legend(keywidth=2.5))
-      if(type!=3) outp <- outp + facet_wrap(~order,scales = "free_y")
+      if(type!=3) outp <- outp + facet_wrap(~Order.q,scales = "free_y")
     }else{
       outp <- ggplot(output2, aes(x = x, y = y, color=Community))+geom_line(size=1.5, aes(x = x, y = y, color=Community, linetype=Method))+
         scale_color_manual(values = color_nogreen(length(unique(output2$Community))))+
@@ -1048,7 +1048,7 @@ RE_plot = function(data, datatype, type, method=NULL){
         scale_linetype_manual(values = c("dashed", "solid"), name="Method",breaks=c("Interpolated", "Extrapolated"), labels=c("Interpolation", "Extrapolation"))+
         theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
         ggtitle(title)+guides(linetype=guide_legend(keywidth=2.5))
-      if(type!=3) outp <- outp + facet_wrap(~order,scales = "free_y")
+      if(type!=3) outp <- outp + facet_wrap(~Order.q,scales = "free_y")
     }
   }
   return(outp)
@@ -1168,7 +1168,7 @@ invChatPD_abu <- function(aL_table, q, Cs, n){
   m <- rep(mm,each = length(q))
   order <- rep(q,length(mm))
   SC <- rep(SC,each = length(q))
-  tibble(m = m,method = method,order = order,
+  tibble(m = m,method = method,Order.q = order,
          qPD = out,SC=SC)
 }
 
@@ -1212,7 +1212,7 @@ invChatPD_inc <- function(aL_table, q, Cs, n){
   m <- rep(mm,each = length(q))
   order <- rep(q,length(mm))
   SC <- rep(SC,each = length(q))
-  tibble(t_ = m,method = method,order = order,
+  tibble(t_ = m,method = method,Order.q = order,
          qPD = out,SC=SC)
 }
 
