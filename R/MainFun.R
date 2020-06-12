@@ -124,18 +124,54 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
   #btime <- Sys.time()
   #print(paste0('Info time:',btime-atime))
   ############output2
-  if(datatype == "abundance") {
-    up <- lapply(mydata, function(j) 2*sum(j))
-  }else {
-    up <- lapply(mydata, function(j) 2*ncol(j))
+  if(length(knots)!=length(mydata)) knots <- rep(knots,length(mydata))
+  if(is.null(size)){
+    if(is.null(endpoint)){
+      if(datatype == "abundance") {
+        endpoint <- sapply(mydata, function(x) 2*sum(x))
+      }else if(datatype == "incidence_raw"){
+        endpoint <- sapply(mydata, function(x) 2*ncol(x))
+      }
+    }else{
+      if(length(endpoint)!=length(mydata)){
+        endpoint <- rep(endpoint,length(mydata))
+      }
+    }
+    size <- lapply(1:length(mydata),function(i){
+      if(datatype == "abundance") {
+        ni <- sum(mydata[[i]])
+      }else if(datatype == "incidence_raw"){
+        ni <- ncol(mydata[[i]])
+      }
+
+      if(endpoint[i] <= ni){
+        mi <- floor(seq(1,endpoint[i],length.out = knots[i]))
+      }else{
+        mi <- floor(c(seq(1,ni,length.out = floor(knots[i]/2)),
+                      seq(ni+1,endpoint[i],length.out = knots[i]-floor(knots[i]/2))))
+      }
+      unique(mi)
+    })
+  }else{
+    if(class(size)=="numeric"|class(size)=="integer"|class(size)=="double"){
+      size <- list(size = size)
+    }
+    if(length(size)!=length(mydata)) size <- lapply(1:length(mydata), function(x) size[[1]])
+    size <- lapply(1:length(mydata),function(i){
+      if(datatype == "abundance") {
+        ni <- sum(mydata[[i]])
+      }else if(datatype == "incidence_raw"){
+        ni <- ncol(mydata[[i]])
+      }
+      if( sum(size[[i]] == ni) == 0 ) mi <- sort(c(ni,size[[i]]))
+      else mi <- size[[i]]
+      unique(mi)
+    })
   }
-  end <- max(unlist(up))
 
   FUN <- function(e){
     if(class(mydata)=="list"){
-      Q = as.numeric(q)
-      if(is.null(endpoint) == T) endpoint = end
-      temp = inextPD(datalist=mydata,phylotr=mytree,datatype,Q,nboot,conf,size,knots,endpoint,reft)
+      temp = inextPD(datalist=mydata,phylotr=mytree,datatype,q,nboot,conf,m = size,reft)
       temp$qPD.LCL[temp$qPD.LCL<0] <- 0;temp$SC.LCL[temp$SC.LCL<0] <- 0
       temp$SC.UCL[temp$SC.UCL>1] <- 1
       return(temp)
@@ -144,8 +180,8 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
     }
   }
   #atime <- Sys.time()
-  RE.table <- FUN(3)
-  #RE.table <- tryCatch(FUN(e), error = function(e){return()})
+  #RE.table <- FUN(3)
+  RE.table <- tryCatch(FUN(e), error = function(e){return()})
   #btime <- Sys.time()
   #print(paste0('R/E time:',btime-atime))
   ###############output3
@@ -161,8 +197,8 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
     }
   }
   #atime <- Sys.time()
-  RE.plot <- FUN2(3)
-  #RE.plot <- tryCatch(FUN2(e), error = function(e){return()})
+  #RE.plot <- FUN2(3)
+  RE.plot <- tryCatch(FUN2(e), error = function(e){return()})
   #btime <- Sys.time()
   #print(paste0('plot time:',btime-atime))
   ans <- list(summary = infos,reference_time = reft, inext = RE.table, figure = RE.plot)
@@ -375,20 +411,42 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
   mytree <- drop.tip(tree,tip)
   H_max <- get.rooted.tree.height(mytree)
 
-  if(is.null(reftime)) {reft <- H_max
-  }else if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
-  }else {reft <- reftime}
+  # if(is.null(reftime)) {reft <- H_max
+  # }else if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
+  # }else {reft <- reftime}
+  reft <- reftime
+  reftime <- ifelse(is.null(reftime),H_max,reftime)
+  if(reftime<=0) {stop("Reference time must be greater than 0. Use NULL to set it to pooled tree height.",call. = FALSE)
+  }
 
   FUN = function(e){
     ###########data information
     if(class(mydata) == "list"){
       infos <- sapply(mydata, function(x){
-        datainf(data = x, datatype, phylotr = mytree,reft = reft)})
+        datainf(data = x, datatype, phylotr = mytree,reft = reftime)})
     }else{
       return(NULL)
     }
     ###########profiles
     if(profile == "q") {
+
+      if(is.null(reft)){
+        if (datatype=="incidence_raw") {
+          da <- lapply(mydata, rowSums) %>% do.call(cbind, .) %>% rowSums()
+        }else if (datatype=="abundance") {
+          da <- do.call(cbind, mydata) %>% rowSums()
+        }
+        aL <- phyBranchAL_Abu(phylo = mytree,data = da,"abundance",
+                              refT = reftime)$treeNabu %>%
+          select(branch.abun,branch.length,tgroup)
+        PD2 <- PD.qprofile(aL,q = 2, cal =  "PD",nt = sum(da))
+        Q <- reftime-(reftime^2)/PD2
+        reft = sort(c('Q'= Q, 'reftime' = reftime))
+      }else{
+        names(reft) <- NULL
+        reft <- sort(reft)
+      }
+
       temp <- Phdqtable(datalist = mydata, phylotr = mytree, q, cal = type, datatype, nboot, conf, reft)
       ans <- list(summary = infos, forq_table = temp, forq_figure = Plotq(temp, type))
       class(ans) <- c("PhdObs")
@@ -396,9 +454,9 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
     }
     if(profile == "time") {
       if (is.null(tprofile_times)) {
-        tprofile_times <- seq(0.01, H_max, length.out = 15) %>% unique() %>% sort
+        tprofile_times <- seq(0.01, reftime, length.out = 15) %>% unique() %>% sort
       } else {
-        tprofile_times <- c(tprofile_times, 0.01, H_max) %>% unique() %>% sort
+        tprofile_times <- c(tprofile_times, 0.01, reftime) %>% unique() %>% sort
       }
       temp <- Phdttable(datalist = mydata, phylotr = mytree, times = tprofile_times,cal = type, datatype, nboot, conf)
       if (knots==0) {

@@ -32,7 +32,7 @@ in this case, the caculation of standard errors and confidence intervals will be
 \item{reftime}{a positive value specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
 }
 \value{
-a \code{tibble} tabulating the PD estimates with each \code{q} for the user-specified sample coverage. In addition,
+a \code{tibble} tabulating the PD estimates with each \code{q} for the user-specified sample coverages. In addition,
 the corresponding sample sizes and sample coverages are provided. \cr\cr
 }
 \description{
