@@ -13,7 +13,7 @@
 #' @param tree a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage.\cr
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is \code{"abundance"}. \cr
-#' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if \code{datatype = "abundance"}.\cr
+#' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
 #' @param q a sequence of nonnegative integers specifying the diversity orders of PD. Default is \code{c(0,1,2)}. \cr
 #' @param endpoint an positive interger specifying the endpoint for rarefaction and
 #' extrapolation range. If \code{NULL}, \code{endpoint} = double of the maximum reference sample size. It will be ignored if \code{size} is given. \cr
@@ -95,12 +95,12 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
       n <- n+t_[i]
     }
     if(is.null(names(t_))) {
-      names(mydata) <- paste0("site",1:length(t_))
+      names(mydata) <- paste0("assemblage",1:length(t_))
     }else{
       names(mydata) = names(t_)
     }
   }else{
-    if(is.null(colnames(data))) {colnames(data) <- paste0("site",1:ncol(data))}
+    if(is.null(colnames(data))) {colnames(data) <- paste0("assemblage",1:ncol(data))}
     mydata <- lapply(1:ncol(data), function(i)  {x <- data[,i];names(x) <- pool.name;x})
     names(mydata) = colnames(data)
   }
@@ -217,7 +217,7 @@ iNEXTPD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), endpoi
 #' @param tree a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr
-#' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if \code{datatype = "abundance"}.\cr
+#' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
 #' Ignored if \code{datatype = "abundance"}.
 #' @param q a nonnegative sequence specifying the diversity orders of PD. Default is seq(0, 2, by = 0.25). \cr
 #' @param conf a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr
@@ -277,12 +277,12 @@ PhdAsy <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.
       ntmp <- ntmp+t_[i]
     }
     if(is.null(names(t_))) {
-      names(mydata) <- paste0("site",1:length(t_))
+      names(mydata) <- paste0("assemblage",1:length(t_))
     }else{
       names(mydata) = names(t_)
     }
   }else if (datatype == "abundance"){
-    if(is.null(colnames(data))) {colnames(data) <- paste0("site",1:ncol(data))}
+    if(is.null(colnames(data))) {colnames(data) <- paste0("assemblage",1:ncol(data))}
     mydata <- lapply(1:ncol(data), function(i)  {x <- data[,i];names(x) <- pool.name;x})
     names(mydata) = colnames(data)
   }
@@ -322,8 +322,8 @@ PhdAsy <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.
 #' @param tree a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr
-#' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if \code{datatype = "abundance"}.\cr
-#' automatically assigned siteX as community names.
+#' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
+#' automatically assigned siteX as assemblage names.
 #' Ignored if \code{datatype = "abundance"}.
 #' @param type desired diversity type: \code{type = "PD"} for phylogenetic diversity and \code{type = "D"} for phylogenetic Hill numbers. See Chao et al. (2010) for details. Default is \code{"PD"}.
 #' @param profile desired profile type for chosen type, \code{profile = "q"} for order q profile and \code{profile = "time"} for reference time profile. Default is \code{"q"}. \cr
@@ -348,7 +348,7 @@ PhdAsy <- function(data, tree, datatype = "abundance", t_, q = seq(0, 2, by = 0.
 #' \code{$summary} summary of data. \cr\cr
 #' \code{$fortime_table} or \code{$forq_table} a table of observed phylogenetic diversity(\code{type = "PD"}) or phylogenetic Hill numbers(\code{type = "D"}) for each \code{time} or order \code{q} based on \code{profile}. \cr\cr
 #' \code{$fortime_figure} or \code{$forq_figure} the curves for \code{$fortime_table} or \code{$forq_table} \cr\cr
-#' \code{$AUC_table} table of Area Under Curve (AUC) of time profile for each site from 0.01 to the tree depth. Won't be provided if \code{knots = 0} or \code{profile = "q"}.  \cr\cr
+#' \code{$AUC_table} table of Area Under Curve (AUC) of time profile for each assemblage from 0.01 to the tree depth. Won't be provided if \code{knots = 0} or \code{profile = "q"}.  \cr\cr
 #' @examples
 #' \donttest{
 #' # Type (1) abundance data
@@ -396,12 +396,12 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
       ntmp <- ntmp+t_[i]
     }
     if(is.null(names(t_))) {
-      names(mydata) <- paste0("site",1:length(t_))
+      names(mydata) <- paste0("assemblage",1:length(t_))
     }else{
       names(mydata) = names(t_)
     }
   }else if (datatype == "abundance"){
-    if(is.null(colnames(data))) {colnames(data) <- paste0("site",1:ncol(data))}
+    if(is.null(colnames(data))) {colnames(data) <- paste0("assemblage",1:ncol(data))}
     mydata <- lapply(1:ncol(data), function(i)  {x <- data[,i];names(x) <- pool.name;x})
     names(mydata) = colnames(data)
   }
@@ -483,11 +483,11 @@ PhdObs <- function(data, tree, datatype = "abundance", t_, type = "PD", profile 
 #' @param tree a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr
-#' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if \code{datatype = "abundance"}.\cr
+#' @param t_ needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
 #' Ignored if \code{datatype = "abundance"}.
 #' @param q a nonnegative sequence specifying the diversity orders of PD. Default is \code{c(0,1,2)}. \cr
 #' @param level a positive sequence < 1 specifying a particular value of sample coverage.
-#' If \code{NULL},then \code{level} will be chosen as the minimum coverage of all sites after extrapolating each site to its double sample sizes. Default is \code{NULL}.
+#' If \code{NULL},then \code{level} will be chosen as the minimum coverage of all sites after extrapolating each assemblage to its double sample sizes. Default is \code{NULL}.
 #' @param nboot a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
 #' in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.
 #' @param conf a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr
@@ -532,19 +532,19 @@ estimatePD <- function(data, tree, datatype = "abundance", t_, q = c(0,1,2), lev
   pool.name <- rownames(data)
   mydata = list()
   if(datatype=="incidence_raw"){
-    if(ncol(data) != sum(t_)) stop("Number of columns does not euqal to the sum of t_ (number of sampling units for each community).", call. = FALSE)
+    if(ncol(data) != sum(t_)) stop("Number of columns does not euqal to the sum of t_ (number of sampling units for each assemblage).", call. = FALSE)
     ntmp <- 0
     for(i in 1:length(t_)){
       mydata[[i]] <- data[,(ntmp+1):(ntmp+t_[i])]
       ntmp <- ntmp+t_[i]
     }
     if(is.null(names(t_))) {
-      names(mydata) <- paste0("site",1:length(t_))
+      names(mydata) <- paste0("assemblage",1:length(t_))
     }else{
       names(mydata) = names(t_)
     }
   }else if (datatype == "abundance"){
-    if(is.null(colnames(data))) {colnames(data) <- paste0("site",1:ncol(data))}
+    if(is.null(colnames(data))) {colnames(data) <- paste0("assemblage",1:ncol(data))}
     mydata <- lapply(1:ncol(data), function(i)  {x <- data[pool.name,i];names(x) <- pool.name;x})
     names(mydata) = colnames(data)
   }

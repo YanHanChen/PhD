@@ -1,12 +1,12 @@
 Package: PhD
 Type: Package
 Title: Phylogenetic Diversity
-Version: 0.6.4
+Version: 0.6.5
 Author: Anne Chao and Chun-Huo Chiu
 Maintainer: Anne Chao <chao@stat.nthu.edu.tw>
 Description: Provides simple functions to compute and plot two
-    types (sample-size- and coverage-based) rarefaction and extrapolation of phylogenetic
-    diversity for individual-based (abundance) data or sampling-unit-
+    types (size-based and coverage-based) rarefaction and extrapolation of phylogenetic
+    diversity for individual-based (abundance) or sampling-unit-
     based (incidence raw) data.
 License: GPL (>= 3)
 Suggests: knitr,

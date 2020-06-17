@@ -208,7 +208,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
   reftime <- rep(rep(reft,each = length(q)),length(nms))
   nms_tmp <- rep(nms,each = length(q)*length(reft))
   Outputforq <- tibble(Order.q = odr, Empirical = out[,1],LCL = out[,2], UCL = out[,3],
-                       reftime = reftime,Community = nms_tmp)
+                       reftime = reftime,Assemblage = nms_tmp)
   Outputforq <- Outputforq %>% mutate (method = ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill numbers"))
   return(Outputforq)
 }
@@ -331,7 +331,7 @@ Phdttable <- function(datalist, phylotr, times, cal, datatype, nboot, conf){
   Outputfort <- tibble(time = rep(times,length(q_int)*length(datalist)),
                        Empirical = out[,1],LCL = out[,2], UCL = out[,3],
                        Order.q = rep(rep(q_int, each=length(times)),length(datalist)),
-                       Community = rep(nms, each=length(times)*length(q_int)),
+                       Assemblage = rep(nms, each=length(times)*length(q_int)),
                        method=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill numbers"))
   out = list(fort = Outputfort, Q_Height=c(Q, H_max))
   return(out)
@@ -427,20 +427,20 @@ AUC_one_table <- function(datalist, phylotr, knot, cal, datatype, nboot, conf, r
 
 
   AUC <- tibble(Order.q = rep(q_int,length(nms)), Empirical = AUC[,1],LCL = AUC[,2], UCL = AUC[,3],
-                       Community = rep(nms,each = length(q_int)))
+                       Assemblage = rep(nms,each = length(q_int)))
   AUC
 }
 Plott <- function(out, cal, Q_Height){
   fort <- out
   fort$Order.q = paste0("q = ", fort$Order.q)
   fort$Order.q <- factor(fort$Order.q)
-  Community <- unique(fort$Community)
+  Assemblage <- unique(fort$Assemblage)
   Q = Q_Height[1]
   root = Q_Height[2]
   # print(fort)
   # print(Q)
   if (cal=="PD") {
-    if(length(Community)==1){
+    if(length(Assemblage)==1){
       p2 <- ggplot(fort, aes(x=time, y=Empirical)) + geom_line(size=1.5,aes(color=Order.q))+
         geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Order.q),linetype = 0,alpha=0.3)
       p2 <-  p2 +xlab("time")+ylab("Phylogenetic Diversity")+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
@@ -449,12 +449,12 @@ Plott <- function(out, cal, Q_Height){
         annotate('text',x=root, y=0.1, label="root",parse = TRUE,size=5, color = "gray") +
         geom_vline(xintercept = c(Q,root), linetype = "longdash",size=0.5, color = "gray")
     }else{
-      p2 <- ggplot(fort, aes(x=time, y=Empirical, color=Community, linetype=Community)) + geom_line(size=1.5)  +
-        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Community),linetype = 0,alpha=0.3)+
-        scale_color_manual(values = color_nogreen(length(unique(fort$Community))))+
-        scale_fill_manual(values = color_nogreen(length(unique(fort$Community))))+
+      p2 <- ggplot(fort, aes(x=time, y=Empirical, color=Assemblage, linetype=Assemblage)) + geom_line(size=1.5)  +
+        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Assemblage),linetype = 0,alpha=0.3)+
+        scale_color_manual(values = color_nogreen(length(unique(fort$Assemblage))))+
+        scale_fill_manual(values = color_nogreen(length(unique(fort$Assemblage))))+
         theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(fort, time%in%c(Q, root)), aes(x=time, y=Empirical, color=Community))+
+        geom_point(size=3, data=subset(fort, time%in%c(Q, root)), aes(x=time, y=Empirical, color=Assemblage))+
         annotate('text',x=Q, y=0.1,label="Q" ,parse = TRUE,size=5, color = "gray") +
         annotate('text',x=root, y=0.1, label="root",parse = TRUE,size=5, color = "gray") +
         geom_vline(xintercept = c(Q,root), linetype = "longdash",size=0.5, color = "gray") +
@@ -462,7 +462,7 @@ Plott <- function(out, cal, Q_Height){
       p2 <-  p2 +xlab("time")+ylab("Phylogenetic Diversity")
     }
   } else {
-    if(length(Community)==1){
+    if(length(Assemblage)==1){
       p2 <- ggplot(fort, aes(x=time, y=Empirical)) + geom_line(size=1.5,aes(color=Order.q))+
         geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Order.q),linetype = 0,alpha=0.3)
       p2 <-  p2 +xlab("time")+ylab("Phylogenetic Hill numbers")+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
@@ -472,12 +472,12 @@ Plott <- function(out, cal, Q_Height){
         annotate('text',x=root, y=0.1, label="root",parse = TRUE,size=5, color = "gray") +
         geom_vline(xintercept = c(0.01, Q,root), linetype = "longdash",size=0.5, color = "gray")
     }else{
-      p2 <- ggplot(fort, aes(x=time, y=Empirical, color=Community, linetype=Community)) + geom_line(size=1.5)  +
-        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Community),linetype = 0,alpha=0.3)+
-        scale_color_manual(values = color_nogreen(length(unique(fort$Community))))+
-        scale_fill_manual(values = color_nogreen(length(unique(fort$Community))))+
+      p2 <- ggplot(fort, aes(x=time, y=Empirical, color=Assemblage, linetype=Assemblage)) + geom_line(size=1.5)  +
+        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Assemblage),linetype = 0,alpha=0.3)+
+        scale_color_manual(values = color_nogreen(length(unique(fort$Assemblage))))+
+        scale_fill_manual(values = color_nogreen(length(unique(fort$Assemblage))))+
         theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(fort, time%in%c(0.01, Q, root)), aes(x=time, y=Empirical, color=Community))+
+        geom_point(size=3, data=subset(fort, time%in%c(0.01, Q, root)), aes(x=time, y=Empirical, color=Assemblage))+
         annotate('text',x=Q, y=0.1,label="Q" ,parse = TRUE,size=5, color = "gray") +
         annotate('text',x=0.01, y=0.1,label=0.01 ,parse = TRUE,size=5, color = "gray") +
         annotate('text',x=root, y=0.1, label="root",parse = TRUE,size=5, color = "gray") +
@@ -494,25 +494,25 @@ Plotq <- function(out, cal){
                          levels = unique(paste0('reftime = ',as.character(round(forq$reftime,4)))))
   # forq$reftime <- as.character(forq$reftime)
   # forq$reftime <- factor(forq$reftime, levels = unique(forq$reftime <- factor(forq$reftime)))
-  Community <- unique(forq$Community)
+  Assemblage <- unique(forq$Assemblage)
   q1 <- unique(forq$Order.q[(forq$Order.q %% 1)==0])
   if (cal=="PD") {
     #haha=sapply(strsplit(as.character(forq$reftime), " = "), function(i) i) %>% as.vector() %>% unique()
     #Q=haha[2] %>% as.numeric()
     #root=haha[4] %>% as.numeric()
-    if(length(Community)==1){
+    if(length(Assemblage)==1){
       p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=reftime)) + geom_line(size=1.5)+
         geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=reftime),linetype = 0,alpha=0.3)
       #lai 1006
       p1 <-  p1 +xlab("Order q")+ylab("Phylogenetic Diversity") +theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
         geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=reftime))
     }else{
-      p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=Community, linetype=Community)) + geom_line(size=1.5)  +
-        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Community),linetype = 0,alpha=0.3)+
-        scale_color_manual(values = color_nogreen(length(unique(forq$Community))))+
-        scale_fill_manual(values = color_nogreen(length(unique(forq$Community))))+
+      p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=Assemblage, linetype=Assemblage)) + geom_line(size=1.5)  +
+        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Assemblage),linetype = 0,alpha=0.3)+
+        scale_color_manual(values = color_nogreen(length(unique(forq$Assemblage))))+
+        scale_fill_manual(values = color_nogreen(length(unique(forq$Assemblage))))+
         theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=Community))+
+        geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=Assemblage))+
         facet_wrap(~reftime, scales = "free")
       p1 <-  p1 +xlab("Order q")+ylab("Phylogenetic Diversity")
     }
@@ -520,18 +520,18 @@ Plotq <- function(out, cal){
     #haha=sapply(strsplit(as.character(forq$reftime), " = "), function(i) i) %>% as.vector() %>% unique()
     #Q=haha[[2]][2] %>% as.numeric()
     #root=haha[[3]][2] %>% as.numeric()
-    if(length(Community)==1){
+    if(length(Assemblage)==1){
       p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=reftime)) + geom_line(size=1.5)+
         geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=reftime),linetype = 0,alpha=0.3)
       p1 <-  p1 +xlab("Order q")+ylab("Phylogenetic Hill numbers") +theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
         geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=reftime))
     }else{
-      p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=Community, linetype=Community)) + geom_line(size=1.5)  +
-        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Community),linetype = 0,alpha=0.3)+
-        scale_color_manual(values = color_nogreen(length(unique(forq$Community))))+
-        scale_fill_manual(values = color_nogreen(length(unique(forq$Community))))+
+      p1 <- ggplot(forq, aes(x=Order.q, y=Empirical, color=Assemblage, linetype=Assemblage)) + geom_line(size=1.5)  +
+        geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Assemblage),linetype = 0,alpha=0.3)+
+        scale_color_manual(values = color_nogreen(length(unique(forq$Assemblage))))+
+        scale_fill_manual(values = color_nogreen(length(unique(forq$Assemblage))))+
         theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-        geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=Community))+
+        geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=Empirical, color=Assemblage))+
         facet_wrap(~reftime, scales = "free")
       p1 <-  p1 +xlab("Order q")+ylab("Phylogenetic Hill numbers")
     }
@@ -603,7 +603,7 @@ AsyPD <- function(datalist, datatype, phylotr, q, nboot, conf, reft){#change fin
     })
   }
   Estoutput <- do.call(rbind,Estoutput) %>%
-    mutate(Community = rep(names(datalist),each = length(q)))
+    mutate(Assemblage = rep(names(datalist),each = length(q)))
   Estoutput$LCL[Estoutput$LCL<0] = 0
   return(Estoutput)
 }
@@ -636,25 +636,25 @@ Asy_plot = function(output, type, method=NULL){##add title
   }
   if(ncol(output) %in% c(2, 5)) output = cbind(output, "Beta")
   if(ncol(output) == 6){
-    colnames(output) = c("x", "y", "se", "LCL", "UCL","Community")
-    Community <- unique(output[,6]) %>% unlist
+    colnames(output) = c("x", "y", "se", "LCL", "UCL","Assemblage")
+    Assemblage <- unique(output[,6]) %>% unlist
   }else{
-    colnames(output) = c("x", "y","Community")
-    Community <- unique(output[,3]) %>% unlist
+    colnames(output) = c("x", "y","Assemblage")
+    Assemblage <- unique(output[,3]) %>% unlist
   }
   q <- unlist(output$x)
   q1<-q[(round(q) - q) ==0]
-  if(length(Community) == 1){
+  if(length(Assemblage) == 1){
     p <- ggplot(output,aes(x=x,y=y))+geom_line(size=1.5,color="#F8766D")+xlab("Order q")+
       geom_point(size=3, data=subset(output, x%in%q1),color="#F8766D")+
       ylab(ylab_)+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))
     if(ncol(output) == 6) p <- p + geom_ribbon(aes(ymin=LCL,ymax=UCL),alpha=0.3,fill="#F8766D")
   }else{
-    p <- ggplot(output,aes(x=x,y=y,color=Community,linetype=Community))+geom_line(size=1.5)+xlab("Order q")+
-      scale_color_manual(values = color_nogreen(length(unique(output$Community))))+
+    p <- ggplot(output,aes(x=x,y=y,color=Assemblage,linetype=Assemblage))+geom_line(size=1.5)+xlab("Order q")+
+      scale_color_manual(values = color_nogreen(length(unique(output$Assemblage))))+
       geom_point(size=3, data=subset(output, x%in%q1))+
       ylab(ylab_)+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))
-    if(ncol(output) == 6) p <- p + geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Community),alpha=0.3, colour=NA)+scale_fill_manual(values = color_nogreen(length(unique(output$Community))))
+    if(ncol(output) == 6) p <- p + geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Assemblage),alpha=0.3, colour=NA)+scale_fill_manual(values = color_nogreen(length(unique(output$Assemblage))))
   }
   p <- p+ggtitle(title_)
   return(p)
@@ -871,7 +871,7 @@ inextPD = function(datalist, phylotr, datatype, q, nboot, conf=0.95, m, reft){
       tibble(m=rep(m[[i]],length(q)),method=rep(method,length(q)),Order.q=orderq,
              qPD=qPDm,qPD.LCL=qPDm-qtile*ses_pd,qPD.UCL=qPDm+qtile*ses_pd,
              SC=rep(covm,length(q)),SC.LCL=rep(covm-qtile*ses_cov,length(q)),SC.UCL=rep(covm+qtile*ses_cov,length(q)),
-             Community = nms[i])
+             Assemblage = nms[i])
     }) %>% do.call(rbind, .)
   }else if(datatype=="incidence_raw"){
     Estoutput <- lapply(1:length(datalist), function(i){
@@ -912,7 +912,7 @@ inextPD = function(datalist, phylotr, datatype, q, nboot, conf=0.95, m, reft){
       tibble(t=rep(m[[i]],length(q)),method=rep(method,length(q)),Order.q=orderq,
              qPD=qPDm,qPD.LCL=qPDm-qtile*ses_pd,qPD.UCL=qPDm+qtile*ses_pd,
              SC=rep(covm,length(q)),SC.LCL=rep(covm-qtile*ses_cov,length(q)),SC.UCL=rep(covm+qtile*ses_cov,length(q)),
-             Community = nms[i])
+             Assemblage = nms[i])
     }) %>% do.call(rbind, .)
   }
   return(Estoutput)
@@ -1011,7 +1011,7 @@ RE_plot = function(data, datatype, type, method=NULL){
   if(ncol(data) %in% c(9, 10)){
     x <- ifelse(datatype=='incidence_raw', 'sampling units', "individuals")
     if(ncol(data) == 9) data = cbind(data, "Beta")
-    Community <- unique(data[,10])
+    Assemblage <- unique(data[,10])
     if(type == 1){
       output <- data[, c(1, 2, 4, 5, 6, 10,3)]
       xlab_ <- paste0("Number of ", x)
@@ -1023,7 +1023,7 @@ RE_plot = function(data, datatype, type, method=NULL){
       xlab_ <- paste0("Number of ", x)
       ylab_ <- "Sample Coverage"
     }
-    colnames(output) <- c("x", "Method", "y", "LCL", "UCL", "Community","Order.q")
+    colnames(output) <- c("x", "Method", "y", "LCL", "UCL", "Assemblage","Order.q")
     output[, 2] <- as.character(output[, 2])
     output[, 6] <- as.character(output[, 6])
     output2 <- output
@@ -1031,7 +1031,7 @@ RE_plot = function(data, datatype, type, method=NULL){
     output3 <- output
     output3[output3[,2]=="Observed",2] <- "Extrapolation"
     output2=rbind(output2, output3)
-    if(length(Community) == 1){
+    if(length(Assemblage) == 1){
       outp <- ggplot(output2, aes(x = x, y = y))+
         geom_ribbon(aes(ymin = LCL, ymax = UCL),fill="#F8766D",alpha=0.3)+geom_line(size=1.5, aes(x = x, y = y, linetype=Method),color="#F8766D")+
         geom_point(size=3, data=subset(output, Method=="Observed"),color="#F8766D")+xlab(xlab_)+ylab(ylab_)+
@@ -1040,10 +1040,10 @@ RE_plot = function(data, datatype, type, method=NULL){
         ggtitle(title)+guides(linetype=guide_legend(keywidth=2.5))
       if(type!=3) outp <- outp + facet_wrap(~Order.q,scales = "free_y")
     }else{
-      outp <- ggplot(output2, aes(x = x, y = y, color=Community))+geom_line(size=1.5, aes(x = x, y = y, color=Community, linetype=Method))+
-        scale_color_manual(values = color_nogreen(length(unique(output2$Community))))+
-        geom_ribbon(aes(ymin = LCL, ymax = UCL, fill = Community), alpha=0.3, colour=NA)+
-        scale_fill_manual(values = color_nogreen(length(unique(output2$Community))))+
+      outp <- ggplot(output2, aes(x = x, y = y, color=Assemblage))+geom_line(size=1.5, aes(x = x, y = y, color=Assemblage, linetype=Method))+
+        scale_color_manual(values = color_nogreen(length(unique(output2$Assemblage))))+
+        geom_ribbon(aes(ymin = LCL, ymax = UCL, fill = Assemblage), alpha=0.3, colour=NA)+
+        scale_fill_manual(values = color_nogreen(length(unique(output2$Assemblage))))+
         geom_point(size=3, data=subset(output, Method=="Observed"))+xlab(xlab_)+ylab(ylab_)+
         scale_linetype_manual(values = c("dashed", "solid"), name="Method",breaks=c("Interpolated", "Extrapolated"), labels=c("Interpolation", "Extrapolation"))+
         theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
@@ -1120,9 +1120,9 @@ invChatPD <- function(datalist, phylotr, q, datatype, level, nboot, conf, reft){
       est <- est %>% mutate(qPD.LCL=qPD-qtile*ses,qPD.UCL=qPD+qtile*ses)
     }) %>% do.call(rbind,.)
   }
-  Community = rep(names(datalist), each = length(q)*length(level))
+  Assemblage = rep(names(datalist), each = length(q)*length(level))
   goalSC = rep(rep(level,each = length(q)),length(datalist))
-  out <- out %>% mutate(goalSC = goalSC,Community = Community,reftime = reft)
+  out <- out %>% mutate(goalSC = goalSC,Assemblage = Assemblage,reftime = reft)
   out <- out[,c(9,1,2,3,5,4,6,7,8,10)]
   rownames(out) <- NULL
   out
