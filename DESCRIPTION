@@ -1,7 +1,7 @@
 Package: PhD
 Type: Package
 Title: Phylogenetic Diversity
-Version: 0.6.5
+Version: 0.6.6
 Author: Anne Chao and Chun-Huo Chiu
 Maintainer: Anne Chao <chao@stat.nthu.edu.tw>
 Description: Provides simple functions to compute and plot two

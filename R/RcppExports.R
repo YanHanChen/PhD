@@ -25,7 +25,19 @@ delta <- function(del_tmpaL, k, n) {
     .Call('_PhD_delta', PACKAGE = 'PhD', del_tmpaL, k, n)
 }
 
-RPD <- function(x, n, m, q) {
-    .Call('_PhD_RPD', PACKAGE = 'PhD', x, n, m, q)
+delta_part2 <- function(ai, k, n) {
+    .Call('_PhD_delta_part2', PACKAGE = 'PhD', ai, k, n)
+}
+
+RPD_old <- function(x, n, m, q) {
+    .Call('_PhD_RPD_old', PACKAGE = 'PhD', x, n, m, q)
+}
+
+RPD <- function(ai, Lis, n, m, q) {
+    .Call('_PhD_RPD', PACKAGE = 'PhD', ai, Lis, n, m, q)
+}
+
+ghat_pt2 <- function(ai, n, mmax) {
+    .Call('_PhD_ghat_pt2', PACKAGE = 'PhD', ai, n, mmax)
 }
 

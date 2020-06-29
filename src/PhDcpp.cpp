@@ -90,7 +90,17 @@ double delta(NumericMatrix del_tmpaL, double k, double n){
 }
 
 // [[Rcpp::export]]
-NumericVector RPD(NumericMatrix x , int n  , int m , NumericVector q) {
+NumericVector delta_part2(NumericVector ai, double k, double n){
+  int nrow = ai.length();
+  NumericVector ans(nrow);
+  for(int i = 0;i < nrow; i++){
+    ans[i] = exp(Rf_lchoose(n-k-1,ai[i]-1)-Rf_lchoose(n, ai[i]));
+  }
+  return(ans);
+}
+
+// [[Rcpp::export]]
+NumericVector RPD_old(NumericMatrix x , int n  , int m , NumericVector q) {
   int nrow = x.nrow();
   double tbar=0;
   NumericVector ghat(m);
@@ -141,3 +151,86 @@ NumericVector RPD(NumericMatrix x , int n  , int m , NumericVector q) {
   return out ;
 }
 
+// [[Rcpp::export]]
+NumericMatrix RPD(NumericVector ai ,NumericMatrix Lis, int n , int m , NumericVector q) {
+  int tau_l = Lis.ncol();
+  int S = ai.length();
+  int qlength = q.length();
+  NumericMatrix ghat_pt2(m,S);
+  NumericMatrix out(qlength,tau_l);
+  for (int k = 0; k < m ; k++) {
+    for (int i = 0; i < S; i++) {
+      if ( ai[i] >= k+1 && ai[i] <= n-m+k+1 )
+      {
+        ghat_pt2(k,i) = exp(Rf_lchoose(ai[i], k+1)+Rf_lchoose(n-ai[i], m-k-1)-Rf_lchoose(n, m)) ;
+      }
+      else
+      {
+        ghat_pt2(k,i) = 0 ;
+      }
+    }
+  }
+  for(int l = 0; l < tau_l;l++){
+    double tbar=0;
+    NumericVector ghat(m);
+    for (int i = 0; i < S; i++) {
+      tbar += ai[i]*Lis(i, l)/n;
+    }
+    for(int k = 0; k < m ; k++) {
+      for (int i = 0; i < S; i++) {
+       ghat[k] +=  Lis(i, l)*ghat_pt2(k,i) ;
+      }
+    }
+    //Rcpp::Rcout << "ghat: " << ghat << std::endl;
+    for(int j = 0; j < qlength; j++ ){
+      for(int k = 0; k < m; k++){
+        if(q[j] == 0){
+          out(j,l) += ghat[k];
+        }else if(q[j] == 1){
+          //Rcout << "q1 in cpp: " <<log ( (k+1) )<< std::endl;
+          out(j,l) += -( (k+1) / (m*tbar) ) * log ( (k+1) / (m*tbar) ) * ghat[k];
+        }else if(q[j] == 2){
+          out(j,l) += pow( ( (k+1) / (m*tbar) ),2) * ghat[k];
+        }else{
+          out(j,l) += pow( ( (k+1) / (m*tbar) ),q[j]) * ghat[k];
+        }
+      }
+    }
+    for(int j = 0; j < qlength; j++ ){
+      if(q[j] == 0){
+        out(j,l) = out(j,l) ;
+      }else if(q[j] == 1){
+        out(j,l) = exp(out(j,l));
+      }else if(q[j] == 2){
+        out(j,l) = 1 / out(j,l);
+      }else{
+        out(j,l) = pow( out(j,l) , 1/(1-q[j]) );
+      }
+    }
+
+  }
+
+  return out ;
+}
+
+// [[Rcpp::export]]
+NumericMatrix ghat_pt2(NumericVector ai , int n , int mmax ) {
+  //int tau_l = Lis.ncol();
+  int S = ai.length();
+  //int qlength = q.length();
+  //NumericMatrix ghat_pt2(m,S);
+  NumericMatrix out(mmax,S);
+  for (int k = 0; k < mmax ; k++) {
+    for (int i = 0; i < S; i++) {
+      if ( ai[i] >= k+1 && ai[i] <= n-mmax+k+1 )
+      {
+        out(k,i) = exp(Rf_lchoose(ai[i], k+1)+Rf_lchoose(n-ai[i], mmax-k-1)-Rf_lchoose(n, mmax)) ;
+      }
+      else
+      {
+        out(k,i) = 0 ;
+      }
+    }
+  }
+  return out ;
+}

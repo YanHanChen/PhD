@@ -89,9 +89,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// RPD
-NumericVector RPD(NumericMatrix x, int n, int m, NumericVector q);
-RcppExport SEXP _PhD_RPD(SEXP xSEXP, SEXP nSEXP, SEXP mSEXP, SEXP qSEXP) {
+// delta_part2
+NumericVector delta_part2(NumericVector ai, double k, double n);
+RcppExport SEXP _PhD_delta_part2(SEXP aiSEXP, SEXP kSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type ai(aiSEXP);
+    Rcpp::traits::input_parameter< double >::type k(kSEXP);
+    Rcpp::traits::input_parameter< double >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(delta_part2(ai, k, n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// RPD_old
+NumericVector RPD_old(NumericMatrix x, int n, int m, NumericVector q);
+RcppExport SEXP _PhD_RPD_old(SEXP xSEXP, SEXP nSEXP, SEXP mSEXP, SEXP qSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -99,7 +112,35 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
     Rcpp::traits::input_parameter< int >::type m(mSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type q(qSEXP);
-    rcpp_result_gen = Rcpp::wrap(RPD(x, n, m, q));
+    rcpp_result_gen = Rcpp::wrap(RPD_old(x, n, m, q));
+    return rcpp_result_gen;
+END_RCPP
+}
+// RPD
+NumericMatrix RPD(NumericVector ai, NumericMatrix Lis, int n, int m, NumericVector q);
+RcppExport SEXP _PhD_RPD(SEXP aiSEXP, SEXP LisSEXP, SEXP nSEXP, SEXP mSEXP, SEXP qSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type ai(aiSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Lis(LisSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type m(mSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type q(qSEXP);
+    rcpp_result_gen = Rcpp::wrap(RPD(ai, Lis, n, m, q));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ghat_pt2
+NumericMatrix ghat_pt2(NumericVector ai, int n, int mmax);
+RcppExport SEXP _PhD_ghat_pt2(SEXP aiSEXP, SEXP nSEXP, SEXP mmaxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type ai(aiSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type mmax(mmaxSEXP);
+    rcpp_result_gen = Rcpp::wrap(ghat_pt2(ai, n, mmax));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -111,7 +152,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_PhD_Dq_2nd", (DL_FUNC) &_PhD_Dq_2nd, 4},
     {"_PhD_Dq", (DL_FUNC) &_PhD_Dq, 6},
     {"_PhD_delta", (DL_FUNC) &_PhD_delta, 3},
-    {"_PhD_RPD", (DL_FUNC) &_PhD_RPD, 4},
+    {"_PhD_delta_part2", (DL_FUNC) &_PhD_delta_part2, 3},
+    {"_PhD_RPD_old", (DL_FUNC) &_PhD_RPD_old, 4},
+    {"_PhD_RPD", (DL_FUNC) &_PhD_RPD, 5},
+    {"_PhD_ghat_pt2", (DL_FUNC) &_PhD_ghat_pt2, 3},
     {NULL, NULL, 0}
 };
 

@@ -2,11 +2,11 @@
 % Please edit documentation in R/MainFun.R
 \name{iNEXTPD}
 \alias{iNEXTPD}
-\title{Interpolation and extrapolation of phylogenetic diversity}
+\title{Interpolation and extrapolation of phylogenetic diversity/phylogenetic Hill numbers}
 \usage{
-iNEXTPD(data, tree, datatype = "abundance", t_, q = c(0, 1, 2),
-  endpoint = NULL, knots = 40, size = NULL, plot.type = 1:3,
-  conf = 0.95, nboot = 50, reftime = NULL)
+iNEXTPD(data, t_, datatype = "abundance", tree, q = c(0, 1, 2),
+  reftime = NULL, type = "PD", endpoint = NULL, knots = 40,
+  size = NULL, nboot = 50, conf = 0.95)
 }
 \arguments{
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr Type (1) abundance data: a S by N matrix/data.frame
@@ -18,50 +18,37 @@ where S is the number of species. When there are N assemblages, users must first
 obtain a large incidence matrix, where the rows of the matrix refer to all species presented in the pooled data. Likewise,
 the rownames of data must be the species names matching the species names in phylogeny tree and thus can not be empty. \cr}
 
-\item{tree}{a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage.\cr}
+\item{t_}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is \code{"abundance"}. \cr}
 
-\item{t_}{needed only when datatype = "incidence_raw", a sequence of named nonnegative integers specifying the sampling units in each community. Ignored if \code{datatype = "abundance"}.\cr}
+\item{tree}{a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage.\cr}
 
-\item{q}{a sequence of nonnegative integers specifying the diversity orders of PD. Default is \code{c(0,1,2)}. \cr}
+\item{q}{a nonnegative value or sequence specifying the diversity order. Default is \code{c(0,1,2)}.}
+
+\item{reftime}{a positive value or sequence specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
+
+\item{type}{desired diversity type: \code{type = "PD"} for phylogenetic diversity and \code{type = "D"} for phylogenetic Hill number. See Chao et al. (2010) for details. Default is \code{"PD"}.}
 
 \item{endpoint}{an positive interger specifying the endpoint for rarefaction and
 extrapolation range. If \code{NULL}, \code{endpoint} = double of the maximum reference sample size. It will be ignored if \code{size} is given. \cr}
 
 \item{knots}{a positive integer specifying the number of knots between 1 and the \code{endpoint}. Default is 40.\cr}
 
-\item{size}{a sequence of positive integers specifying the sample sizes for which PD estimates will be calculated. If \code{NULL}, then PD estimates will be
+\item{size}{a sequence of positive integers specifying the sample sizes for which \code{PD} or \code{D} estimates will be calculated. If \code{NULL}, then estimates will be
 calculated for those sample sizes determined by the specified/default \code{endpoint} and \code{knots}. \cr}
-
-\item{plot.type}{a positive integer vector specifying types of curves. Three types of plots: sample-size-based rarefaction and extrapolation curve (\code{plot.type = 1});
-coverage-based rarefaction and extrapolation curve (\code{plot.type = 2}); sample completeness curve (\code{plot.type = 3}). Default is \code{c(1,2,3)}. \cr}
-
-\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr}
 
 \item{nboot}{a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
 in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.}
 
-\item{reftime}{a positive value specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
+\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr}
 }
 \value{
-a list of four objects: \cr\cr
-\code{$summary} data information summary including reference sample size (\code{n}), number of observed species (\code{S.obs}),
-observed branch length (Faith's PD) (\code{PD.obs}), the first two species frequency counts (\code{f1*}, \code{f2*}) and their branch length sums,
-respectively (\code{g1}, \code{g2}). \cr\cr
-\code{$reference_time} the reference time for the caculation. If \code{reftime} is not specified by users or \code{NULL}, \code{$reference_time}
-is the \code{tree} depth of pooled assemblage by default. \cr\cr
-\code{$inext} a table of PD estimates and sample completeness for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr\cr
-\code{$figure} plots of the estimated curves based on \code{$inext} using \code{ggplot2} package. Different choice of \code{plot.type} will yied different types of plot:
-\itemize{
- \item{Sample-size-based R/E curve (\code{plot.type = 1}): the curve of PD estimates with confidence intervals (if \code{nboot > 0}) as a function of sample size.} \cr
- \item{Coverage-based R/E curve (\code{plot.type = 2}): the curve of the PD estimates with confidence intervals (if \code{nboot > 0}) as a function of sample coverage.} \cr
- \item{Sample completeness curve (\code{plot.type = 3}): the curve of sample coverage with respect to sample size.}
-}
+a tibble of PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr\cr
 }
 \description{
-\code{iNEXTPD}: the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity(PD) for q = 0, 1 and 2.
+\code{iNEXTPD}: the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
 See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background and methods.
 }
 \examples{
@@ -70,14 +57,13 @@ See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background 
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2), plot.type = 1:3)
+out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2),reftime = c(162.5,325))
 # Type (2) incidence data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 t_ <- data.inc$t
-out <- iNEXTPD(data = data, tree = tree,datatype = "incidence_raw",
-t_ = t_,q = c(0,1,2), plot.type = 1:3)
+out <- iNEXTPD(data = data, t_ = t_,datatype = "incidence_raw", tree = tree,q = c(0,1,2))
 }
 }
 \references{
