@@ -19,8 +19,8 @@ or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}
 plots of the estimated curves based on \code{ggplot2} package. Different choice of \code{plot.type} will yied different types of plot:
 \itemize{
  \item{Sample-size-based R/E curve (\code{plot.type = 1}): the curve of estimates as a function of sample size.} \cr
- \item{Coverage-based R/E curve (\code{plot.type = 2}): the curve of the estimates as a function of sample coverage.} \cr
- \item{Sample completeness curve (\code{plot.type = 3}): the curve of sample coverage with respect to sample size.}
+ \item{Sample completeness curve (\code{plot.type = 2}): the curve of sample coverage with respect to sample size.} \cr
+ \item{Coverage-based R/E curve (\code{plot.type = 3}): the curve of the estimates as a function of sample coverage.} \cr
  }
 }
 \description{
@@ -32,13 +32,14 @@ plots of the estimated curves based on \code{ggplot2} package. Different choice 
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2),reftime = c(162.5,325))
-ggiNEXTPD(outcome)
+out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2))
+ggiNEXTPD(out)
 # Type (2) incidence data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 t_ <- data.inc$t
 out <- iNEXTPD(data = data, t_ = t_,datatype = "incidence_raw", tree = tree,q = c(0,1,2))
+ggiNEXTPD(out,datatype = "incidence_raw")
 }
 }

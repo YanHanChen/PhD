@@ -9,7 +9,7 @@ ggtqplot(outcome, profile = "q")
 \arguments{
 \item{outcome}{the outcome of the function \code{PhdObs} or \code{PhdAsy}.}
 
-\item{proflie}{specifying the type of profile: \code{profile = 'q'} for q profile and \code{profile = 'time'} for time profile.}
+\item{profile}{specifying the type of profile: \code{profile = 'q'} for q profile and \code{profile = 'time'} for time profile.}
 }
 \value{
 plot of the PD/D empirical or estimated curves based on \code{ggplot2} package.

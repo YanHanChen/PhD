@@ -164,7 +164,7 @@ iNEXTPD <- function(data, t_, datatype = "abundance",tree,q = c(0,1,2),reftime=N
     if(class(mydata)=="list"){
       # temp = inextPD(datalist=mydata,phylotr=mytree,datatype,q,nboot,conf,m = size,reftime,cal = type)
       inextPD(datalist = mydata,datatype = datatype,phylotr = mytree,q = q,reft = reftime,m=size,
-                     cal = type,nboot=nboot,conf = conf)
+                     cal = type,nboot=nboot,conf = conf,unconditional_var = TRUE)
     }else{
       return(NULL)
     }
@@ -675,8 +675,8 @@ PDInfo <- function(data,t_,datatype = "abundance", tree, reftime=NULL){
 #' @return plots of the estimated curves based on \code{ggplot2} package. Different choice of \code{plot.type} will yied different types of plot:
 #' \itemize{
 #'  \item{Sample-size-based R/E curve (\code{plot.type = 1}): the curve of estimates as a function of sample size.} \cr
-#'  \item{Coverage-based R/E curve (\code{plot.type = 2}): the curve of the estimates as a function of sample coverage.} \cr
-#'  \item{Sample completeness curve (\code{plot.type = 3}): the curve of sample coverage with respect to sample size.}
+#'  \item{Sample completeness curve (\code{plot.type = 2}): the curve of sample coverage with respect to sample size.} \cr
+#'  \item{Coverage-based R/E curve (\code{plot.type = 3}): the curve of the estimates as a function of sample coverage.} \cr
 #'  }
 #' @examples
 #' \donttest{
@@ -684,21 +684,22 @@ PDInfo <- function(data,t_,datatype = "abundance", tree, reftime=NULL){
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2),reftime = c(162.5,325))
-#' ggiNEXTPD(outcome)
+#' out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2))
+#' ggiNEXTPD(out)
 #' # Type (2) incidence data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' t_ <- data.inc$t
 #' out <- iNEXTPD(data = data, t_ = t_,datatype = "incidence_raw", tree = tree,q = c(0,1,2))
+#' ggiNEXTPD(out,datatype = "incidence_raw")
 #' }
 #' @export
 ggiNEXTPD <- function(outcome,plot.type = 1:3,datatype = 'abundance'){
   TYPE <- c(1,2,3)
   if(is.na(sum(pmatch(plot.type, TYPE))) == F){
     temp2 <- lapply(plot.type, function(j) RE_plot(outcome, datatype, j))
-    allname <- c("RE.plot.size", "RE.plot.C", "RE.plot.sizeC")
+    allname <- c('RE.plot.size', 'RE.plot.sizeC','RE.plot.C')
     names(temp2) <- allname[plot.type]
     temp2
   }
@@ -708,7 +709,7 @@ ggiNEXTPD <- function(outcome,plot.type = 1:3,datatype = 'abundance'){
 #'
 #' \code{ggtqplot}: plot the outcome of \code{PhdObs} or \code{PhdAsy} using \code{ggplot2} package.
 #' @param outcome the outcome of the function \code{PhdObs} or \code{PhdAsy}.
-#' @param proflie specifying the type of profile: \code{profile = 'q'} for q profile and \code{profile = 'time'} for time profile.
+#' @param profile specifying the type of profile: \code{profile = 'q'} for q profile and \code{profile = 'time'} for time profile.
 #' @return plot of the PD/D empirical or estimated curves based on \code{ggplot2} package.
 #' @examples
 #' \donttest{

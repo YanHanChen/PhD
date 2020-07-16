@@ -831,42 +831,69 @@ Boots.one = function(phylo, aL, datatype, nboot,reft, BLs, splunits = NULL){
   return(list(boot_data=boot_data,Li = Li, f0 = f0))
 }
 #===============inextPD==================
-inextPD = function(datalist, datatype, phylotr, q,reft, m, cal, nboot, conf=0.95){
+inextPD = function(datalist, datatype, phylotr, q,reft, m, cal, nboot, conf=0.95, unconditional_var=TRUE){
   # m is a list
   nms <- names(datalist)
   qtile <- qnorm(1-(1-conf)/2)
   if(datatype=="abundance"){
     Estoutput <- lapply(1:length(datalist), function(i){
       aL <- phyBranchAL_Abu(phylo = phylotr,data = datalist[[i]],datatype,refT = reft)
-      #aL$treeNabu$branch.length <- aL$BLbyT[,1]
-      #aL_table <- aL$treeNabu %>% select(branch.abun,branch.length,tgroup)
       x <- datalist[[i]] %>% .[.>0]
       n <- sum(x)
+      #====conditional on m====
       qPDm <- PhD.m.est(ai = aL$treeNabu$branch.abun,Lis = aL$BLbyT,m = m[[i]],
                         q = q,nt = n,cal = cal) %>% as.numeric()
       covm = Coverage(x, datatype, m[[i]],n)
+      #====unconditional====
+      if(unconditional_var){
+        goalSC <- unique(covm)
+        qPD_unc <- unique(invChatPD_abu(x = x,ai = aL$treeNabu$branch.abun,Lis = aL$BLbyT,
+                                           q = q,Cs = goalSC,n = n,cal = cal))
+      }
       if(nboot>1){
         Boots <- Boots.one(phylo = phylotr,aL$treeNabu,datatype,nboot,reft,aL$BLbyT)
         Li_b <- Boots$Li
         f0 <- Boots$f0
         tgroup_B <- c(rep("Tip",length(x)+f0),rep("Inode",nrow(Li_b)-length(x)-f0))
         #aL_table_b <- tibble(branch.abun = 0, branch.length= Li_b[,1],tgroup = tgroup_B)
-        ses <- sapply(1:nboot, function(B){
-          # atime <- Sys.time()
-          ai_B <- Boots$boot_data[,B]
-          isn0 <- ai_B>0
-          qPDm_b <-  PhD.m.est(ai = ai_B[isn0],Lis = Li_b[isn0,,drop=F],
-                               m=m[[i]],q=q,nt = n,cal = cal) %>% as.numeric()
-          covm_b = Coverage(ai_B[isn0&tgroup_B=="Tip"], datatype, m[[i]],n)
-          # btime <- Sys.time()
-          # print(paste0("Est boot sample",B,": ",btime-atime))
-          return(c(qPDm_b,covm_b))
-        }) %>% apply(., 1, sd)
+        if(unconditional_var){
+          ses <- sapply(1:nboot, function(B){
+            # atime <- Sys.time()
+            ai_B <- Boots$boot_data[,B]
+            isn0 <- ai_B>0
+            qPDm_b <-  PhD.m.est(ai = ai_B[isn0],Lis = Li_b[isn0,,drop=F],
+                                 m=m[[i]],q=q,nt = n,cal = cal) %>% as.numeric()
+            covm_b <- Coverage(ai_B[isn0&tgroup_B=="Tip"], datatype, m[[i]],n)
+            qPD_unc_b <- unique(invChatPD_abu(x = ai_B[isn0&tgroup_B=="Tip"],
+                                              ai = ai_B[isn0],Lis = Li_b[isn0,,drop=F],
+                                              q = q,Cs = goalSC,n = n,cal = cal))$qPD
+            # btime <- Sys.time()
+            # print(paste0("Est boot sample",B,": ",btime-atime))
+            return(c(qPDm_b,covm_b,qPD_unc_b))
+          }) %>% apply(., 1, sd)
+        }else{
+          ses <- sapply(1:nboot, function(B){
+            # atime <- Sys.time()
+            ai_B <- Boots$boot_data[,B]
+            isn0 <- ai_B>0
+            qPDm_b <-  PhD.m.est(ai = ai_B[isn0],Lis = Li_b[isn0,,drop=F],
+                                 m=m[[i]],q=q,nt = n,cal = cal) %>% as.numeric()
+            covm_b <- Coverage(ai_B[isn0&tgroup_B=="Tip"], datatype, m[[i]],n)
+            # btime <- Sys.time()
+            # print(paste0("Est boot sample",B,": ",btime-atime))
+            return(c(qPDm_b,covm_b))
+          }) %>% apply(., 1, sd)
+        }
       }else{
-        ses <- rep(NA,length(c(qPDm,covm)))
+        if(unconditional_var){
+          ses <- rep(NA,length(c(qPDm,covm,qPD_unc$qPD)))
+        }else{
+          ses <- rep(NA,length(c(qPDm,covm)))
+        }
       }
-      ses_cov <- ses[(length(ses)-length(m[[i]])+1):length(ses)]
-      ses_pd <- ses[-((length(ses)-length(m[[i]])+1):length(ses))]
+
+      ses_pd <- ses[1:length(qPDm)]
+      ses_cov <- ses[(length(qPDm)+1):(length(qPDm)+length(covm))]
       m_ <- rep(m[[i]],each = length(q)*length(reft))
       method <- ifelse(m[[i]]>n,'Extrapolation',ifelse(m[[i]]<n,'Rarefaction','Observed'))
       method <- rep(method,each = length(q)*length(reft))
@@ -874,53 +901,87 @@ inextPD = function(datalist, datatype, phylotr, q,reft, m, cal, nboot, conf=0.95
       SC_ <- rep(covm,each = length(q)*length(reft))
       SC.LCL_ <- rep(covm-qtile*ses_cov,each = length(q)*length(reft))
       SC.UCL_ <- rep(covm+qtile*ses_cov,each = length(q)*length(reft))
-      reft_ = rep(rep(reft,each = length(q)),length(m[[i]]))
-      tibble(Assemblage = nms[i], m=m_,Method=method,Order.q=orderq,
+      reft_ <- rep(rep(reft,each = length(q)),length(m[[i]]))
+      out_m <- tibble(Assemblage = nms[i], m=m_,Method=method,Order.q=orderq,
              qPD=qPDm,qPD.LCL=qPDm-qtile*ses_pd,qPD.UCL=qPDm+qtile*ses_pd,
              SC=SC_,SC.LCL=SC.LCL_,SC.UCL=SC.UCL_,
              Reference.time = reft_,
              Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number")) %>%
         arrange(Reference.time,Order.q,m)
-    }) %>% do.call(rbind, .)
+      out_m$qPD.LCL[out_m$qPD.LCL<0] <- 0;out_m$SC.LCL[out_m$SC.LCL<0] <- 0
+      out_m$SC.UCL[out_m$SC.UCL>1] <- 1
+      if(unconditional_var){
+        ses_pd_unc <- ses[-(1:(length(qPDm)+length(covm)))]
+        out_C <- qPD_unc %>% mutate(qPD.LCL = qPD-qtile*ses_pd_unc,qPD.UCL = qPD+qtile*ses_pd_unc,
+                                    Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number"),
+                                    Assemblage = nms[i])
+        id_C <- match(c('Assemblage','goalSC','SC','m', 'Method', 'Order.q', 'qPD', 'qPD.LCL','qPD.UCL','Reference.time',
+                        'Type'), names(out_C), nomatch = 0)
+        out_C <- out_C[, id_C] %>% arrange(Reference.time,Order.q,m)
+        out_C$qPD.LCL[out_C$qPD.LCL<0] <- 0
+      }else{
+        out_C <- NULL
+      }
+      return(list(size_based = out_m, coverage_based = out_C))
+    })
   }else if(datatype=="incidence_raw"){
     Estoutput <- lapply(1:length(datalist), function(i){
       aL <- phyBranchAL_Inc(phylo = phylotr,data = datalist[[i]],datatype,refT = reft)
-      # aL$treeNabu$branch.length <- aL$BLbyT[,1]
-      # aL_table <- aL$treeNabu %>% select(branch.abun,branch.length,tgroup)
       x <- datalist[[i]] %>% .[rowSums(.)>0,colSums(.)>0]
       n <- ncol(x)
+      #====conditional on m====
       qPDm <- PhD.m.est(ai = aL$treeNabu$branch.abun,Lis = aL$BLbyT,m = m[[i]],
                         q = q,nt = n,cal = cal) %>% as.numeric()
       covm = Coverage(x, datatype, m[[i]], n)
+      #====unconditional====
+      if(unconditional_var){
+        goalSC <- unique(covm)
+        qPD_unc <- unique(invChatPD_inc(x = rowSums(x),ai = aL$treeNabu$branch.abun,Lis = aL$BLbyT,
+                                          q = q,Cs = goalSC,n = n,cal = cal))
+        colnames(qPD_unc)[which(colnames(qPD_unc)=='t')] <- 'm'
+      }
       if(nboot>1){
         Boots <- Boots.one(phylo = phylotr,aL$treeNabu,datatype,nboot,reft,aL$BLbyT,n)
         Li_b <- Boots$Li
         f0 <- Boots$f0
         tgroup_B <- c(rep("Tip",nrow(x)+f0),rep("Inode",nrow(Li_b)-nrow(x)-f0))
-        # aL_table_b <- tibble(branch.abun = 0, branch.length= Li_b[,1],tgroup = tgroup_B)
-        ses <- sapply(1:nboot, function(B){
-          # atime <- Sys.time()
-          #aL_table_b[,1] <- Boots$boot_data[,B]
-          ai_B <- Boots$boot_data[,B]
-          isn0 <- ai_B>0
-          # isn0 <- as.vector(aL_table_b[,1]>0)
-          # Li_b_tmp <- Li_b[isn0,]
-          # aL_table_b <- aL_table_b[isn0,]
-          qPDm_b <-  PhD.m.est(ai = ai_B[isn0],Lis = Li_b[isn0,,drop=F],
-                               m=m[[i]],q=q,nt = n,cal = cal) %>% as.numeric()
-          covm_b = Coverage(ai_B[isn0&tgroup_B=="Tip"], datatype, m[[i]],n)
-          # qPDm_b <-  PhD.m.est(aL=aL_table_b,m=m[[i]],q=q,datatype=datatype,nt = n) %>%
-          #   t() %>% as.numeric()
-          # covm_b = Coverage(unlist(aL_table_b$branch.abun[aL_table_b$tgroup=="Tip"]), datatype, m[[i]],n)
-          # btime <- Sys.time()
-          # print(paste0("Est boot sample",B,": ",btime-atime))
-          return(c(qPDm_b,covm_b))
-        }) %>% apply(., 1, sd)
+        if(unconditional_var){
+          ses <- sapply(1:nboot, function(B){
+            # atime <- Sys.time()
+            ai_B <- Boots$boot_data[,B]
+            isn0 <- ai_B>0
+            qPDm_b <-  PhD.m.est(ai = ai_B[isn0],Lis = Li_b[isn0,,drop=F],
+                                 m=m[[i]],q=q,nt = n,cal = cal) %>% as.numeric()
+            covm_b = Coverage(ai_B[isn0&tgroup_B=="Tip"], datatype, m[[i]],n)
+            qPD_unc_b <- unique(invChatPD_inc(x = ai_B[isn0&tgroup_B=="Tip"],
+                                              ai = ai_B[isn0],Lis = Li_b[isn0,,drop=F],
+                                              q = q,Cs = goalSC,n = n,cal = cal))$qPD
+            # btime <- Sys.time()
+            # print(paste0("Est boot sample",B,": ",btime-atime))
+            return(c(qPDm_b,covm_b,qPD_unc_b))
+          }) %>% apply(., 1, sd)
+        }else{
+          ses <- sapply(1:nboot, function(B){
+            # atime <- Sys.time()
+            ai_B <- Boots$boot_data[,B]
+            isn0 <- ai_B>0
+            qPDm_b <-  PhD.m.est(ai = ai_B[isn0],Lis = Li_b[isn0,,drop=F],
+                                 m=m[[i]],q=q,nt = n,cal = cal) %>% as.numeric()
+            covm_b = Coverage(ai_B[isn0&tgroup_B=="Tip"], datatype, m[[i]],n)
+            # btime <- Sys.time()
+            # print(paste0("Est boot sample",B,": ",btime-atime))
+            return(c(qPDm_b,covm_b))
+          }) %>% apply(., 1, sd)
+        }
       }else{
-        ses <- rep(NA,length(c(qPDm,covm)))
+        if(unconditional_var){
+          ses <- rep(NA,length(c(qPDm,covm,qPD_unc$qPD)))
+        }else{
+          ses <- rep(NA,length(c(qPDm,covm)))
+        }
       }
-      ses_cov <- ses[(length(ses)-length(m[[i]])+1):length(ses)]
-      ses_pd <- ses[-((length(ses)-length(m[[i]])+1):length(ses))]
+      ses_pd <- ses[1:length(qPDm)]
+      ses_cov <- ses[(length(qPDm)+1):(length(qPDm)+length(covm))]
       m_ <- rep(m[[i]],each = length(q)*length(reft))
       method <- ifelse(m[[i]]>n,'Extrapolation',ifelse(m[[i]]<n,'Rarefaction','Observed'))
       method <- rep(method,each = length(q)*length(reft))
@@ -929,17 +990,36 @@ inextPD = function(datalist, datatype, phylotr, q,reft, m, cal, nboot, conf=0.95
       SC.LCL_ <- rep(covm-qtile*ses_cov,each = length(q)*length(reft))
       SC.UCL_ <- rep(covm+qtile*ses_cov,each = length(q)*length(reft))
       reft_ = rep(rep(reft,each = length(q)),length(m[[i]]))
-      tibble(Assemblage = nms[i], m=m_,Method=method,Order.q=orderq,
+      out_m <- tibble(Assemblage = nms[i], m=m_,Method=method,Order.q=orderq,
              qPD=qPDm,qPD.LCL=qPDm-qtile*ses_pd,qPD.UCL=qPDm+qtile*ses_pd,
              SC=SC_,SC.LCL=SC.LCL_,SC.UCL=SC.UCL_,
              Reference.time = reft_,
              Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number")) %>%
         arrange(Reference.time,Order.q,m)
-    }) %>% do.call(rbind, .)
+      out_m$qPD.LCL[out_m$qPD.LCL<0] <- 0;out_m$SC.LCL[out_m$SC.LCL<0] <- 0
+      out_m$SC.UCL[out_m$SC.UCL>1] <- 1
+      if(unconditional_var){
+        ses_pd_unc <- ses[-(1:(length(qPDm)+length(covm)))]
+        out_C <- qPD_unc %>% mutate(qPD.LCL = qPD-qtile*ses_pd_unc,qPD.UCL = qPD+qtile*ses_pd_unc,
+                                    Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number"),
+                                    Assemblage = nms[i])
+        id_C <- match(c('Assemblage','goalSC','SC','m', 'Method', 'Order.q', 'qPD', 'qPD.LCL','qPD.UCL','Reference.time',
+                        'Type'), names(out_C), nomatch = 0)
+        out_C <- out_C[, id_C] %>% arrange(Reference.time,Order.q,m)
+        out_C$qPD.LCL[out_C$qPD.LCL<0] <- 0
+      }else{
+        out_C <- NULL
+      }
+      return(list(size_based = out_m, coverage_based = out_C))
+    })
   }
-  Estoutput$qPD.LCL[Estoutput$qPD.LCL<0] <- 0;Estoutput$SC.LCL[Estoutput$SC.LCL<0] <- 0
-  Estoutput$SC.UCL[Estoutput$SC.UCL>1] <- 1
-  return(Estoutput)
+  if(unconditional_var){
+    ans <- list(size_based = do.call(rbind,lapply(Estoutput, function(x) x$size_based)),
+                coverage_based = do.call(rbind,lapply(Estoutput, function(x) x$coverage_based)))
+  }else{
+    ans <- list(size_based = do.call(rbind,lapply(Estoutput, function(x) x$size_based)))
+  }
+  return(ans)
 }
 #=====old version=====
 # PhD.m.est = function(aL, m, q,datatype, nt){
@@ -1086,26 +1166,33 @@ Coverage = function(data, datatype, m, nt){
 }
 RE_plot = function(data, datatype, type){
   #data <- as.data.frame(data)
-  ylab_ <- unique(data$Type)
-  title <- c("Sample-size-based sampling curve", "Coverage-based sampling curve", "Sample completeness curve")
-  title <- title[type]
-
   x <- ifelse(datatype=='incidence_raw', 'sampling units', "individuals")
-  Assemblage <- unique(data$Assemblage)
   if(type == 1){
-    #output <- data[, c(1, 2, 4, 5, 6, 10,3)]
-    output <- data[, c(2, 3, 5, 6, 7, 1, 4, 11)]
+    data <- data$size_based
+    id <- match(c('m','Method','qPD','qPD.LCL','qPD.UCL','Assemblage','Order.q',
+                    'Reference.time'), names(data), nomatch = 0)
+    output <- data[, id]
     xlab_ <- paste0("Number of ", x)
   }else if(type == 2){
-    #output <- data[, c(7, 2, 4, 5, 6, 10,3)]
-    output <- data[, c(8, 3, 5, 6, 7, 1, 4, 11)]
-    xlab_ <- "Sample Coverage"
-  }else if(type == 3){
-    #output <- data[, c(1, 2, 7, 8, 9, 10,3)] %>% filter(Order.q==1)
-    output <- data[, c(2, 3, 8, 9, 10, 1, 4,11)] %>% filter(Order.q==1)
+    data <- data$size_based %>% filter(Order.q==1)
+    id <- match(c('m','Method','SC','SC.LCL','SC.UCL','Assemblage','Order.q',
+                  'Reference.time'), names(data), nomatch = 0)
+    output <- data[, id]
     xlab_ <- paste0("Number of ", x)
     ylab_ <- "Sample Coverage"
+  }else if(type == 3){
+    data <- data$coverage_based
+    id <- match(c('SC','Method','qPD','qPD.LCL','qPD.UCL','Assemblage','Order.q',
+                  'Reference.time'), names(data), nomatch = 0)
+    output <- data[, id]
+    xlab_ <- "Sample Coverage"
   }
+  ylab_ <- unique(data$Type)
+  title <- c("Sample-size-based sampling curve", "Sample completeness curve","Coverage-based sampling curve")
+  title <- title[type]
+
+
+  Assemblage <- unique(data$Assemblage)
   colnames(output) <- c("x", "Method", "y", "LCL", "UCL", "Assemblage","Order.q",'Reference.time')
   output$Method <- as.character(output$Method)
   output$Assemblage <- as.character(output$Assemblage)
@@ -1155,8 +1242,8 @@ RE_plot = function(data, datatype, type){
       scale_linetype_manual(values = c("dashed", "solid"), name="Method",breaks=c("Interpolated", "Extrapolated"), labels=c("Interpolation", "Extrapolation"))+
       theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
       ggtitle(title)+guides(linetype=guide_legend(keywidth=2.5))
-    if(type!=3)  outp <- outp + facet_wrap(Reference.time~Order.q,scales = "free_y",labeller=mylab)
-    else if (type == 3) outp <- outp + facet_wrap(~Reference.time,scales = "free_y")
+    if(type!=2)  outp <- outp + facet_wrap(Reference.time~Order.q,scales = "free_y",labeller=mylab)
+    else if (type == 2) outp <- outp + facet_wrap(~Reference.time,scales = "free_y")
     if(length(unique(output$Reference.time))==1) outp <- outp + theme(strip.background = element_blank(), strip.text.x = element_blank())
   }
   return(outp)
@@ -1179,8 +1266,7 @@ invChatPD <- function(datalist, datatype,phylotr, q, reft, cal,level, nboot, con
       n <- sum(x_)
       #n_sp_samp <- sum(aL_table$tgroup=='Tip')
       est <- invChatPD_abu(x = x_,ai = aL$treeNabu$branch.abun,Lis = aL$BLbyT,
-                           q = q,Cs = level, n = n,cal = cal) %>%
-        mutate(Reference.time = rep(rep(reft,each = length(q)),length(level)))
+                           q = q,Cs = level, n = n,cal = cal)
       if(nboot>1){
         Boots <- Boots.one(phylo = phylotr,aL$treeNabu,datatype,nboot,reft,aL$BLbyT,n)
         Li_b <- Boots$Li
@@ -1212,9 +1298,8 @@ invChatPD <- function(datalist, datatype,phylotr, q, reft, cal,level, nboot, con
       # aL_table <- aL$treeNabu %>% select(branch.abun,branch.length,tgroup)
       x_ <- x_[rowSums(x_)>0,colSums(x_)>0]
       n <- ncol(x_)
-      est <- invChatPD_inc(x = x_,ai = aL$treeNabu$branch.abun,Lis = aL$BLbyT,
-                           q = q,Cs = level, n = n,cal = cal) %>%
-        mutate(Reference.time = rep(rep(reft,each = length(q)),length(level)))
+      est <- invChatPD_inc(x = rowSums(x_),ai = aL$treeNabu$branch.abun,Lis = aL$BLbyT,
+                           q = q,Cs = level, n = n,cal = cal)
       if(nboot>1){
         Boots <- Boots.one(phylo = phylotr,aL$treeNabu,datatype,nboot,reft,aL$BLbyT,n)
         Li_b <- Boots$Li
@@ -1355,17 +1440,14 @@ invChatPD_abu <- function(x,ai,Lis, q, Cs, n,cal){
       f2 <- sum(x == 2)
       if (f1 > 0 & f2 > 0) {
         A <- (n - 1) * f1/((n - 1) * f1 + 2 * f2)
-      }
-      if (f1 > 1 & f2 == 0) {
+      }else if(f1 > 1 & f2 == 0) {
         A <- (n - 1) * (f1 - 1)/((n - 1) * (f1 - 1) + 2)
-      }
-      if (f1 == 1 & f2 == 0) {
+      }else if(f1 == 1 & f2 == 0) {
+        A <- 1
+      }else if(f1 == 0 & f2 == 0) {
         A <- 1
       }
-      if (f1 == 0 & f2 == 0) {
-        A <- 1
-      }
-      mm <- (log(n/f1) + log(1 - cvrg))/log(A) - 1
+      mm <- ifelse(A==1,0,(log(n/f1) + log(1 - cvrg))/log(A) - 1)
       mm <- n + mm
       mm <- round(mm)
     }
@@ -1374,16 +1456,18 @@ invChatPD_abu <- function(x,ai,Lis, q, Cs, n,cal){
   mm[mm==0] <- 1
   SC <- Coverage(x, 'abundance', mm, n)
   out <- as.numeric(PhD.m.est(ai = ai,Lis = Lis,m = mm,q = q,nt = n,cal = cal))
-  method <- ifelse(mm>n,'Extrapolated',ifelse(mm<n,'Interpolated','Observed'))
+  method <- ifelse(mm>n,'Extrapolation',ifelse(mm<n,'Rarefaction','Observed'))
   method <- rep(method,each = length(q)*ncol(Lis))
   m <- rep(mm,each = length(q)*ncol(Lis))
   order <- rep(q,ncol(Lis)*length(mm))
   SC <- rep(SC,each = length(q)*ncol(Lis))
   goalSC <- rep(Cs,each = length(q)*ncol(Lis))
+  reft <- as.numeric(substr(colnames(Lis),start = 2,stop = nchar(colnames(Lis))))
+  Reference.time = rep(rep(reft,each = length(q)),length(Cs))
   tibble(m = m,Method = method,Order.q = order,
-         qPD = out,SC=SC,goalSC = goalSC)
+         qPD = out,SC=SC,goalSC = goalSC,Reference.time = Reference.time)
 }
-invChatPD_inc <- function(x,ai,Lis, q, Cs, n,cal){
+invChatPD_inc <- function(x,ai,Lis, q, Cs, n,cal){ # x is a matrix
   #x <- unlist(aL_table$branch.abun[aL_table$tgroup=="Tip"])
   refC = Coverage(x, 'incidence', n, n)
   f <- function(m, C) abs(Coverage(x, 'incidence', m, n) - C)
@@ -1398,17 +1482,14 @@ invChatPD_inc <- function(x,ai,Lis, q, Cs, n,cal){
       U <- sum(x)
       if (f1 > 0 & f2 > 0) {
         A <- (n - 1) * f1/((n - 1) * f1 + 2 * f2)
-      }
-      if (f1 > 1 & f2 == 0) {
+      }else if(f1 > 1 & f2 == 0) {
         A <- (n - 1) * (f1 - 1)/((n - 1) * (f1 - 1) + 2)
-      }
-      if (f1 == 1 & f2 == 0) {
+      }else if(f1 == 1 & f2 == 0) {
+        A <- 1
+      }else if(f1 == 0 & f2 == 0) {
         A <- 1
       }
-      if (f1 == 0 & f2 == 0) {
-        A <- 1
-      }
-      mm <- (log(U/f1) + log(1 - cvrg))/log(A) - 1
+      mm <- ifelse(A==1,0,(log(U/f1) + log(1 - cvrg))/log(A) - 1)
       mm <- n + mm
       mm <- round(mm)
     }
@@ -1417,14 +1498,16 @@ invChatPD_inc <- function(x,ai,Lis, q, Cs, n,cal){
   mm[mm==0] <- 1
   SC <- Coverage(x, 'incidence', mm, n)
   out <-  as.numeric(PhD.m.est(ai = ai,Lis = Lis,m = mm,q = q,nt = n,cal = cal))
-  method <- ifelse(mm>n,'Extrapolated',ifelse(mm<n,'Interpolated','Observed'))
+  method <- ifelse(mm>n,'Extrapolation',ifelse(mm<n,'Rarefaction','Observed'))
   method <- rep(method,each = length(q)*ncol(Lis))
   m <- rep(mm,each = length(q)*ncol(Lis))
   order <- rep(q,ncol(Lis)*length(mm))
   SC <- rep(SC,each = length(q)*ncol(Lis))
   goalSC <- rep(Cs,each = length(q)*ncol(Lis))
+  reft <- as.numeric(substr(colnames(Lis),start = 2,stop = nchar(colnames(Lis))))
+  Reference.time = rep(rep(reft,each = length(q)),length(Cs))
   tibble(t = m,Method = method,Order.q = order,
-         qPD = out,SC=SC,goalSC = goalSC)
+         qPD = out,SC=SC,goalSC = goalSC, Reference.time = Reference.time)
 }
 
 
