@@ -66,7 +66,7 @@ iNEXTPD <- function(data, t_, datatype = "abundance",tree,q = c(0,1,2),reftime=N
   # if(is.na(pmatch(q, qq) == T) == T) stop("invalid order of q, we only compute q = 0, 1 or 2", call. = FALSE)
   if ((conf < 0) | (conf > 1) | (is.numeric(conf)==F)) stop('conf (confidence level) must be a numerical value between 0 and 1, We use "conf" = 0.95 to calculate!', call. = FALSE)
   if ((nboot < 0) | (is.numeric(nboot)==F)) stop('nboot must be a nonnegative integer, We use "nboot" = 50 to calculate!', call. = FALSE)
-  if(class(data)=="numeric"|class(data)=="integer"|class(data)=="double" ) data <- as.matrix(data)
+  if(class(data)[1]=="numeric"|class(data)[1]=="integer"|class(data)[1]=="double" ) data <- as.matrix(data)
   if(is.null(rownames(data) ))
     stop("Row names of data must be the species names that match tip names in tree and thus can not be empty.", call. = FALSE)
 

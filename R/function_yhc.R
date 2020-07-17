@@ -1227,7 +1227,7 @@ RE_plot = function(data, datatype, type){
     outp <- ggplot(output, aes(x = x, y = y))+
       geom_ribbon(aes(ymin = LCL, ymax = UCL),fill="#F8766D",alpha=0.3)+geom_line(size=1.5, aes(x = x, y = y, linetype=Method),color="#F8766D")+
       geom_point(size=3, data=output_obser,color="#F8766D")+xlab(xlab_)+ylab(ylab_)+
-      scale_linetype_manual(values = c("dashed", "solid"), name="Method",breaks=c("Rarefaction", "Extrapolated"), labels=c("Rarefaction", "Extrapolation"))+
+      scale_linetype_manual(values = c("solid", "dashed"), name="Method",breaks=c("Rarefaction", "Extrapolation"), labels=c("Rarefaction", "Extrapolation"))+
       theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
       ggtitle(title)+guides(linetype=guide_legend(keywidth=2.5))
     if(type!=3) outp <- outp + facet_wrap(Reference.time~Order.q,scales = "free_y",labeller=mylab)
@@ -1239,7 +1239,7 @@ RE_plot = function(data, datatype, type){
       geom_ribbon(aes(ymin = LCL, ymax = UCL, fill = Assemblage), alpha=0.3, colour=NA)+
       scale_fill_manual(values = color_nogreen(length(unique(output$Assemblage))))+
       geom_point(size=3, data=output_obser)+xlab(xlab_)+ylab(ylab_)+
-      scale_linetype_manual(values = c("dashed", "solid"), name="Method",breaks=c("Rarefaction", "Extrapolated"), labels=c("Rarefaction", "Extrapolation"))+
+      scale_linetype_manual(values = c("solid", "dashed"), name="Method",breaks=c("Rarefaction", "Extrapolation"), labels=c("Rarefaction", "Extrapolation"))+
       theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
       ggtitle(title)+guides(linetype=guide_legend(keywidth=2.5))
     if(type!=2)  outp <- outp + facet_wrap(Reference.time~Order.q,scales = "free_y",labeller=mylab)
