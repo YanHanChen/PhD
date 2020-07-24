@@ -4,9 +4,20 @@
 \alias{iNEXTPD}
 \title{Interpolation and extrapolation of phylogenetic diversity/phylogenetic Hill numbers}
 \usage{
-iNEXTPD(data, t_, datatype = "abundance", tree, q = c(0, 1, 2),
-  reftime = NULL, type = "PD", endpoint = NULL, knots = 40,
-  size = NULL, nboot = 50, conf = 0.95)
+iNEXTPD(
+  data,
+  t_,
+  datatype = "abundance",
+  tree,
+  q = c(0, 1, 2),
+  reftime = NULL,
+  type = "PD",
+  endpoint = NULL,
+  knots = 40,
+  size = NULL,
+  nboot = 50,
+  conf = 0.95
+)
 }
 \arguments{
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr Type (1) abundance data: a S by N matrix/data.frame
@@ -45,7 +56,9 @@ in this case, the caculation of standard errors and confidence intervals will be
 \item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr}
 }
 \value{
-a tibble of PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr\cr
+a list containg two tibbles:
+ \code{$size_based} for sizd-based PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr\cr
+ \code{$coverage_based} for coverage-based one.
 }
 \description{
 \code{iNEXTPD}: the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
@@ -57,7 +70,7 @@ See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background 
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2),reftime = c(162.5,325))
+out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2))
 # Type (2) incidence data
 data(data.inc)
 data <- data.inc$data

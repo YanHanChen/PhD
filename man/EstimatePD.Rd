@@ -4,9 +4,18 @@
 \alias{estimatePD}
 \title{Compute phylogenetic diversity with a particular sample coverages.}
 \usage{
-estimatePD(data, t_, datatype = "abundance", tree, q = c(0, 1, 2),
-  reftime = NULL, type = "PD", level = NULL, nboot = 50,
-  conf = 0.95)
+estimatePD(
+  data,
+  t_,
+  datatype = "abundance",
+  tree,
+  q = c(0, 1, 2),
+  reftime = NULL,
+  type = "PD",
+  level = NULL,
+  nboot = 50,
+  conf = 0.95
+)
 }
 \arguments{
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr

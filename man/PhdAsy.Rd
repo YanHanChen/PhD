@@ -4,8 +4,17 @@
 \alias{PhdAsy}
 \title{Asymptotic phylogenetic diversity/phylogenetic Hill numbers}
 \usage{
-PhdAsy(data, t_, datatype = "abundance", tree, q = seq(0, 2, by =
-  0.25), reftime = NULL, type = "PD", nboot = 50, conf = 0.95)
+PhdAsy(
+  data,
+  t_,
+  datatype = "abundance",
+  tree,
+  q = seq(0, 2, by = 0.25),
+  reftime = NULL,
+  type = "PD",
+  nboot = 50,
+  conf = 0.95
+)
 }
 \arguments{
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr

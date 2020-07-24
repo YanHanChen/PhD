@@ -34,14 +34,16 @@
 #' @importFrom stats sd
 #' @importFrom ape drop.tip
 #' @importFrom phyclust get.rooted.tree.height
-#' @return a tibble of PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr\cr
+#' @return a list containg two tibbles:
+#'  \code{$size_based} for sizd-based PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr\cr
+#'  \code{$coverage_based} for coverage-based one.
 #' @examples
 #' \donttest{
 #' # Type (1) abundance data
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2),reftime = c(162.5,325))
+#' out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2))
 #' # Type (2) incidence data
 #' data(data.inc)
 #' data <- data.inc$data

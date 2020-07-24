@@ -4,11 +4,13 @@
 \name{data.abu}
 \alias{data.abu}
 \title{Abundance Data}
-\format{A list includes two objects:
+\format{
+A list includes two objects:
 \describe{
   \item{data}{is a data frame with 46 plants abundance data and three sites: ED, MD and TD.}
   \item{tree}{is a character string giving the phylogenetic tree in Newick format.}
-}}
+}
+}
 \source{
 Carboni, M., Santoro, R., & Acosta, A. T. R. (2010). Are some communities of the coastal dune zonation more susceptible to alien plant invasion?. Journal of Plant Ecology, 3(2), 139-147.
 }
