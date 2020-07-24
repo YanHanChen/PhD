@@ -44,7 +44,7 @@ a tibble of estimated(asymptotic) phylogenetic diversity(\code{type = "PD"}) or 
 with respect to specified/default order \code{q} and reference time \code{reftime}.\cr\cr
 }
 \description{
-\code{PhdAsy}: estimates asymptotic diversity with respect to specified/default order \code{q} and reference time \code{reftime} to infer true phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
+\code{PhdAsy} estimates asymptotic diversity with respect to specified/default order \code{q} and reference time \code{reftime} to infer true phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
 It is based on statistical estimation of the unknown true PD or D; see Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.\cr
 }
 \examples{

@@ -7,8 +7,8 @@
 \format{
 A list includes two objects:
 \describe{
-  \item{data}{is a data frame with 46 plants abundance data and three sites: ED, MD and TD.}
-  \item{tree}{is a character string giving the phylogenetic tree in Newick format.}
+  \item{data}{a data frame with 46 plants abundance data and three sites: ED, MD and TD.}
+  \item{tree}{a phylo object giving the phylogenetic tree in Newick format.}
 }
 }
 \source{

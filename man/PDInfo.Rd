@@ -26,7 +26,7 @@ number of observed species \code{S.obs}, observed branch length (Faith's PD) \co
 (\code{f1*/Q1*}, \code{f2*/Q2*}) and their branch length sums, respectively (\code{g1/R1}, \code{g2/R2}) at specified/default reference time \code{reftime}. \cr\cr
 }
 \description{
-\code{PDInfo}: summarize phylogenetic data statistics for specified/default reference time \code{reftime}.
+\code{PDInfo} summarizes phylogenetic data statistics for specified/default reference time \code{reftime}.
 }
 \examples{
 \donttest{

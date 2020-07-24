@@ -2,7 +2,7 @@
 % Please edit documentation in R/MainFun.R
 \name{estimatePD}
 \alias{estimatePD}
-\title{Compute phylogenetic diversity with a particular sample coverages.}
+\title{Compute phylogenetic diversity with respect to particular sample coverages.}
 \usage{
 estimatePD(
   data,
@@ -21,7 +21,7 @@ estimatePD(
 \item{data}{a matrix/data.frame of species abundances/incidences data.\cr
 See \code{\link{iNEXTPD}} for data details.}
 
-\item{t_}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
+\item{t_}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the numbers of sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
 Ignored if \code{datatype = "abundance"}.}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
@@ -36,7 +36,7 @@ or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}
 \item{type}{desired diversity type: \code{type = "PD"} for phylogenetic diversity and \code{type = "D"} for phylogenetic Hill number. See Chao et al. (2010) for details. Default is \code{"PD"}.}
 
 \item{level}{a positive value or sequence < 1 specifying a particular value of sample coverage.
-If \code{NULL},then \code{level} will be chosen as the minimum coverage of all sites after extrapolating each assemblage to its double sample sizes. Default is \code{NULL}.}
+If \code{NULL}, then \code{level} will be chosen as the minimum coverage among all assemblages after extrapolating each one to its double sample sizes. Default is \code{NULL}.}
 
 \item{nboot}{a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
 in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.}
@@ -45,10 +45,10 @@ in this case, the caculation of standard errors and confidence intervals will be
 }
 \value{
 a tibble of the PD or D estimates with respect to specified/default order \code{q} and reference time \code{reftime} for the user-specified sample coverages.
-In addition,the corresponding sample sizes and sample coverages are also provided. \cr\cr
+In addition, the corresponding sample sizes and sample coverages are also provided. \cr\cr
 }
 \description{
-\code{EstimatePD}: estimates phylogenetic diversity(PD) or phylogenetic Hill numbers(D) with particular user-specified levels of sample coverage with respect to specified/default order \code{q} and reference time \code{reftime}.
+\code{EstimatePD} estimates phylogenetic diversity(PD) or phylogenetic Hill numbers(D) with respect to particular user-specified levels of sample coverages.
 }
 \examples{
 \donttest{

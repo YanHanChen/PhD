@@ -44,7 +44,7 @@ a tibble of empirical(observed) phylogenetic diversity(\code{type = "PD"}) or
 phylogenetic Hill number(\code{type = "D"}) with respect to each \code{reftime} and order \code{q}.\cr\cr
 }
 \description{
-\code{PhdObs}: computes emprircal phylogenetic diversity(PD) or phylogenetic Hill numbers(D) for specified/default order \code{q} and reference time \code{reftime};
+\code{PhdObs} computes emprircal phylogenetic diversity(PD) or phylogenetic Hill numbers(D) for specified/default order \code{q} and reference time \code{reftime};
 see Chao et al. (2010) for details of PD and D.\cr
 }
 \examples{

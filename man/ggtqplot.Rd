@@ -2,20 +2,20 @@
 % Please edit documentation in R/MainFun.R
 \name{ggtqplot}
 \alias{ggtqplot}
-\title{Plot the outcome of \code{PhdObs} or \code{PhdAsy} based on \code{ggplot2} package.}
+\title{Plots the outcome of \code{PhdObs} or \code{PhdAsy} based on \code{ggplot2} package.}
 \usage{
 ggtqplot(outcome, profile = "q")
 }
 \arguments{
 \item{outcome}{the outcome of the function \code{PhdObs} or \code{PhdAsy}.}
 
-\item{profile}{specifying the type of profile: \code{profile = 'q'} for q profile and \code{profile = 'time'} for time profile.}
+\item{profile}{specifying the type of profile: \code{profile = 'q'} for order q profile and \code{profile = 'time'} for reference time profile.}
 }
 \value{
 plot of the PD/D empirical or estimated curves based on \code{ggplot2} package.
 }
 \description{
-\code{ggtqplot}: plot the outcome of \code{PhdObs} or \code{PhdAsy} using \code{ggplot2} package.
+\code{ggtqplot} plots the outcome of \code{PhdObs} or \code{PhdAsy} using \code{ggplot2} package.
 }
 \examples{
 \donttest{

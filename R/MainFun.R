@@ -1,6 +1,6 @@
 #' Interpolation and extrapolation of phylogenetic diversity/phylogenetic Hill numbers
 #'
-#' \code{iNEXTPD}: the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
+#' \code{iNEXTPD} provides the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
 #' See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background and methods.
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr Type (1) abundance data: a S by N matrix/data.frame
 #' where N is the number of assemblages. The element in i-th row and k-th is the abundance of species i in assemblage k. Please note
@@ -35,7 +35,7 @@
 #' @importFrom ape drop.tip
 #' @importFrom phyclust get.rooted.tree.height
 #' @return a list containg two tibbles:
-#'  \code{$size_based} for sizd-based PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr\cr
+#'  \code{$size_based} for sizd-based PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr
 #'  \code{$coverage_based} for coverage-based one.
 #' @examples
 #' \donttest{
@@ -200,7 +200,7 @@ iNEXTPD <- function(data, t_, datatype = "abundance",tree,q = c(0,1,2),reftime=N
 
 #' Asymptotic phylogenetic diversity/phylogenetic Hill numbers
 #'
-#' \code{PhdAsy}: estimates asymptotic diversity with respect to specified/default order \code{q} and reference time \code{reftime} to infer true phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
+#' \code{PhdAsy} estimates asymptotic diversity with respect to specified/default order \code{q} and reference time \code{reftime} to infer true phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
 #' It is based on statistical estimation of the unknown true PD or D; see Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.\cr
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr
 #' See \code{\link{iNEXTPD}} for data details.
@@ -305,7 +305,7 @@ PhdAsy <- function(data, t_, datatype = "abundance", tree, q = seq(0, 2, by = 0.
 
 #' Observed phylogenetic diversity/phylogenetic Hill numbers
 #'
-#' \code{PhdObs}: computes emprircal phylogenetic diversity(PD) or phylogenetic Hill numbers(D) for specified/default order \code{q} and reference time \code{reftime};
+#' \code{PhdObs} computes emprircal phylogenetic diversity(PD) or phylogenetic Hill numbers(D) for specified/default order \code{q} and reference time \code{reftime};
 #' see Chao et al. (2010) for details of PD and D.\cr
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr
 #' See \code{\link{iNEXTPD}} for data details.
@@ -463,12 +463,12 @@ PhdObs <- function(data, t_, datatype = "abundance", tree, q = seq(0, 2, by = 0.
 }
 
 
-#' Compute phylogenetic diversity with a particular sample coverages.
+#' Compute phylogenetic diversity with respect to particular sample coverages.
 #'
-#' \code{EstimatePD}: estimates phylogenetic diversity(PD) or phylogenetic Hill numbers(D) with particular user-specified levels of sample coverage with respect to specified/default order \code{q} and reference time \code{reftime}.
+#' \code{EstimatePD} estimates phylogenetic diversity(PD) or phylogenetic Hill numbers(D) with respect to particular user-specified levels of sample coverages.
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr
 #' See \code{\link{iNEXTPD}} for data details.
-#' @param t_ needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
+#' @param t_ needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the numbers of sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
 #' Ignored if \code{datatype = "abundance"}.
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr
@@ -477,7 +477,7 @@ PhdObs <- function(data, t_, datatype = "abundance", tree, q = seq(0, 2, by = 0.
 #' @param reftime a positive value or sequence specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.
 #' @param type desired diversity type: \code{type = "PD"} for phylogenetic diversity and \code{type = "D"} for phylogenetic Hill number. See Chao et al. (2010) for details. Default is \code{"PD"}.
 #' @param level a positive value or sequence < 1 specifying a particular value of sample coverage.
-#' If \code{NULL},then \code{level} will be chosen as the minimum coverage of all sites after extrapolating each assemblage to its double sample sizes. Default is \code{NULL}.
+#' If \code{NULL}, then \code{level} will be chosen as the minimum coverage among all assemblages after extrapolating each one to its double sample sizes. Default is \code{NULL}.
 #' @param nboot a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
 #' in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.
 #' @param conf a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr
@@ -489,7 +489,7 @@ PhdObs <- function(data, t_, datatype = "abundance", tree, q = seq(0, 2, by = 0.
 #' @importFrom ape drop.tip
 #' @importFrom phyclust get.rooted.tree.height
 #' @return a tibble of the PD or D estimates with respect to specified/default order \code{q} and reference time \code{reftime} for the user-specified sample coverages.
-#' In addition,the corresponding sample sizes and sample coverages are also provided. \cr\cr
+#' In addition, the corresponding sample sizes and sample coverages are also provided. \cr\cr
 #' @examples
 #' \donttest{
 #' # Type (1) abundance data
@@ -578,7 +578,7 @@ estimatePD <- function(data,t_,datatype = "abundance", tree, q = c(0,1,2), refti
 
 #' Summarize phylogenetic data infomation.
 #'
-#' \code{PDInfo}: summarize phylogenetic data statistics for specified/default reference time \code{reftime}.
+#' \code{PDInfo} summarizes phylogenetic data statistics for specified/default reference time \code{reftime}.
 #' @param data a matrix/data.frame of species abundances/incidences data.\cr
 #' See \code{\link{iNEXTPD}} for data details.
 #' @param t_ needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
@@ -666,12 +666,12 @@ PDInfo <- function(data,t_,datatype = "abundance", tree, reftime=NULL){
 }
 
 
-#' Plot the outcome of iNEXTPD using \code{ggplot2} package.
+#' Plots the outcome of iNEXTPD using \code{ggplot2} package.
 #'
-#' \code{ggiNEXTPD}: plot the outcome of iNEXTPD using ggplot2 package.
+#' \code{ggiNEXTPD} plot the outcome of iNEXTPD using ggplot2 package.
 #' @param outcome the outcome of the function \code{iNEXTPD}
 #' @param plot.type a positive integer vector specifying types of curves. Three types of plots: sample-size-based rarefaction and extrapolation curve (\code{plot.type = 1});
-#' coverage-based rarefaction and extrapolation curve (\code{plot.type = 2}); sample coverage curve (\code{plot.type = 3}). Default is \code{c(1,2,3)}. \cr
+#' sample coverage curve (\code{plot.type = 2});coverage-based rarefaction and extrapolation curve (\code{plot.type = 3}). Default is \code{c(1,2,3)} \cr
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr
 #' @return plots of the estimated curves based on \code{ggplot2} package. Different choice of \code{plot.type} will yied different types of plot:
@@ -707,11 +707,11 @@ ggiNEXTPD <- function(outcome,plot.type = 1:3,datatype = 'abundance'){
   }
 }
 
-#' Plot the outcome of \code{PhdObs} or \code{PhdAsy} based on \code{ggplot2} package.
+#' Plots the outcome of \code{PhdObs} or \code{PhdAsy} based on \code{ggplot2} package.
 #'
-#' \code{ggtqplot}: plot the outcome of \code{PhdObs} or \code{PhdAsy} using \code{ggplot2} package.
+#' \code{ggtqplot} plots the outcome of \code{PhdObs} or \code{PhdAsy} using \code{ggplot2} package.
 #' @param outcome the outcome of the function \code{PhdObs} or \code{PhdAsy}.
-#' @param profile specifying the type of profile: \code{profile = 'q'} for q profile and \code{profile = 'time'} for time profile.
+#' @param profile specifying the type of profile: \code{profile = 'q'} for order q profile and \code{profile = 'time'} for reference time profile.
 #' @return plot of the PD/D empirical or estimated curves based on \code{ggplot2} package.
 #' @examples
 #' \donttest{

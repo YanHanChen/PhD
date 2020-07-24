@@ -7,8 +7,8 @@
 \format{
 A list includes three objects:
 \describe{
-  \item{data}{is a pooled data frame with 41 birds incidence data and 29 sampling points.}
-  \item{tree}{is a character string giving the phylogenetic tree in Newick format.}
+  \item{data}{a pooled data frame with 41 birds incidence data and 29 sampling points.}
+  \item{tree}{a phylo object string giving the phylogenetic tree in Newick format.}
   \item{t}{is a vector giving the numbers of sampling points in each site.}
 }
 }

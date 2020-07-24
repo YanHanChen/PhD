@@ -2,7 +2,7 @@
 % Please edit documentation in R/MainFun.R
 \name{ggiNEXTPD}
 \alias{ggiNEXTPD}
-\title{Plot the outcome of iNEXTPD using \code{ggplot2} package.}
+\title{Plots the outcome of iNEXTPD using \code{ggplot2} package.}
 \usage{
 ggiNEXTPD(outcome, plot.type = 1:3, datatype = "abundance")
 }
@@ -10,7 +10,7 @@ ggiNEXTPD(outcome, plot.type = 1:3, datatype = "abundance")
 \item{outcome}{the outcome of the function \code{iNEXTPD}}
 
 \item{plot.type}{a positive integer vector specifying types of curves. Three types of plots: sample-size-based rarefaction and extrapolation curve (\code{plot.type = 1});
-coverage-based rarefaction and extrapolation curve (\code{plot.type = 2}); sample coverage curve (\code{plot.type = 3}). Default is \code{c(1,2,3)}. \cr}
+sample coverage curve (\code{plot.type = 2});coverage-based rarefaction and extrapolation curve (\code{plot.type = 3}). Default is \code{c(1,2,3)} \cr}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr}
@@ -24,7 +24,7 @@ plots of the estimated curves based on \code{ggplot2} package. Different choice 
  }
 }
 \description{
-\code{ggiNEXTPD}: plot the outcome of iNEXTPD using ggplot2 package.
+\code{ggiNEXTPD} plot the outcome of iNEXTPD using ggplot2 package.
 }
 \examples{
 \donttest{

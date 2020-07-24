@@ -57,11 +57,11 @@ in this case, the caculation of standard errors and confidence intervals will be
 }
 \value{
 a list containg two tibbles:
- \code{$size_based} for sizd-based PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr\cr
+ \code{$size_based} for sizd-based PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr
  \code{$coverage_based} for coverage-based one.
 }
 \description{
-\code{iNEXTPD}: the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
+\code{iNEXTPD} provides the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
 See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background and methods.
 }
 \examples{
