@@ -475,12 +475,12 @@ Plott <- function(out){
   Assemblage <- unique(fort$Assemblage)
   ylab_ <- paste0(unique(fort$Method)," ",unique(fort$Type))
   if(length(Assemblage)==1){
-    p2 <- ggplot(fort, aes(x=Reference.time, y=qPD)) + geom_line(size=1.5,aes(color=Order.q))+
-      geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Order.q),linetype = 0,alpha=0.3)+
+    p2 <- ggplot(fort, aes(x=Reference.time, y=qPD)) + theme_bw() +geom_line(size=1.5,aes(color=Order.q))+
+      geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Order.q),linetype = 0,alpha=0.2)+
       xlab("Reference time")+ylab(ylab_)+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))
   }else{
-    p2 <- ggplot(fort, aes(x=Reference.time, y=qPD, color=Assemblage, linetype=Assemblage)) + geom_line(size=1.5)  +
-      geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Assemblage),linetype = 0,alpha=0.3)+
+    p2 <- ggplot(fort, aes(x=Reference.time, y=qPD, color=Assemblage, linetype=Assemblage)) + theme_bw() + geom_line(size=1.5)  +
+      geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Assemblage,alpha=0.2),linetype = 0,alpha=0.2)+
       scale_color_manual(values = color_nogreen(length(unique(fort$Assemblage))))+
       scale_fill_manual(values = color_nogreen(length(unique(fort$Assemblage))))+
       theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
@@ -496,14 +496,14 @@ Plotq <- function(out){
   ylab_ <- paste0(unique(forq$Method)," ",unique(forq$Type))
   q1 <- unique(forq$Order.q[(forq$Order.q %% 1)==0])
   if(length(Assemblage)==1){
-    p1 <- ggplot(forq, aes(x=Order.q, y=qPD, color=Reference.time)) + geom_line(size=1.5)+
-      geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Reference.time),linetype = 0,alpha=0.3)
+    p1 <- ggplot(forq, aes(x=Order.q, y=qPD, color=Reference.time)) + theme_bw() + geom_line(size=1.5)+
+      geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Reference.time),linetype = 0,alpha=0.2)
     #lai 1006
-    p1 <-  p1 +xlab("Order q")+ylab(ylab_) +theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
+    p1 <-  p1 +xlab("Order q")+ylab(ylab_) + theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
       geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=qPD, color=Reference.time))
   }else{
-    p1 <- ggplot(forq, aes(x=Order.q, y=qPD, color=Assemblage, linetype=Assemblage)) + geom_line(size=1.5)  +
-      geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Assemblage),linetype = 0,alpha=0.3)+
+    p1 <- ggplot(forq, aes(x=Order.q, y=qPD, color=Assemblage, linetype=Assemblage)) + theme_bw() + geom_line(size=1.5)  +
+      geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Assemblage),linetype = 0,alpha=0.2)+
       scale_color_manual(values = color_nogreen(length(unique(forq$Assemblage))))+
       scale_fill_manual(values = color_nogreen(length(unique(forq$Assemblage))))+
       theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
@@ -627,13 +627,13 @@ Asy_plot = function(output, type, method=NULL){##add title
     p <- ggplot(output,aes(x=x,y=y))+geom_line(size=1.5,color="#F8766D")+xlab("Order q")+
       geom_point(size=3, data=subset(output, x%in%q1),color="#F8766D")+
       ylab(ylab_)+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))
-    if(ncol(output) == 6) p <- p + geom_ribbon(aes(ymin=LCL,ymax=UCL),alpha=0.3,fill="#F8766D")
+    if(ncol(output) == 6) p <- p + geom_ribbon(aes(ymin=LCL,ymax=UCL),alpha=0.2,fill="#F8766D")
   }else{
     p <- ggplot(output,aes(x=x,y=y,color=Assemblage,linetype=Assemblage))+geom_line(size=1.5)+xlab("Order q")+
       scale_color_manual(values = color_nogreen(length(unique(output$Assemblage))))+
       geom_point(size=3, data=subset(output, x%in%q1))+
       ylab(ylab_)+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))
-    if(ncol(output) == 6) p <- p + geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Assemblage),alpha=0.3, colour=NA)+scale_fill_manual(values = color_nogreen(length(unique(output$Assemblage))))
+    if(ncol(output) == 6) p <- p + geom_ribbon(aes(ymin=LCL,ymax=UCL,fill=Assemblage),alpha=0.2, colour=NA)+scale_fill_manual(values = color_nogreen(length(unique(output$Assemblage))))
   }
   p <- p+ggtitle(title_)
   return(p)
@@ -1228,8 +1228,8 @@ RE_plot = function(data, type){
     Order.q = c(`0` = "q = 0", `1` = "q = 1",`2` = 'q = 2')
   )
   if(length(Assemblage) == 1){
-    outp <- ggplot(output, aes(x = x, y = y))+
-      geom_ribbon(aes(ymin = LCL, ymax = UCL),fill="#F8766D",alpha=0.3)+geom_line(size=1.5, aes(x = x, y = y, linetype=Method),color="#F8766D")+
+    outp <- ggplot(output, aes(x = x, y = y))+ theme_bw() +
+      geom_ribbon(aes(ymin = LCL, ymax = UCL),fill="#F8766D",alpha=0.2)+geom_line(size=1.5, aes(x = x, y = y, linetype=Method),color="#F8766D")+
       geom_point(size=3, data=output_obser,color="#F8766D")+xlab(xlab_)+ylab(ylab_)+
       scale_linetype_manual(values = c("solid", "dashed"), name="Method",breaks=c("Rarefaction", "Extrapolation"), labels=c("Rarefaction", "Extrapolation"))+
       theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
@@ -1238,9 +1238,10 @@ RE_plot = function(data, type){
     else if (type==3) outp <- outp + facet_wrap(~Reference.time,scales = "free_y")
     #if(length(unique(output$Reference.time))==1) outp <- outp + theme(strip.background = element_blank(), strip.text.x = element_blank())
   }else{
-    outp <- ggplot(output, aes(x = x, y = y, color=Assemblage))+geom_line(size=1.5, aes(x = x, y = y, color=Assemblage, linetype=Method))+
+    outp <- ggplot(output, aes(x = x, y = y, color=Assemblage)) + theme_bw() +
+      geom_line(size=1.5, aes(x = x, y = y, color=Assemblage, linetype=Method))+
       scale_color_manual(values = color_nogreen(length(unique(output$Assemblage))))+
-      geom_ribbon(aes(ymin = LCL, ymax = UCL, fill = Assemblage), alpha=0.3, colour=NA)+
+      geom_ribbon(aes(ymin = LCL, ymax = UCL, fill = Assemblage), alpha=0.2, colour=NA)+
       scale_fill_manual(values = color_nogreen(length(unique(output$Assemblage))))+
       geom_point(size=3, data=output_obser)+xlab(xlab_)+ylab(ylab_)+
       scale_linetype_manual(values = c("solid", "dashed"), name="Method",breaks=c("Rarefaction", "Extrapolation"), labels=c("Rarefaction", "Extrapolation"))+
