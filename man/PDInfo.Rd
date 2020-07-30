@@ -2,45 +2,48 @@
 % Please edit documentation in R/MainFun.R
 \name{PDInfo}
 \alias{PDInfo}
-\title{Summarize phylogenetic data infomation.}
+\title{Summarizes phylogenetic data information.}
 \usage{
-PDInfo(data, t_, datatype = "abundance", tree, reftime = NULL)
+PDInfo(data, nT, datatype = "abundance", tree, reftime = NULL)
 }
 \arguments{
-\item{data}{a matrix/data.frame of species abundances/incidences data.\cr
-See \code{\link{iNEXTPD}} for data details.}
+\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).
+See the function \code{\link{iNEXTPD}} for details.}
 
-\item{t_}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
-Ignored if \code{datatype = "abundance"}.}
+\item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
+If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr}
+or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.\cr}
 
-\item{tree}{a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr}
+\item{tree}{a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.}
 
-\item{reftime}{a positive value or sequence specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
+\item{reftime}{a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
+then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+the pooled assemblage. Default is \code{NULL}.}
 }
 \value{
-a tibble of phylogenetic data statistics, including reference sample size \code{n}/ number of sampling units \code{T},
-number of observed species \code{S.obs}, observed branch length (Faith's PD) \code{PD.obs}, the first two species frequency counts
-(\code{f1*/Q1*}, \code{f2*/Q2*}) and their branch length sums, respectively (\code{g1/R1}, \code{g2/R2}) at specified/default reference time \code{reftime}. \cr\cr
+Returns a table of phylogenetic data information, including reference sample size (\code{n}), number of sampling units (\code{nT}),
+number of observed species (\code{S.obs}), observed total branch length, i.e., Faith’s PD (\code{PD.obs}), the first two rare species
+frequency counts and their branch length sums, at specified/default reference time specified in the argument \code{reftime}.
 }
 \description{
-\code{PDInfo} summarizes phylogenetic data statistics for specified/default reference time \code{reftime}.
+\code{PDInfo} summarizes phylogenetic data statistics for specified/default reference time.
 }
 \examples{
 \donttest{
-# Type (1) abundance data
+# Datatype: abundance data
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
 out <- PDInfo(data = data,datatype = "abundance", tree = tree)
-# Type (2) incidence data
+
+# Datatype: incidence data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
-t_ <- data.inc$t
-out <- PDInfo(data = data, t_ = t_, datatype = "incidence_raw", tree = tree)
+nT <- data.inc$nT
+out <- PDInfo(data = data, nT = nT,datatype = "incidence_raw",tree = tree)
 }
 }
 \references{

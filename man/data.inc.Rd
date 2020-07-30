@@ -7,20 +7,23 @@
 \format{
 A list includes three objects:
 \describe{
-  \item{data}{a pooled data frame with 41 birds incidence data and 29 sampling points.}
-  \item{tree}{a phylo object string giving the phylogenetic tree in Newick format.}
-  \item{t}{is a vector giving the numbers of sampling points in each site.}
+  \item{$data}{a incidence (or occurrence) matrix for 41 species.}
+  \item{$tree}{a phylo object giving the phylogenetic tree in Newick format.}
+  \item{$nT}{a vector giving the numbers of sampling units in each site.}
 }
 }
 \source{
-Jetz, W., Thomas, G.H., Joy, J.B., Hartmann, K. & Mooers A.O. (2012). The global diversity of birds in space and time. Nature, 491, 444-448.
+Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.
 }
 \usage{
 data(data.inc)
 }
 \description{
-This data set describes the phylogeny of 41 birds as reported by Jetz et al. (2012).
-It gives the two sites of species incidence data to these 41 species in November 2012 at Barrington Tops National Park, Australia.
-It also includes two sites of birds: the North Site and the South Site, which contains 12 and 17 sampling points respectively(each sampling point is regarded as a sampling unit).
+This data set consists of the species-by-site raw incidence (detection/non-detection) matrix and the
+phylogenetic tree of 41 bird species collected in November 2012 at Barrington Tops National Park,
+Australia from two sites: the North Site (27 species from \code{nT= 12} point counts) and the South
+Site (38 species from \code{nT= 17} point counts). Each point count is regarded as a sampling unit in
+which species incidence (detection or non-detection) is recorded. See the vignette for part of the
+data in the required input format, and Chao et al. (2015) for the statistical analysis of this data set.
 }
 \keyword{datasets}

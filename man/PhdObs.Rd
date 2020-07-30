@@ -2,11 +2,11 @@
 % Please edit documentation in R/MainFun.R
 \name{PhdObs}
 \alias{PhdObs}
-\title{Observed phylogenetic diversity/phylogenetic Hill numbers}
+\title{Computes observed phylogenetic diversity and phylogenetic Hill numbers}
 \usage{
 PhdObs(
   data,
-  t_,
+  nT,
   datatype = "abundance",
   tree,
   q = seq(0, 2, by = 0.25),
@@ -17,50 +17,55 @@ PhdObs(
 )
 }
 \arguments{
-\item{data}{a matrix/data.frame of species abundances/incidences data.\cr
-See \code{\link{iNEXTPD}} for data details.}
+\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).
+See the function \code{\link{iNEXTPD}} for details.}
 
-\item{t_}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the numbers of sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
-If \code{names(t_) = NULL}, automatically assign siteX as assemblage names. Ignored if \code{datatype = "abundance"}.}
+\item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
+If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}. \cr}
+or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.\cr}
 
-\item{tree}{a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr}
+\item{tree}{a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.}
 
 \item{q}{a nonnegative value or sequence specifying the diversity order. Default is \code{seq(0, 2, by = 0.25)}.}
 
-\item{reftime}{a positive value or sequence specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
+\item{reftime}{a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
+then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+the pooled assemblage. Default is \code{NULL}.}
 
-\item{type}{desired diversity type: \code{type = "PD"} for phylogenetic diversity and \code{type = "D"} for phylogenetic Hill number. See Chao et al. (2010) for details. Default is \code{"PD"}.}
+\item{type}{desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
+and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.}
 
-\item{nboot}{a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
-in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.}
+\item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
+Enter 0 to skip the bootstrap procedures. Default is 50.}
 
 \item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
 }
 \value{
-a tibble of empirical(observed) phylogenetic diversity(\code{type = "PD"}) or
-phylogenetic Hill number(\code{type = "D"}) with respect to each \code{reftime} and order \code{q}.\cr\cr
+Returns a table of empirical (observed) phylogenetic diversity (type = "PD") or phylogenetic Hill number (type= "meanPD")
+for specified/default order q and reference time.
 }
 \description{
-\code{PhdObs} computes emprircal phylogenetic diversity(PD) or phylogenetic Hill numbers(D) for specified/default order \code{q} and reference time \code{reftime};
-see Chao et al. (2010) for details of PD and D.\cr
+\code{PhdObs} computes empirical or observed phylogenetic diversity (PD) and phylogenetic Hill
+numbers (meanPD, mean phylogenetic diversity) for specified/default order \code{q} and reference
+time specified in the argument \code{reftime} \code{reftime}. See Chao et al. (2010) for details of PD and meanPD.\cr
 }
 \examples{
 \donttest{
-# Type (1) abundance data
+# Datatype: abundance data
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
 out <- PhdObs(data = data,datatype = "abundance",tree = tree,
-q = seq(0, 2, by = 0.25),reftime = c(162.5,325))
-# Type (2) incidence data
+q = seq(0, 2, by = 0.25))
+
+# Datatype: incidence data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
-t_ <- data.inc$t
-out <- PhdObs(data = data,t_ = t_, datatype = "incidence_raw",
+nT <- data.inc$nT
+out <- PhdObs(data = data,nT = nT, datatype = "incidence_raw",
 tree = tree, q = seq(0, 2, by = 0.25))
 }
 }

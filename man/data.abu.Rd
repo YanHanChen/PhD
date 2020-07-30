@@ -7,18 +7,21 @@
 \format{
 A list includes two objects:
 \describe{
-  \item{data}{a data frame with 46 plants abundance data and three sites: ED, MD and TD.}
-  \item{tree}{a phylo object giving the phylogenetic tree in Newick format.}
+  \item{$data}{a data frame with 46 plant species abundance data in three habitats: ED, MD and TD.}
+  \item{$tree}{a phylo object giving the phylogenetic tree in Newick format.}
 }
 }
 \source{
-Carboni, M., Santoro, R., & Acosta, A. T. R. (2010). Are some communities of the coastal dune zonation more susceptible to alien plant invasion?. Journal of Plant Ecology, 3(2), 139-147.
+Carboni M, Santoro R, Acosta A. T. R. (2010). Are some communities of the coastal dune zonation more susceptible to alien plant invasion? Journal of Plant Ecology 3:139–147.
+Carboni M, Santoro R, Acosta A. T. R. (2011). Dealing with scarce data to understand how environmental gradients and propagule pressure shape fine‐scale alien distribution patterns on coastal dunes. Journal of Vegetation Science 22:751–765.
 }
 \usage{
 data(data.abu)
 }
 \description{
-This data set describes the phylogeny of 46 plants on dunes (Holocene) of the central western coast of Italy as reported by Carboni et al. (2010).
-It includes three types of dunes: emboryo dunes (ED), mobile dunes (MD) and transtion dunes (TD), which contains 17, 39, 42 distinct plants respectively.
+This data set consists of the abundance and phylogenetic tree of 46 vascular plant species collected
+in the period 2002-2009 along the Tyrrhenian coast from three successively less extreme foredune
+habitats: emboryo dunes (ED, 17 species), mobile dunes (MD, 39 species) and transition dunes (TD, 42
+species). See the vignette for part of the data in the required input format, and Carboni et al. (2010, 2011) for sampling details and habitat descriptions.
 }
 \keyword{datasets}

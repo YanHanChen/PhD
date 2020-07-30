@@ -2,11 +2,11 @@
 % Please edit documentation in R/MainFun.R
 \name{iNEXTPD}
 \alias{iNEXTPD}
-\title{Interpolation and extrapolation of phylogenetic diversity/phylogenetic Hill numbers}
+\title{Interpolation (rarefaction) and extrapolation of Chao et al.’s (2010) phylogenetic diversity and mean phylogenetic diversity (phylogenetic Hill numbers)}
 \usage{
 iNEXTPD(
   data,
-  t_,
+  nT,
   datatype = "abundance",
   tree,
   q = c(0, 1, 2),
@@ -20,67 +20,81 @@ iNEXTPD(
 )
 }
 \arguments{
-\item{data}{a matrix/data.frame of species abundances/incidences data.\cr Type (1) abundance data: a S by N matrix/data.frame
-where N is the number of assemblages. The element in i-th row and k-th is the abundance of species i in assemblage k. Please note
-that the rownames of data must be the species names matching the species names in phylogeny tree and thus can not be empty.\cr
-Type (2) incidence data: the sampling unit is quadrat or transect, the observed species was only recorded as presence(detection)/absence(non-detection)
-data in each sampling unit. For single assemblage consisting of t_ sampling units, data is a S by t_ incidence matrix,
-where S is the number of species. When there are N assemblages, users must first merge N data matrices by species identity to
-obtain a large incidence matrix, where the rows of the matrix refer to all species presented in the pooled data. Likewise,
-the rownames of data must be the species names matching the species names in phylogeny tree and thus can not be empty. \cr}
+\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).\cr
+Abundance data: a species-by-site matrix/data.frame of species abundances. The row (species) names of
+data must match the species names in the phylogenetic tree and thus cannot be missing.\cr
+Raw incidence data: species-by-site raw incidence matrix/data.frame. When there are N assemblages
+and thus N matrices, users must first merge the N matrices by species identity to obtain a large
+merged incidence matrix, where the rows of the matrix refer to all species presented in the merged
+data. The row (species) names of data must match the species names in the phylogenetic tree and
+thus cannot be missing.\cr}
 
-\item{t_}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr}
+\item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
+If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}), default is \code{"abundance"}. \cr}
+or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.\cr}
 
-\item{tree}{a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage.\cr}
+\item{tree}{a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.}
 
 \item{q}{a nonnegative value or sequence specifying the diversity order. Default is \code{c(0,1,2)}.}
 
-\item{reftime}{a positive value or sequence specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
+\item{reftime}{a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
+then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+the pooled assemblage. Default is \code{NULL}.}
 
-\item{type}{desired diversity type: \code{type = "PD"} for phylogenetic diversity and \code{type = "D"} for phylogenetic Hill number. See Chao et al. (2010) for details. Default is \code{"PD"}.}
+\item{type}{desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
+and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.}
 
-\item{endpoint}{an positive interger specifying the endpoint for rarefaction and
-extrapolation range. If \code{NULL}, \code{endpoint} = double of the maximum reference sample size. It will be ignored if \code{size} is given. \cr}
+\item{endpoint}{a positive integer specifying the endpoint for the rarefaction and extrapolation range.
+If \code{NULL}, then \code{endpoint} = double of the reference sample sizes. It is ignored if \code{size} is given.}
 
-\item{knots}{a positive integer specifying the number of knots between 1 and the \code{endpoint}. Default is 40.\cr}
+\item{knots}{a positive integer specifying the number of equally-spaced knots between 1 and the \code{endpoint}. Default is 40.}
 
-\item{size}{a sequence of positive integers specifying the sample sizes for which \code{PD} or \code{D} estimates will be calculated. If \code{NULL}, then estimates will be
-calculated for those sample sizes determined by the specified/default \code{endpoint} and \code{knots}. \cr}
+\item{size}{a sequence of positive integers specifying the sample sizes for which PD or meanPD estimates will be calculated.
+If \code{NULL}, then estimates will be calculated for those sample sizes determined by the specified/default \code{endpoint}
+and \code{knots}. \cr}
 
-\item{nboot}{a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
-in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.}
+\item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
+Enter 0 to skip the bootstrap procedures. Default is 50.}
 
 \item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr}
 }
 \value{
-a list containg two tibbles:
- \code{$size_based} for sizd-based PD or D estimates and sample coverage for interpolated or extrapolated sample sizes along with their confidence intervals (if \code{nboot > 0}). \cr
- \code{$coverage_based} for coverage-based one.
+Returns a list containing two tables:
+\itemize{
+ \item{\code{$size_based}: size-based PD or meanPD estimates along with their confidence intervals
+ (if \code{nboot > 0}) and relevant statistics information.} \cr
+ \item{\code{$coverage_based}: coverage-based diversity estimates along with confidence intervals
+ (if \code{nboot > 0}) and relevant statistics information.}
+ }
 }
 \description{
-\code{iNEXTPD} provides the seamless rarefaction and extrapolation sampling curves of phylogenetic diversity(PD) or phylogenetic Hill numbers(D).
-See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for pertinent background and methods.
+\code{iNEXTPD} computes phylogenetic diversity estimates for rarefied samples and extrapolated samples
+along with confidence intervals and related coverage estimates based on Chao et al.’s (2010) phylogenetic
+diversity (PD) and mean phylogenetic diversity (meanPD). See Chao et al. (2010, 2015, 2016) and
+Hsieh and Chao (2017) for pertinent background and methodologies.
 }
 \examples{
 \donttest{
-# Type (1) abundance data
+# Datatype: abundance data
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2))
-# Type (2) incidence data
+out <- iNEXTPD(data = data,tree = tree,datatype = "abundance",q = c(0,1,2))
+
+# Datatype: incidence data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
-t_ <- data.inc$t
-out <- iNEXTPD(data = data, t_ = t_,datatype = "incidence_raw", tree = tree,q = c(0,1,2))
+nT <- data.inc$nT
+out <- iNEXTPD(data = data,nT = nT,datatype = "incidence_raw",tree = tree,q = c(0,1,2))
 }
 }
 \references{
-Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609.\cr\cr
+Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
 Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
-Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
+Chao, A., Chiu C.-H. and Jost L. (2016). Phylogenetic diversity measures and their decomposition: a framework based on Hill numbers. pp. 141-172 in Pellens R. and Grandcolas P. (eds)
+Biodiversity Conservation and Phylogenetic Systematics: Preserving our Evolutionary Heritage in an Extinction Crisis, Springer. \cr\cr
+Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation:  making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
 }

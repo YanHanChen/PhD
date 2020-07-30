@@ -2,11 +2,11 @@
 % Please edit documentation in R/MainFun.R
 \name{estimatePD}
 \alias{estimatePD}
-\title{Compute phylogenetic diversity with respect to particular sample coverages.}
+\title{Compute phylogenetic diversity for specified values of sample coverage}
 \usage{
 estimatePD(
   data,
-  t_,
+  nT,
   datatype = "abundance",
   tree,
   q = c(0, 1, 2),
@@ -18,55 +18,64 @@ estimatePD(
 )
 }
 \arguments{
-\item{data}{a matrix/data.frame of species abundances/incidences data.\cr
-See \code{\link{iNEXTPD}} for data details.}
+\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data). See the function \code{\link{iNEXTPD}} for details.}
 
-\item{t_}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the numbers of sampling units in each assemblage. Ignored if \code{datatype = "abundance"}.\cr
-Ignored if \code{datatype = "abundance"}.}
+\item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
+If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr}
+or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.\cr}
 
-\item{tree}{a phylo object describing the Newick phylogeny tree for all observed species in the pooled assemblage. \cr}
+\item{tree}{a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.}
 
 \item{q}{a nonnegative value or sequence specifying the diversity order. Default is \code{c(0,1,2)}.}
 
-\item{reftime}{a positive value or sequence specifying the reference time for tree. If \code{NULL}, \code{reftime} = the tree depth of pooled assemblage. Default is \code{NULL}.}
+\item{reftime}{a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
+then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+the pooled assemblage. Default is \code{NULL}.}
 
-\item{type}{desired diversity type: \code{type = "PD"} for phylogenetic diversity and \code{type = "D"} for phylogenetic Hill number. See Chao et al. (2010) for details. Default is \code{"PD"}.}
+\item{type}{desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
+and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.}
 
 \item{level}{a positive value or sequence < 1 specifying a particular value of sample coverage.
-If \code{NULL}, then \code{level} will be chosen as the minimum coverage among all assemblages after extrapolating each one to its double sample sizes. Default is \code{NULL}.}
+If \code{NULL}, then \code{level} is set to be the minimum coverage value among all extrapolated samples up to double the reference sample sizes. Default is \code{NULL}.}
 
-\item{nboot}{a positive integer specifying the number of bootstrap replications. Enter 0 to skip bootstrap;
-in this case, the caculation of standard errors and confidence intervals will be skipped. Default is 50.}
+\item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
+Enter 0 to skip the bootstrap procedures. Default is 50.}
 
 \item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr}
 }
 \value{
-a tibble of the PD or D estimates with respect to specified/default order \code{q} and reference time \code{reftime} for the user-specified sample coverages.
-In addition, the corresponding sample sizes and sample coverages are also provided. \cr\cr
+Returns a table of the computed phylogenetic diversity (PD or meanPD) for specified/default diversity orders \code{q} and reference times
+for the user-specified values of sample coverage. The corresponding sample sizes and sample coverage values are also provided.
 }
 \description{
-\code{EstimatePD} estimates phylogenetic diversity(PD) or phylogenetic Hill numbers(D) with respect to particular user-specified levels of sample coverages.
+\code{EstimatePD} computes Chao et al.’s (2010) phylogenetic diversity (PD, effective total branch lengths,
+for diversity order q = 0, 1 and 2) and mean phylogenetic diversity (meanPD, phylogenetic Hill
+numbers or the effective number of lineages, q = 0, 1 and 2) at specified values of sample coverage.
+See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for formulas and interpretations.
+Use function \code{iNEXTPD} to compute PD or meanPD for specified sample sizes.
 }
 \examples{
 \donttest{
-# Type (1) abundance data
+# Datatype: abundance data
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- estimatePD(data = data, datatype = "abundance",tree = tree)
-# Type (2) incidence data
+out <- estimatePD(data = data,datatype = "abundance",tree = tree)
+
+# Datatype: incidence data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
-t_ <- data.inc$t
-out <- estimatePD(data = data,t_ = t_, datatype = "incidence_raw", tree = tree)
+nT <- data.inc$nT
+out <- estimatePD(data = data,nT = nT,datatype = "incidence_raw",tree = tree)
 }
 }
 \references{
 Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
 Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
-Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
+Chao, A., Chiu C.-H. and Jost L. (2016). Phylogenetic diversity measures and their decomposition: a framework based on Hill numbers. pp. 141-172 in Pellens R. and Grandcolas P. (eds)
+Biodiversity Conservation and Phylogenetic Systematics: Preserving our Evolutionary Heritage in an Extinction Crisis, Springer. \cr\cr
+Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation:  making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
 }

@@ -1,14 +1,13 @@
 Package: PhD
 Type: Package
 Title: Phylogenetic Diversity
-Version: 0.7.4
-Author: Anne Chao and Chun-Huo Chiu
+Version: 1.0.0
+Author: Anne Chao, Yan-Han Chen and Chun-Huo Chiu
 Maintainer: Anne Chao <chao@stat.nthu.edu.tw>
-Description: Provides simple functions to compute and plot two
-    types (size-based and coverage-based) rarefaction and extrapolation of phylogenetic
-    diversity for individual-based (abundance) or sampling-unit-
-    based (incidence raw) data.
+Description: (1) The iNEXTPD standardization: computes and plots two types (size-based and coverage-based) rarefaction and extrapolation for phylogenetic diversity (2) Phylogenetic diversity estimation: computes and plots asymptotic phylogenetic diversity profile as a function of diversity order (q-profile) or reference time (time-profile). 
 License: GPL (>= 3)
+Depends:
+    R (>= 3.6)
 Suggests: knitr,
     rmarkdown,
     ggpubr,
@@ -17,6 +16,7 @@ Imports:
     Rcpp,
     dplyr,
     ggplot2,
+    iNEXT,
     chaoUtility,
     stats,
     ape,

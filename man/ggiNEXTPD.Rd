@@ -2,44 +2,46 @@
 % Please edit documentation in R/MainFun.R
 \name{ggiNEXTPD}
 \alias{ggiNEXTPD}
-\title{Plots the outcome of iNEXTPD using \code{ggplot2} package.}
+\title{Plots the outcome of \code{iNEXTPD} using the \code{ggplot2} package.}
 \usage{
-ggiNEXTPD(outcome, plot.type = 1:3, datatype = "abundance")
+ggiNEXTPD(outcome, plot.type = 1:3)
 }
 \arguments{
 \item{outcome}{the outcome of the function \code{iNEXTPD}}
 
-\item{plot.type}{a positive integer vector specifying types of curves. Three types of plots: sample-size-based rarefaction and extrapolation curve (\code{plot.type = 1});
-sample coverage curve (\code{plot.type = 2});coverage-based rarefaction and extrapolation curve (\code{plot.type = 3}). Default is \code{c(1,2,3)} \cr}
-
-\item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species by sampling-units incidence matrix (\code{datatype = "incidence_raw"}). Default is "abundance". \cr}
+\item{plot.type}{a positive integer value or sequence specifying types of curves. There are three
+types of plots: sample-size-based rarefaction and extrapolation curve (\code{$RE.plot.size}, \code{plot.type = 1});
+sample coverage curve as a function of sample size (\code{$RE.plot.sizeC}, \code{plot.type = 2}); coverage-based
+rarefaction and extrapolation curve (\code{$RE.plot.C}, \code{plot.type = 3}). Default is \code{c(1,2,3)} \cr}
 }
 \value{
-plots of the estimated curves based on \code{ggplot2} package. Different choice of \code{plot.type} will yied different types of plot:
+Returns different plots of the estimated diversity curves based on the \code{ggplot2} package. Three choices of \code{plot.type}:
 \itemize{
- \item{Sample-size-based R/E curve (\code{plot.type = 1}): the curve of estimates as a function of sample size.} \cr
- \item{Sample completeness curve (\code{plot.type = 2}): the curve of sample coverage with respect to sample size.} \cr
- \item{Coverage-based R/E curve (\code{plot.type = 3}): the curve of the estimates as a function of sample coverage.} \cr
+ \item{\code{$RE.plot.size}: sample-size-based rarefaction and extrapolation curve (\code{plot.type = 1}),
+ sampling curve depicting phylogenetic diversity estimates as a function of sample size.} \cr
+ \item{\code{$RE.plot.sizeC}: sample completeness curve (\code{plot.type = 2}), the curve of sample coverage as a function of sample size.} \cr
+ \item{\code{$RE.plot.C}: coverage-based R/E curve (\code{plot.type = 3}), sampling curve depicting phylogenetic diversity estimates as a function of
+ sample coverage.}
  }
 }
 \description{
-\code{ggiNEXTPD} plot the outcome of iNEXTPD using ggplot2 package.
+\code{ggiNEXTPD} plots the outcome of \code{iNEXTPD} using the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-# Type (1) abundance data
+# Datatype: abundance data
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- iNEXTPD(data = data, tree = tree,datatype = "abundance",q = c(0,1,2))
+out <- iNEXTPD(data = data,tree = tree,datatype = "abundance",q = c(0,1,2))
 ggiNEXTPD(out)
-# Type (2) incidence data
+
+# Datatype: incidence data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
-t_ <- data.inc$t
-out <- iNEXTPD(data = data, t_ = t_,datatype = "incidence_raw", tree = tree,q = c(0,1,2))
-ggiNEXTPD(out,datatype = "incidence_raw")
+nT <- data.inc$nT
+out <- iNEXTPD(data = data, nT = nT,datatype = "incidence_raw",tree = tree,q = c(0,1,2))
+ggiNEXTPD(out)
 }
 }

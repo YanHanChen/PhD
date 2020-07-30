@@ -114,7 +114,7 @@ Phdqtable <- function(datalist, phylotr, q, cal, datatype, nboot, conf, reft){
   nms_tmp <- rep(nms,each = length(q)*length(reft))
   Outputforq <- tibble(Order.q = odr, Empirical = out[,1],LCL = out[,2], UCL = out[,3],
                        reftime = reftime,Assemblage = nms_tmp)
-  Outputforq <- Outputforq %>% mutate (method = ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill numbers"))
+  Outputforq <- Outputforq %>% mutate (method = ifelse(cal=="PD", "PD", "meanPD"))
   return(Outputforq)
 }
 color_nogreen <- function(n) {
@@ -237,7 +237,7 @@ Phdttable <- function(datalist, phylotr, times, cal, datatype, nboot, conf){
                        Empirical = out[,1],LCL = out[,2], UCL = out[,3],
                        Order.q = rep(rep(q_int, each=length(times)),length(datalist)),
                        Assemblage = rep(nms, each=length(times)*length(q_int)),
-                       method=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill numbers"))
+                       method=ifelse(cal=="PD", "PD", "meanPD"))
   out = list(fort = Outputfort, Q_Height=c(Q, H_max))
   return(out)
 }
@@ -311,7 +311,7 @@ EmpPD <- function(datalist,datatype, phylotr, q, reft, cal, nboot, conf){
                        qPD = out[,1],qPD.LCL = out[,2], qPD.UCL = out[,3],
                        Reference.time = rep(reft,length(q)*length(datalist)),
                        Method='Empirical',
-                       Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number")) %>%
+                       Type=ifelse(cal=="PD", "PD", "meanPD")) %>%
     arrange(Reference.time)
   return(Output)
 }
@@ -473,17 +473,18 @@ Plott <- function(out){
   fort <- out
   fort$Order.q <- factor(paste0("q = ", fort$Order.q),levels = paste0("q = ", unique(fort$Order.q)))
   Assemblage <- unique(fort$Assemblage)
+  ylab_ <- paste0(unique(fort$Method)," ",unique(fort$Type))
   if(length(Assemblage)==1){
     p2 <- ggplot(fort, aes(x=Reference.time, y=qPD)) + geom_line(size=1.5,aes(color=Order.q))+
       geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Order.q),linetype = 0,alpha=0.3)+
-      xlab("Reference time")+ylab(unique(fort$Type))+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))
+      xlab("Reference time")+ylab(ylab_)+theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))
   }else{
     p2 <- ggplot(fort, aes(x=Reference.time, y=qPD, color=Assemblage, linetype=Assemblage)) + geom_line(size=1.5)  +
       geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Assemblage),linetype = 0,alpha=0.3)+
       scale_color_manual(values = color_nogreen(length(unique(fort$Assemblage))))+
       scale_fill_manual(values = color_nogreen(length(unique(fort$Assemblage))))+
       theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
-      facet_wrap(~Order.q, scales = "free")+xlab("Reference time")+ylab(unique(fort$Type))
+      facet_wrap(~Order.q, scales = "free")+xlab("Reference time")+ylab(ylab_)
   }
   return(p2)
 }
@@ -492,12 +493,13 @@ Plotq <- function(out){
   forq$Reference.time <- factor(paste0('Ref.time = ',as.character(round(forq$Reference.time,4))),
                          levels = unique(paste0('Ref.time = ',as.character(round(forq$Reference.time,4)))))
   Assemblage <- unique(forq$Assemblage)
+  ylab_ <- paste0(unique(forq$Method)," ",unique(forq$Type))
   q1 <- unique(forq$Order.q[(forq$Order.q %% 1)==0])
   if(length(Assemblage)==1){
     p1 <- ggplot(forq, aes(x=Order.q, y=qPD, color=Reference.time)) + geom_line(size=1.5)+
       geom_ribbon(aes(ymin=qPD.LCL,ymax=qPD.UCL,fill=Reference.time),linetype = 0,alpha=0.3)
     #lai 1006
-    p1 <-  p1 +xlab("Order q")+ylab(unique(forq$Type)) +theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
+    p1 <-  p1 +xlab("Order q")+ylab(ylab_) +theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
       geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=qPD, color=Reference.time))
   }else{
     p1 <- ggplot(forq, aes(x=Order.q, y=qPD, color=Assemblage, linetype=Assemblage)) + geom_line(size=1.5)  +
@@ -507,7 +509,7 @@ Plotq <- function(out){
       theme(text=element_text(size=20),legend.position="bottom",legend.key.width = unit(2,"cm"))+
       geom_point(size=3, data=subset(forq, Order.q%in%q1), aes(x=Order.q, y=qPD, color=Assemblage))+
       facet_wrap(~Reference.time, scales = "free")
-    p1 <-  p1 +xlab("Order q")+ylab(unique(forq$Type))
+    p1 <-  p1 +xlab("Order q")+ylab(ylab_)
   }
   return(p1)
 }
@@ -578,7 +580,7 @@ AsyPD <- function(datalist, datatype, phylotr, q,reft, cal,nboot, conf){#change 
   }
   Estoutput <- do.call(rbind,Estoutput) %>%
     mutate(Assemblage = rep(names(datalist),each = length(q)*tau_l),Method = 'Asymptotic',
-           Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number")) %>%
+           Type=ifelse(cal=="PD", "PD", "meanPD")) %>%
     select(Assemblage,Order.q,qPD,qPD.LCL, qPD.UCL, Reference.time,Method, Type) %>%
     arrange(Reference.time)
   Estoutput$qPD.LCL[Estoutput$qPD.LCL<0] = 0
@@ -595,21 +597,21 @@ Asy_plot = function(output, type, method=NULL){##add title
     }
   }
   if(is.null(method) == T & type == 1) {
-    title_ <- "Phylogenetic diversity_estimated"
+    title_ <- "Phylogenetic diversity (asymptotic)"
   } else if(is.null(method) == T & type == 2) {
-    title_ <- "Phylogenetic diversity_empirical"
+    title_ <- "Phylogenetic diversity (observed)"
   } else if( substr(method,1,1) != "1"  & type == 1) {
-    title_ <- paste("Phylogenetic", method ,"diversity", "_estimated")
+    title_ <- paste("Phylogenetic", method ,"diversity", "(asymptotic)")
   } else if( substr(method,1,1) != "1"  & type == 2) {
-    title_ <- paste("Phylogenetic", method ,"diversity", "_empirical")
+    title_ <- paste("Phylogenetic", method ,"diversity", "(observed)")
   } else if( substr(method,1,1) == "1"  & type == 1) {
-    title_ <- paste(method, "_estimated")
+    title_ <- paste(method, "(asymptotic)")
   } else if( substr(method,1,1) == "1"  & type == 2) {
-    title_ <- paste(method, "_empirical")
+    title_ <- paste(method, "(observed)")
   } else if(type == 3) {
-    title_ <- paste(method, "_estimated")
+    title_ <- paste(method, "(asymptotic)")
   } else {
-    title_ <- paste(method, "_empirical")
+    title_ <- paste(method, "(observed)")
   }
   if(ncol(output) %in% c(2, 5)) output = cbind(output, "Beta")
   if(ncol(output) == 6){
@@ -755,7 +757,7 @@ PhD.q.est = function(ai,Lis, q, nt, cal){
   })
   if(cal=='PD'){
     est <- as.numeric(est)
-  }else if (cal=='D'){
+  }else if (cal=='meanPD'){
     est <- as.numeric(sapply(1:length(t_bars), function(i){
       est[,i]/t_bars[i]
     }))
@@ -906,14 +908,14 @@ inextPD = function(datalist, datatype, phylotr, q,reft, m, cal, nboot, conf=0.95
              qPD=qPDm,qPD.LCL=qPDm-qtile*ses_pd,qPD.UCL=qPDm+qtile*ses_pd,
              SC=SC_,SC.LCL=SC.LCL_,SC.UCL=SC.UCL_,
              Reference.time = reft_,
-             Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number")) %>%
+             Type=ifelse(cal=="PD", "PD", "meanPD")) %>%
         arrange(Reference.time,Order.q,m)
       out_m$qPD.LCL[out_m$qPD.LCL<0] <- 0;out_m$SC.LCL[out_m$SC.LCL<0] <- 0
       out_m$SC.UCL[out_m$SC.UCL>1] <- 1
       if(unconditional_var){
         ses_pd_unc <- ses[-(1:(length(qPDm)+length(covm)))]
         out_C <- qPD_unc %>% mutate(qPD.LCL = qPD-qtile*ses_pd_unc,qPD.UCL = qPD+qtile*ses_pd_unc,
-                                    Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number"),
+                                    Type=ifelse(cal=="PD", "PD", "meanPD"),
                                     Assemblage = nms[i])
         id_C <- match(c('Assemblage','goalSC','SC','m', 'Method', 'Order.q', 'qPD', 'qPD.LCL','qPD.UCL','Reference.time',
                         'Type'), names(out_C), nomatch = 0)
@@ -938,7 +940,7 @@ inextPD = function(datalist, datatype, phylotr, q,reft, m, cal, nboot, conf=0.95
         goalSC <- unique(covm)
         qPD_unc <- unique(invChatPD_inc(x = rowSums(x),ai = aL$treeNabu$branch.abun,Lis = aL$BLbyT,
                                           q = q,Cs = goalSC,n = n,cal = cal))
-        colnames(qPD_unc)[which(colnames(qPD_unc)=='t')] <- 'm'
+        #colnames(qPD_unc)[which(colnames(qPD_unc)=='t')] <- 'm'
       }
       if(nboot>1){
         Boots <- Boots.one(phylo = phylotr,aL$treeNabu,datatype,nboot,reft,aL$BLbyT,n)
@@ -990,22 +992,22 @@ inextPD = function(datalist, datatype, phylotr, q,reft, m, cal, nboot, conf=0.95
       SC.LCL_ <- rep(covm-qtile*ses_cov,each = length(q)*length(reft))
       SC.UCL_ <- rep(covm+qtile*ses_cov,each = length(q)*length(reft))
       reft_ = rep(rep(reft,each = length(q)),length(m[[i]]))
-      out_m <- tibble(Assemblage = nms[i], m=m_,Method=method,Order.q=orderq,
+      out_m <- tibble(Assemblage = nms[i], nt=m_,Method=method,Order.q=orderq,
              qPD=qPDm,qPD.LCL=qPDm-qtile*ses_pd,qPD.UCL=qPDm+qtile*ses_pd,
              SC=SC_,SC.LCL=SC.LCL_,SC.UCL=SC.UCL_,
              Reference.time = reft_,
-             Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number")) %>%
-        arrange(Reference.time,Order.q,m)
+             Type=ifelse(cal=="PD", "PD", "meanPD")) %>%
+        arrange(Reference.time,Order.q,nt)
       out_m$qPD.LCL[out_m$qPD.LCL<0] <- 0;out_m$SC.LCL[out_m$SC.LCL<0] <- 0
       out_m$SC.UCL[out_m$SC.UCL>1] <- 1
       if(unconditional_var){
         ses_pd_unc <- ses[-(1:(length(qPDm)+length(covm)))]
         out_C <- qPD_unc %>% mutate(qPD.LCL = qPD-qtile*ses_pd_unc,qPD.UCL = qPD+qtile*ses_pd_unc,
-                                    Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number"),
+                                    Type=ifelse(cal=="PD", "PD", "meanPD"),
                                     Assemblage = nms[i])
-        id_C <- match(c('Assemblage','goalSC','SC','m', 'Method', 'Order.q', 'qPD', 'qPD.LCL','qPD.UCL','Reference.time',
+        id_C <- match(c('Assemblage','goalSC','SC','nt', 'Method', 'Order.q', 'qPD', 'qPD.LCL','qPD.UCL','Reference.time',
                         'Type'), names(out_C), nomatch = 0)
-        out_C <- out_C[, id_C] %>% arrange(Reference.time,Order.q,m)
+        out_C <- out_C[, id_C] %>% arrange(Reference.time,Order.q,nt)
         out_C$qPD.LCL[out_C$qPD.LCL<0] <- 0
       }else{
         out_C <- NULL
@@ -1112,7 +1114,7 @@ PhD.m.est = function(ai,Lis, m, q, nt, cal){
       }
       return(as.numeric(ans))
     })
-  }else if (cal=='D'){
+  }else if (cal=='meanPD'){
     out <- sapply(m, function(mm){
       if(mm<nt){
         ans <- RPD(ai = ai,Lis = Lis,n = nt,m = mm,q = q)
@@ -1164,18 +1166,20 @@ Coverage = function(data, datatype, m, nt){
     ifelse(datatype!='abundance', Sub2(i), Sub(i) )
   })
 }
-RE_plot = function(data, datatype, type){
+RE_plot = function(data, type){
   #data <- as.data.frame(data)
+  datatype <- ifelse(colnames(data$size_based[,2])=='m','abundance','incidence_raw')
   x <- ifelse(datatype=='incidence_raw', 'sampling units', "individuals")
+  x_name <- colnames(data$size_based[,2])
   if(type == 1){
     data <- data$size_based
-    id <- match(c('m','Method','qPD','qPD.LCL','qPD.UCL','Assemblage','Order.q',
+    id <- match(c(x_name,'Method','qPD','qPD.LCL','qPD.UCL','Assemblage','Order.q',
                     'Reference.time'), names(data), nomatch = 0)
     output <- data[, id]
     xlab_ <- paste0("Number of ", x)
   }else if(type == 2){
     data <- data$size_based %>% filter(Order.q==1)
-    id <- match(c('m','Method','SC','SC.LCL','SC.UCL','Assemblage','Order.q',
+    id <- match(c(x_name,'Method','SC','SC.LCL','SC.UCL','Assemblage','Order.q',
                   'Reference.time'), names(data), nomatch = 0)
     output <- data[, id]
     xlab_ <- paste0("Number of ", x)
@@ -1232,7 +1236,7 @@ RE_plot = function(data, datatype, type){
       ggtitle(title)+guides(linetype=guide_legend(keywidth=2.5))
     if(type!=3) outp <- outp + facet_wrap(Reference.time~Order.q,scales = "free_y",labeller=mylab)
     else if (type==3) outp <- outp + facet_wrap(~Reference.time,scales = "free_y")
-    if(length(unique(output$Reference.time))==1) outp <- outp + theme(strip.background = element_blank(), strip.text.x = element_blank())
+    #if(length(unique(output$Reference.time))==1) outp <- outp + theme(strip.background = element_blank(), strip.text.x = element_blank())
   }else{
     outp <- ggplot(output, aes(x = x, y = y, color=Assemblage))+geom_line(size=1.5, aes(x = x, y = y, color=Assemblage, linetype=Method))+
       scale_color_manual(values = color_nogreen(length(unique(output$Assemblage))))+
@@ -1244,7 +1248,7 @@ RE_plot = function(data, datatype, type){
       ggtitle(title)+guides(linetype=guide_legend(keywidth=2.5))
     if(type!=2)  outp <- outp + facet_wrap(Reference.time~Order.q,scales = "free_y",labeller=mylab)
     else if (type == 2) outp <- outp + facet_wrap(~Reference.time,scales = "free_y")
-    if(length(unique(output$Reference.time))==1) outp <- outp + theme(strip.background = element_blank(), strip.text.x = element_blank())
+    #if(length(unique(output$Reference.time))==1) outp <- outp + theme(strip.background = element_blank(), strip.text.x = element_blank())
   }
   return(outp)
 }
@@ -1326,12 +1330,12 @@ invChatPD <- function(datalist, datatype,phylotr, q, reft, cal,level, nboot, con
   }
   Assemblage = rep(names(datalist), each = length(q)*length(reft)*length(level))
   out <- out %>% mutate(Assemblage = Assemblage,
-                        Type=ifelse(cal=="PD", "Phylogenetic Diversity", "Phylogenetic Hill number"))
+                        Type=ifelse(cal=="PD", "PD", "meanPD"))
   if(datatype=='abundance'){
     out <- out %>% select(Assemblage,m,Method,Order.q,qPD,qPD.LCL,qPD.UCL,
                           SC,goalSC,Reference.time,Type) %>% arrange(Reference.time,goalSC,Order.q)
   }else if(datatype=='incidence_raw'){
-    out <- out %>% select(Assemblage,t,Method,Order.q,qPD,qPD.LCL,qPD.UCL,
+    out <- out %>% select(Assemblage,nt,Method,Order.q,qPD,qPD.LCL,qPD.UCL,
                           SC,goalSC,Reference.time,Type) %>% arrange(Reference.time,goalSC,Order.q)
   }
   out$qPD.LCL[out$qPD.LCL<0] <- 0
@@ -1506,7 +1510,7 @@ invChatPD_inc <- function(x,ai,Lis, q, Cs, n,cal){ # x is a matrix
   goalSC <- rep(Cs,each = length(q)*ncol(Lis))
   reft <- as.numeric(substr(colnames(Lis),start = 2,stop = nchar(colnames(Lis))))
   Reference.time = rep(rep(reft,each = length(q)),length(Cs))
-  tibble(t = m,Method = method,Order.q = order,
+  tibble(nt = m,Method = method,Order.q = order,
          qPD = out,SC=SC,goalSC = goalSC, Reference.time = Reference.time)
 }
 
