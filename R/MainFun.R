@@ -82,7 +82,7 @@ iNEXTPD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=NUL
   # if(is.na(pmatch(q, qq) == T) == T) stop("invalid order of q, we only compute q = 0, 1 or 2", call. = FALSE)
   if ((conf < 0) | (conf > 1) | (is.numeric(conf)==F)) stop('conf (confidence level) must be a numerical value between 0 and 1, We use "conf" = 0.95 to calculate!', call. = FALSE)
   if ((nboot < 0) | (is.numeric(nboot)==F)) stop('nboot must be a nonnegative integer, We use "nboot" = 50 to calculate!', call. = FALSE)
-  if(class(data)[1]=="numeric"|class(data)[1]=="integer"|class(data)[1]=="double" ) data <- as.matrix(data)
+  if(c("numeric") %in% class(data) | c("integer") %in% class(data) | c("double") %in% class(data) ) data <- as.matrix(data)
   if(is.null(rownames(data) ))
     stop("Row names of data must be the species names that match tip names in tree and thus can not be empty.", call. = FALSE)
 
@@ -272,7 +272,7 @@ PhdAsy <- function(data,nT,datatype = "abundance",tree,q = seq(0,2,by = 0.25),re
   if ((datatype != "incidence_raw") & (datatype != "abundance")) stop("invalid datatype", call. = FALSE)
   if ((conf < 0) | (conf < 0) | (is.numeric(conf)==F)) stop('conf"(confidence level) must be a numerical value between 0 and 1, We use "conf" = 0.95 to calculate!', call. = FALSE)
   if ((nboot < 0) | (is.numeric(nboot)==F)) stop('nboot must be a nonnegative integer, We use "nboot" = 50 to calculate!', call. = FALSE)
-  if(class(data)[1]=="numeric"|class(data)[1]=="integer"|class(data)[1]=="double" ) data <- as.matrix(data)
+  if(c("numeric") %in% class(data) | c("integer") %in% class(data) | c("double") %in% class(data) ) data <- as.matrix(data)
   if(is.null(rownames(data) ))
     stop("Row names of data must be the species names that match tip names in tree and thus can not be empty.", call. = FALSE)
 
@@ -390,7 +390,7 @@ PhdObs <- function(data,nT,datatype = "abundance",tree,q = seq(0, 2, by = 0.25),
   #     stop('knot must be a nonnegative integer, We use "knots" = 50 to calculate!', call. = FALSE)
   #   }
   # }
-  if(class(data)[1]=="numeric"|class(data)[1]=="integer"|class(data)[1]=="double" ) data <- as.matrix(data)
+  if(c("numeric") %in% class(data) | c("integer") %in% class(data) | c("double") %in% class(data) ) data <- as.matrix(data)
   if(is.null(rownames(data) ))
     stop("Row names of data must be the species names that match tip names in tree and thus can not be empty.", call. = FALSE)
 
@@ -551,7 +551,7 @@ estimatePD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=
   if ((conf < 0) | (conf > 1) | (is.numeric(conf)==F)) stop('conf"(confidence level) must be a numerical value between 0 and 1, We use "conf" = 0.95 to calculate!', call. = FALSE)
   if ((nboot < 0) | (is.numeric(nboot)==F)) stop('nboot must be a nonnegative integer, We use "nboot" = 50 to calculate!', call. = FALSE)
   #if (length(level)>1) stop('Currently, we only accept one fixed level of coverage.')
-  if(class(data)[1]=="numeric"|class(data)[1]=="integer"|class(data)[1]=="double" ) data <- as.matrix(data)
+  if(c("numeric") %in% class(data) | c("integer") %in% class(data) | c("double") %in% class(data) ) data <- as.matrix(data)
   if(is.null(rownames(data) ))
     stop("Row names of data must be the species names that match tip names in tree and thus can not be empty.", call. = FALSE)
 
@@ -650,7 +650,7 @@ PDInfo <- function(data,nT,datatype = "abundance", tree,reftime=NULL){
   if(sum(c(duplicated(tree$tip.label),duplicated(tree$node.label[tree$node.label!=""])))>0)
     stop("The phylo tree should not contains duplicated tip or node labels, please remove them.", call. = FALSE)
   if ((datatype != "incidence_raw") & (datatype != "abundance")) stop("invalid datatype", call. = FALSE)
-  if(class(data)[1]=="numeric"|class(data)[1]=="integer"|class(data)[1]=="double" ) data <- as.matrix(data)
+  if(c("numeric") %in% class(data) | c("integer") %in% class(data) | c("double") %in% class(data) ) data <- as.matrix(data)
   if(is.null(rownames(data) ))
     stop("Row names of data must be the species names that match tip names in tree and thus can not be empty.", call. = FALSE)
 

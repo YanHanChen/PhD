@@ -9,5 +9,3 @@ matrix:
       r: release
     - os: osx
       r: release
-    - os: windows
-      r: release

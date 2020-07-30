@@ -1134,7 +1134,7 @@ PhD.m.est = function(ai,Lis, m, q, nt, cal){
 }
 Coverage = function(data, datatype, m, nt){
   if(datatype == "incidence_raw") datatype = "incidence"
-  ifelse(class(data)=="matrix" || class(data)=="data.frame", type <- "raw", type <- "numeric")
+  ifelse("matrix" %in% class(data) || "data.frame" %in% class(data), type <- "raw", type <- "numeric")
   ifelse(type == "raw", x <- rowSums(data), x <- data )
   if(type=="raw" || datatype=='incidence') u<-sum(x)
   x <- x[x>0]
