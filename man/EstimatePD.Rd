@@ -24,7 +24,7 @@ estimatePD(
 If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.\cr}
+or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.}
 
 \item{tree}{a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.}
 
@@ -43,7 +43,7 @@ If \code{NULL}, then \code{level} is set to be the minimum coverage value among 
 \item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 Enter 0 to skip the bootstrap procedures. Default is 50.}
 
-\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr}
+\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
 }
 \value{
 Returns a table of the computed phylogenetic diversity (PD or meanPD) for specified/default diversity orders \code{q} and reference times

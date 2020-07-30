@@ -12,7 +12,7 @@ ggiNEXTPD(outcome, plot.type = 1:3)
 \item{plot.type}{a positive integer value or sequence specifying types of curves. There are three
 types of plots: sample-size-based rarefaction and extrapolation curve (\code{$RE.plot.size}, \code{plot.type = 1});
 sample coverage curve as a function of sample size (\code{$RE.plot.sizeC}, \code{plot.type = 2}); coverage-based
-rarefaction and extrapolation curve (\code{$RE.plot.C}, \code{plot.type = 3}). Default is \code{c(1,2,3)} \cr}
+rarefaction and extrapolation curve (\code{$RE.plot.C}, \code{plot.type = 3}). Default is \code{c(1,2,3)}.}
 }
 \value{
 Returns different plots of the estimated diversity curves based on the \code{ggplot2} package. Three choices of \code{plot.type}:

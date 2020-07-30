@@ -27,13 +27,13 @@ Raw incidence data: species-by-site raw incidence matrix/data.frame. When there 
 and thus N matrices, users must first merge the N matrices by species identity to obtain a large
 merged incidence matrix, where the rows of the matrix refer to all species presented in the merged
 data. The row (species) names of data must match the species names in the phylogenetic tree and
-thus cannot be missing.\cr}
+thus cannot be missing.}
 
 \item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
 If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.\cr}
+or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.}
 
 \item{tree}{a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.}
 
@@ -53,12 +53,12 @@ If \code{NULL}, then \code{endpoint} = double of the reference sample sizes. It 
 
 \item{size}{a sequence of positive integers specifying the sample sizes for which PD or meanPD estimates will be calculated.
 If \code{NULL}, then estimates will be calculated for those sample sizes determined by the specified/default \code{endpoint}
-and \code{knots}. \cr}
+and \code{knots}.}
 
 \item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 Enter 0 to skip the bootstrap procedures. Default is 50.}
 
-\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95. \cr}
+\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
 }
 \value{
 Returns a list containing two tables:

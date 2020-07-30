@@ -24,7 +24,7 @@ See the function \code{\link{iNEXTPD}} for details.}
 If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
-or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.\cr}
+or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.}
 
 \item{tree}{a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.}
 
