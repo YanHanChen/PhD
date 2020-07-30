@@ -1,4 +1,4 @@
-#' Abundance Data
+#' Species abundance data from three habitats
 #'
 #' This data set consists of the abundance and phylogenetic tree of 46 vascular plant species collected
 #' in the period 2002-2009 along the Tyrrhenian coast from three successively less extreme foredune
@@ -7,7 +7,7 @@
 #' @usage data(data.abu)
 #' @format A list includes two objects:
 #' \describe{
-#'   \item{$data}{a data frame with 46 plant species abundance data in three habitats: ED, MD and TD.}
+#'   \item{$data}{a data.frame with 46 plant species abundance data in three habitats: ED, MD and TD.}
 #'   \item{$tree}{a phylo object giving the phylogenetic tree in Newick format.}
 #' }
 #' @source Carboni M, Santoro R, Acosta A. T. R. (2010). Are some communities of the coastal dune zonation more susceptible to alien plant invasion? Journal of Plant Ecology 3:139–147.\cr\cr

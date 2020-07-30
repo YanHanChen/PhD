@@ -35,7 +35,7 @@ then \code{reftime} is set as the tree depth of the phylogenetic tree, which is 
 the pooled assemblage. Default is \code{NULL}.}
 
 \item{type}{desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
-and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.}
+and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.}
 
 \item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 Enter 0 to skip the bootstrap procedures. Default is 50.}
@@ -49,7 +49,7 @@ for specified/default order q and reference time.
 \description{
 \code{PhdObs} computes empirical or observed phylogenetic diversity (PD) and phylogenetic Hill
 numbers (meanPD, mean phylogenetic diversity) for specified/default order \code{q} and reference
-time specified in the argument \code{reftime} \code{reftime}. See Chao et al. (2010) for details of PD and meanPD.
+time specified in the argument \code{reftime}. See Chao et al. (2010) for details of PD and meanPD.
 }
 \examples{
 \donttest{
@@ -60,7 +60,7 @@ tree <- data.abu$tree
 out <- PhdObs(data = data,datatype = "abundance",tree = tree,
 q = seq(0, 2, by = 0.25))
 
-# Datatype: incidence data
+# Datatype: incidence_raw data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree

@@ -22,7 +22,7 @@
 #' then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 #' the pooled assemblage. Default is \code{NULL}.
 #' @param type desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
-#' and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.
+#' and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.
 #' @param endpoint a positive integer specifying the endpoint for the rarefaction and extrapolation range.
 #' If \code{NULL}, then \code{endpoint} = double of the reference sample sizes. It is ignored if \code{size} is given.
 #' @param knots a positive integer specifying the number of equally-spaced knots between 1 and the \code{endpoint}. Default is 40.
@@ -56,7 +56,7 @@
 #' tree <- data.abu$tree
 #' out <- iNEXTPD(data = data,tree = tree,datatype = "abundance",q = c(0,1,2))
 #'
-#' # Datatype: incidence data
+#' # Datatype: incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
@@ -229,7 +229,7 @@ iNEXTPD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=NUL
 #' then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 #' the pooled assemblage. Default is \code{NULL}.
 #' @param type desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
-#' and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.
+#' and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.
 #' @param nboot a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 #' Enter 0 to skip the bootstrap procedures. Default is 50.
 #' @param conf a positive number < 1 specifying the level of confidence interval, default is 0.95.
@@ -252,7 +252,7 @@ iNEXTPD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=NUL
 #' tree <- data.abu$tree
 #' out <- PhdAsy(data = data, datatype = "abundance", tree = tree, q = seq(0, 2, by = 0.25))
 #'
-#' # Datatype: incidence data
+#' # Datatype: incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
@@ -327,7 +327,7 @@ PhdAsy <- function(data,nT,datatype = "abundance",tree,q = seq(0,2,by = 0.25),re
 #'
 #' \code{PhdObs} computes empirical or observed phylogenetic diversity (PD) and phylogenetic Hill
 #' numbers (meanPD, mean phylogenetic diversity) for specified/default order \code{q} and reference
-#' time specified in the argument \code{reftime} \code{reftime}. See Chao et al. (2010) for details of PD and meanPD.
+#' time specified in the argument \code{reftime}. See Chao et al. (2010) for details of PD and meanPD.
 #' @param data a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).
 #' See the function \code{\link{iNEXTPD}} for details.
 #' @param nT needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
@@ -340,7 +340,7 @@ PhdAsy <- function(data,nT,datatype = "abundance",tree,q = seq(0,2,by = 0.25),re
 #' then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 #' the pooled assemblage. Default is \code{NULL}.
 #' @param type desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
-#' and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.
+#' and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.
 #' @param nboot a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 #' Enter 0 to skip the bootstrap procedures. Default is 50.
 #' @param conf a positive number < 1 specifying the level of confidence interval, default is 0.95.
@@ -363,7 +363,7 @@ PhdAsy <- function(data,nT,datatype = "abundance",tree,q = seq(0,2,by = 0.25),re
 #' out <- PhdObs(data = data,datatype = "abundance",tree = tree,
 #' q = seq(0, 2, by = 0.25))
 #'
-#' # Datatype: incidence data
+#' # Datatype: incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
@@ -494,7 +494,7 @@ PhdObs <- function(data,nT,datatype = "abundance",tree,q = seq(0, 2, by = 0.25),
 #' for diversity order q = 0, 1 and 2) and mean phylogenetic diversity (meanPD, phylogenetic Hill
 #' numbers or the effective number of lineages, q = 0, 1 and 2) at specified values of sample coverage.
 #' See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for formulas and interpretations.
-#' Use function \code{iNEXTPD} to compute PD or meanPD for specified sample sizes.
+#' Use the function \code{iNEXTPD} to compute PD or meanPD for specified sample sizes.
 #' @param data a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data). See the function \code{\link{iNEXTPD}} for details.
 #' @param nT needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
 #' If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.
@@ -506,9 +506,9 @@ PhdObs <- function(data,nT,datatype = "abundance",tree,q = seq(0, 2, by = 0.25),
 #' then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 #' the pooled assemblage. Default is \code{NULL}.
 #' @param type desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
-#' and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.
-#' @param level a positive value or sequence < 1 specifying a particular value of sample coverage.
-#' If \code{NULL}, then \code{level} is set to be the minimum coverage value among all extrapolated samples up to double the reference sample sizes. Default is \code{NULL}.
+#' and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.
+#' @param level a positive value or sequence < 1 specifying particular values of sample coverage.
+#' If \code{NULL}, then \code{level} is set to be the minimum coverage value among all samples extrapolated up to double the reference sample sizes. Default is \code{NULL}.
 #' @param nboot a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 #' Enter 0 to skip the bootstrap procedures. Default is 50.
 #' @param conf a positive number < 1 specifying the level of confidence interval, default is 0.95.
@@ -634,7 +634,7 @@ estimatePD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=
 #' tree <- data.abu$tree
 #' out <- PDInfo(data = data,datatype = "abundance", tree = tree)
 #'
-#' # Datatype: incidence data
+#' # Datatype: incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
@@ -707,7 +707,7 @@ PDInfo <- function(data,nT,datatype = "abundance", tree,reftime=NULL){
 #'
 #' \code{ggiNEXTPD} plots the outcome of \code{iNEXTPD} using the \code{ggplot2} package.
 #' @param outcome the outcome of the function \code{iNEXTPD}
-#' @param plot.type a positive integer value or sequence specifying types of curves. There are three
+#' @param plot.type a positive integer or sequence specifying types of curves. There are three
 #' types of plots: sample-size-based rarefaction and extrapolation curve (\code{$RE.plot.size}, \code{plot.type = 1});
 #' sample coverage curve as a function of sample size (\code{$RE.plot.sizeC}, \code{plot.type = 2}); coverage-based
 #' rarefaction and extrapolation curve (\code{$RE.plot.C}, \code{plot.type = 3}). Default is \code{c(1,2,3)}.
@@ -728,12 +728,12 @@ PDInfo <- function(data,nT,datatype = "abundance", tree,reftime=NULL){
 #' out <- iNEXTPD(data = data,tree = tree,datatype = "abundance",q = c(0,1,2))
 #' ggiNEXTPD(out)
 #'
-#' # Datatype: incidence data
+#' # Datatype: incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- iNEXTPD(data = data, nT = nT,datatype = "incidence_raw",tree = tree,q = c(0,1,2))
+#' out <- iNEXTPD(data = data,nT = nT,datatype = "incidence_raw",tree = tree,q = c(0,1,2))
 #' ggiNEXTPD(out)
 #' }
 #' @export
@@ -749,7 +749,7 @@ ggiNEXTPD <- function(outcome,plot.type = 1:3){
 
 #' Plots time-profile and q-profile based on the outcome of \code{PhdObs} or \code{PhdAsy} using the \code{ggplot2} package.
 #'
-#' \code{ggtqplotPD} plots time-profile (depicting phylogenetic diversity as a function of time) and q profile
+#' \code{ggtqplotPD} plots time-profile (depicting phylogenetic diversity as a function of time) and q-profile
 #' (depicting phylogenetic diversity as a function of order q) based on the outcome of the functions
 #' \code{PhdObs} or \code{PhdAsy} using the \code{ggplot2} package.
 #' @param outcome the outcome of the functions \code{PhdObs} or \code{PhdAsy}.
@@ -772,7 +772,7 @@ ggiNEXTPD <- function(outcome,plot.type = 1:3){
 #' reftime = seq(0.1,325,length.out = 40))
 #' ggtqplotPD(out,profile = "time")
 #'
-#' # Asymptotic q profile plot for incidence data
+#' # Asymptotic q profile plot for incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
@@ -780,7 +780,7 @@ ggiNEXTPD <- function(outcome,plot.type = 1:3){
 #' out <- PhdAsy(data = data,datatype = "incidence_raw",nT = nT,tree = tree,q = seq(0, 2, by = 0.25))
 #' ggtqplotPD(out,profile = "q")
 #'
-#' # Asymptotic time profile plot for incidence data
+#' # Asymptotic time profile plot for incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree

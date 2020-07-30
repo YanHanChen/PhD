@@ -38,7 +38,7 @@ data <- data.abu$data
 tree <- data.abu$tree
 out <- PDInfo(data = data,datatype = "abundance", tree = tree)
 
-# Datatype: incidence data
+# Datatype: incidence_raw data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree

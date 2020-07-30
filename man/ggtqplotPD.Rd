@@ -15,7 +15,7 @@ ggtqplotPD(outcome, profile = "q")
 plot of the PD or meanPD empirical or estimated asymptotic curves using the \code{ggplot2} package.
 }
 \description{
-\code{ggtqplotPD} plots time-profile (depicting phylogenetic diversity as a function of time) and q profile
+\code{ggtqplotPD} plots time-profile (depicting phylogenetic diversity as a function of time) and q-profile
 (depicting phylogenetic diversity as a function of order q) based on the outcome of the functions
 \code{PhdObs} or \code{PhdAsy} using the \code{ggplot2} package.
 }
@@ -36,7 +36,7 @@ out <- PhdObs(data = data,datatype = "abundance",tree = tree,q = c(0,1,2),
 reftime = seq(0.1,325,length.out = 40))
 ggtqplotPD(out,profile = "time")
 
-# Asymptotic q profile plot for incidence data
+# Asymptotic q profile plot for incidence_raw data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
@@ -44,7 +44,7 @@ nT <- data.inc$nT
 out <- PhdAsy(data = data,datatype = "incidence_raw",nT = nT,tree = tree,q = seq(0, 2, by = 0.25))
 ggtqplotPD(out,profile = "q")
 
-# Asymptotic time profile plot for incidence data
+# Asymptotic time profile plot for incidence_raw data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree

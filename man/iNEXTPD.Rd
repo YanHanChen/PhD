@@ -44,7 +44,7 @@ then \code{reftime} is set as the tree depth of the phylogenetic tree, which is 
 the pooled assemblage. Default is \code{NULL}.}
 
 \item{type}{desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
-and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.}
+and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.}
 
 \item{endpoint}{a positive integer specifying the endpoint for the rarefaction and extrapolation range.
 If \code{NULL}, then \code{endpoint} = double of the reference sample sizes. It is ignored if \code{size} is given.}
@@ -83,7 +83,7 @@ data <- data.abu$data
 tree <- data.abu$tree
 out <- iNEXTPD(data = data,tree = tree,datatype = "abundance",q = c(0,1,2))
 
-# Datatype: incidence data
+# Datatype: incidence_raw data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree

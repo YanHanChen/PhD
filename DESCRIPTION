@@ -4,7 +4,7 @@ Title: Phylogenetic Diversity
 Version: 1.0.0
 Author: Anne Chao, Yan-Han Chen and Chun-Huo Chiu
 Maintainer: Anne Chao <chao@stat.nthu.edu.tw>
-Description: (1) The iNEXTPD standardization: computes and plots two types (size-based and coverage-based) rarefaction and extrapolation for phylogenetic diversity (2) Phylogenetic diversity estimation: computes and plots asymptotic phylogenetic diversity profile as a function of diversity order (q-profile) or reference time (time-profile). 
+Description: (1) The iNEXT standardization for phylogenetic diversity: computes and plots rarefaction and extrapolation of phylogenetic diversity based on two types of standardization methods (sample size and sample coverage). (2) The phylogenetic diversity estimation: computes and plots asymptotic phylogenetic diversity profile as a function of diversity order (q-profile) or time (time-profile).
 License: GPL (>= 3)
 Depends:
     R (>= 3.6)

@@ -35,10 +35,10 @@ then \code{reftime} is set as the tree depth of the phylogenetic tree, which is 
 the pooled assemblage. Default is \code{NULL}.}
 
 \item{type}{desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
-and \code{type = "meanPD"} for mean phylogenetic diversity (i.e., phylogenetic Hill number). Default is \code{"PD"}.}
+and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.}
 
-\item{level}{a positive value or sequence < 1 specifying a particular value of sample coverage.
-If \code{NULL}, then \code{level} is set to be the minimum coverage value among all extrapolated samples up to double the reference sample sizes. Default is \code{NULL}.}
+\item{level}{a positive value or sequence < 1 specifying particular values of sample coverage.
+If \code{NULL}, then \code{level} is set to be the minimum coverage value among all samples extrapolated up to double the reference sample sizes. Default is \code{NULL}.}
 
 \item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 Enter 0 to skip the bootstrap procedures. Default is 50.}
@@ -54,7 +54,7 @@ for the user-specified values of sample coverage. The corresponding sample sizes
 for diversity order q = 0, 1 and 2) and mean phylogenetic diversity (meanPD, phylogenetic Hill
 numbers or the effective number of lineages, q = 0, 1 and 2) at specified values of sample coverage.
 See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for formulas and interpretations.
-Use function \code{iNEXTPD} to compute PD or meanPD for specified sample sizes.
+Use the function \code{iNEXTPD} to compute PD or meanPD for specified sample sizes.
 }
 \examples{
 \donttest{

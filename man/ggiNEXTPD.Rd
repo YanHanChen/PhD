@@ -9,7 +9,7 @@ ggiNEXTPD(outcome, plot.type = 1:3)
 \arguments{
 \item{outcome}{the outcome of the function \code{iNEXTPD}}
 
-\item{plot.type}{a positive integer value or sequence specifying types of curves. There are three
+\item{plot.type}{a positive integer or sequence specifying types of curves. There are three
 types of plots: sample-size-based rarefaction and extrapolation curve (\code{$RE.plot.size}, \code{plot.type = 1});
 sample coverage curve as a function of sample size (\code{$RE.plot.sizeC}, \code{plot.type = 2}); coverage-based
 rarefaction and extrapolation curve (\code{$RE.plot.C}, \code{plot.type = 3}). Default is \code{c(1,2,3)}.}
@@ -36,12 +36,12 @@ tree <- data.abu$tree
 out <- iNEXTPD(data = data,tree = tree,datatype = "abundance",q = c(0,1,2))
 ggiNEXTPD(out)
 
-# Datatype: incidence data
+# Datatype: incidence_raw data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
-out <- iNEXTPD(data = data, nT = nT,datatype = "incidence_raw",tree = tree,q = c(0,1,2))
+out <- iNEXTPD(data = data,nT = nT,datatype = "incidence_raw",tree = tree,q = c(0,1,2))
 ggiNEXTPD(out)
 }
 }

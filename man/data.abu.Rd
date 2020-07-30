@@ -3,11 +3,11 @@
 \docType{data}
 \name{data.abu}
 \alias{data.abu}
-\title{Abundance Data}
+\title{Species abundance data from three habitats}
 \format{
 A list includes two objects:
 \describe{
-  \item{$data}{a data frame with 46 plant species abundance data in three habitats: ED, MD and TD.}
+  \item{$data}{a data.frame with 46 plant species abundance data in three habitats: ED, MD and TD.}
   \item{$tree}{a phylo object giving the phylogenetic tree in Newick format.}
 }
 }
