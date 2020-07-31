@@ -13,18 +13,18 @@
 #' data. The row (species) names of data must match the species names in the phylogenetic tree and
 #' thus cannot be missing.
 #' @param nT needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
-#' If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.
+#' If \code{names(nT) = NULL}, then assemblage are automatically named as "assemblage1", "assemblage2",..., etc. Ignored if \code{datatype = "abundance"}.
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.
 #' @param tree a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.
 #' @param q a nonnegative value or sequence specifying the diversity order. Default is \code{c(0,1,2)}.
-#' @param reftime a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
-#' then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+#' @param reftime a positive value or sequence specifying the reference times for diversity computation. If \code{NULL},
+#' then \code{reftime} is set to be the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 #' the pooled assemblage. Default is \code{NULL}.
 #' @param type desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
 #' and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.
 #' @param endpoint a positive integer specifying the endpoint for the rarefaction and extrapolation range.
-#' If \code{NULL}, then \code{endpoint} = double of the reference sample sizes. It is ignored if \code{size} is given.
+#' If \code{NULL}, then \code{endpoint} = double of the reference sample size in each assemblage. It is ignored if \code{size} is given.
 #' @param knots a positive integer specifying the number of equally-spaced knots between 1 and the \code{endpoint}. Default is 40.
 #' @param size a sequence of positive integers specifying the sample sizes for which PD or meanPD estimates will be calculated.
 #' If \code{NULL}, then estimates will be calculated for those sample sizes determined by the specified/default \code{endpoint}
@@ -54,21 +54,21 @@
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- iNEXTPD(data = data,tree = tree,datatype = "abundance",q = c(0,1,2))
+#' out <- iNEXTPD(data = data, tree = tree, datatype = "abundance", q = c(0, 1, 2))
 #'
 #' # Datatype: incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- iNEXTPD(data = data,nT = nT,datatype = "incidence_raw",tree = tree,q = c(0,1,2))
+#' out <- iNEXTPD(data = data, nT = nT, datatype = "incidence_raw", tree = tree, q = c(0, 1, 2))
 #' }
 #' @references
-#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
-#' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
+#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. \emph{Philosophical Transactions of the Royal Society B.}, 365, 3599-3609. \cr\cr
+#' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015). Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
 #' Chao, A., Chiu C.-H. and Jost L. (2016). Phylogenetic diversity measures and their decomposition: a framework based on Hill numbers. pp. 141-172 in Pellens R. and Grandcolas P. (eds)
-#' Biodiversity Conservation and Phylogenetic Systematics: Preserving our Evolutionary Heritage in an Extinction Crisis, Springer. \cr\cr
-#' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation:  making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
+#' \emph{Biodiversity Conservation and Phylogenetic Systematics: Preserving our Evolutionary Heritage in an Extinction Crisis}, Springer. \cr\cr
+#' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology} 66, 100-111.
 #' @export
 iNEXTPD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=NULL,type = 'PD',endpoint = NULL,knots = 40,size = NULL,nboot = 50,conf = 0.95) {
   if(sum(c(duplicated(tree$tip.label),duplicated(tree$node.label[tree$node.label!=""])))>0)
@@ -212,21 +212,20 @@ iNEXTPD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=NUL
 
 }
 
-#' Compute asymptotic estimates for phylogenetic diversity and mean phylogenetic diversity (phylogenetic Hill numbers)
+#' Computes asymptotic estimates for phylogenetic diversity and mean phylogenetic diversity (phylogenetic Hill numbers)
 #'
 #' \code{PhdAsy} computes asymptotic phylogenetic diversity estimates with respect to specified/default
-#' diversity order q and reference time to infer true phylogenetic diversity (PD) or phylogenetic Hill numbers (meanPD).
-#’ See Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.
+#' diversity order q and reference time to infer true phylogenetic diversity (PD) or phylogenetic Hill numbers (meanPD). See Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.
 #' @param data a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).
 #' See the function \code{\link{iNEXTPD}} for details.
 #' @param nT needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
-#' If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.
+#' If \code{names(nT) = NULL}, then assemblage are automatically named as "assemblage1", "assemblage2",..., etc. Ignored if \code{datatype = "abundance"}.
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.
 #' @param tree a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.
 #' @param q a nonnegative value or sequence specifying the diversity order. Default is \code{seq(0, 2, by = 0.25)}.
-#' @param reftime a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
-#' then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+#' @param reftime a positive value or sequence specifying the reference times for diversity computation. If \code{NULL},
+#' then \code{reftime} is set to be the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 #' the pooled assemblage. Default is \code{NULL}.
 #' @param type desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
 #' and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.
@@ -257,12 +256,11 @@ iNEXTPD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=NUL
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- PhdAsy(data = data, nT = nT,datatype = "incidence_raw", tree = tree,q = seq(0, 2, by = 0.25))
+#' out <- PhdAsy(data = data, nT = nT, datatype = "incidence_raw", tree = tree, q = seq(0, 2, by = 0.25))
 #' }
 #' @references
-#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
-#' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
-#' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
+#' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015). Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
+#' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology} 66, 100-111.
 #' @export
 PhdAsy <- function(data,nT,datatype = "abundance",tree,q = seq(0,2,by = 0.25),reftime = NULL,type = 'PD',nboot = 50,conf = 0.95){
   if(sum(c(duplicated(tree$tip.label),duplicated(tree$node.label[tree$node.label!=""])))>0)
@@ -331,13 +329,13 @@ PhdAsy <- function(data,nT,datatype = "abundance",tree,q = seq(0,2,by = 0.25),re
 #' @param data a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).
 #' See the function \code{\link{iNEXTPD}} for details.
 #' @param nT needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
-#' If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.
+#' If \code{names(nT) = NULL}, then assemblage are automatically named as "assemblage1", "assemblage2",..., etc. Ignored if \code{datatype = "abundance"}.
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.
 #' @param tree a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.
 #' @param q a nonnegative value or sequence specifying the diversity order. Default is \code{seq(0, 2, by = 0.25)}.
-#' @param reftime a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
-#' then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+#' @param reftime a positive value or sequence specifying the reference times for diversity computation. If \code{NULL},
+#' then \code{reftime} is set to be the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 #' the pooled assemblage. Default is \code{NULL}.
 #' @param type desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
 #' and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.
@@ -352,7 +350,7 @@ PhdAsy <- function(data,nT,datatype = "abundance",tree,q = seq(0,2,by = 0.25),re
 #' @importFrom stats sd
 #' @importFrom ape drop.tip
 #' @importFrom phyclust get.rooted.tree.height
-#' @return Returns a table of empirical (observed) phylogenetic diversity (type = "PD") or phylogenetic Hill number (type= "meanPD")
+#' @return Returns a table of empirical (observed) phylogenetic diversity (\code{type = "PD"}) or phylogenetic Hill number (\code{type= "meanPD"})
 #' for specified/default order q and reference time.
 #' @examples
 #' \donttest{
@@ -360,7 +358,7 @@ PhdAsy <- function(data,nT,datatype = "abundance",tree,q = seq(0,2,by = 0.25),re
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- PhdObs(data = data,datatype = "abundance",tree = tree,
+#' out <- PhdObs(data = data, datatype = "abundance", tree = tree,
 #' q = seq(0, 2, by = 0.25))
 #'
 #' # Datatype: incidence_raw data
@@ -368,11 +366,11 @@ PhdAsy <- function(data,nT,datatype = "abundance",tree,q = seq(0,2,by = 0.25),re
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- PhdObs(data = data,nT = nT, datatype = "incidence_raw",
+#' out <- PhdObs(data = data, nT = nT, datatype = "incidence_raw",
 #' tree = tree, q = seq(0, 2, by = 0.25))
 #' }
 #' @references
-#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
+#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. \emph{Philosophical Transactions of the Royal Society B.}, 365, 3599-3609. \cr\cr
 #' @export
 PhdObs <- function(data,nT,datatype = "abundance",tree,q = seq(0, 2, by = 0.25),reftime = NULL,type = "PD",
                    nboot = 50,conf = 0.95){
@@ -488,26 +486,25 @@ PhdObs <- function(data,nT,datatype = "abundance",tree,q = seq(0, 2, by = 0.25),
 }
 
 
-#' Compute phylogenetic diversity for specified values of sample coverage
+#' Computes phylogenetic diversity for specified values of sample coverage
 #'
-#' \code{EstimatePD} computes Chao et al.’s (2010) phylogenetic diversity (PD, effective total branch lengths,
+#' \code{EstimatePD} computes Chao et al.’s (2010, 2016) phylogenetic diversity (PD, effective total branch lengths,
 #' for diversity order q = 0, 1 and 2) and mean phylogenetic diversity (meanPD, phylogenetic Hill
-#' numbers or the effective number of lineages, q = 0, 1 and 2) at specified values of sample coverage.
-#' See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for formulas and interpretations.
+#' numbers or the effective number of lineages, q = 0, 1 and 2) at specified values of sample coverage. See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for formulas and interpretations.
 #' Use the function \code{iNEXTPD} to compute PD or meanPD for specified sample sizes.
 #' @param data a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data). See the function \code{\link{iNEXTPD}} for details.
 #' @param nT needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
-#' If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.
+#' If \code{names(nT) = NULL}, then assemblage are automatically named as "assemblage1", "assemblage2",..., etc. Ignored if \code{datatype = "abundance"}.
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.
 #' @param tree a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.
 #' @param q a nonnegative value or sequence specifying the diversity order. Default is \code{c(0,1,2)}.
-#' @param reftime a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
-#' then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+#' @param reftime a positive value or sequence specifying the reference times for diversity computation. If \code{NULL},
+#' then \code{reftime} is set to be the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 #' the pooled assemblage. Default is \code{NULL}.
 #' @param type desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
 #' and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill number). Default is \code{"PD"}.
-#' @param level a positive value or sequence < 1 specifying particular values of sample coverage.
+#' @param level a positive value < 1 or sequence specifying particular values of sample coverage.
 #' If \code{NULL}, then \code{level} is set to be the minimum coverage value among all samples extrapolated up to double the reference sample sizes. Default is \code{NULL}.
 #' @param nboot a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 #' Enter 0 to skip the bootstrap procedures. Default is 50.
@@ -527,21 +524,21 @@ PhdObs <- function(data,nT,datatype = "abundance",tree,q = seq(0, 2, by = 0.25),
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- estimatePD(data = data,datatype = "abundance",tree = tree)
+#' out <- estimatePD(data = data, datatype = "abundance", tree = tree)
 #'
-#' # Datatype: incidence data
+#' # Datatype: incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- estimatePD(data = data,nT = nT,datatype = "incidence_raw",tree = tree)
+#' out <- estimatePD(data = data, nT = nT, datatype = "incidence_raw", tree = tree)
 #' }
 #' @references
-#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
-#' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
+#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. \emph{Philosophical Transactions of the Royal Society B.}, 365, 3599-3609. \cr\cr
+#' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015). Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
 #' Chao, A., Chiu C.-H. and Jost L. (2016). Phylogenetic diversity measures and their decomposition: a framework based on Hill numbers. pp. 141-172 in Pellens R. and Grandcolas P. (eds)
-#' Biodiversity Conservation and Phylogenetic Systematics: Preserving our Evolutionary Heritage in an Extinction Crisis, Springer. \cr\cr
-#' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation:  making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
+#' \emph{Biodiversity Conservation and Phylogenetic Systematics: Preserving our Evolutionary Heritage in an Extinction Crisis, Springer}. \cr\cr
+#' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation:  making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology} 66, 100-111.
 #' @export
 estimatePD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=NULL,type = 'PD',level = NULL,nboot = 50,conf = 0.95){
   if(sum(c(duplicated(tree$tip.label),duplicated(tree$node.label[tree$node.label!=""])))>0)
@@ -616,35 +613,36 @@ estimatePD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=
 #' @param data a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).
 #' See the function \code{\link{iNEXTPD}} for details.
 #' @param nT needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
-#' If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.
+#' If \code{names(nT) = NULL}, then assemblage are automatically named as "assemblage1", "assemblage2",..., etc. Ignored if \code{datatype = "abundance"}.
 #' @param datatype data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 #' or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.
 #' @param tree a phylo object describing the phylogenetic tree in Newick format for all observed species in the pooled assemblage.
-#' @param reftime a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
-#' then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+#' @param reftime a positive value or sequence specifying the reference times for diversity computation. If \code{NULL},
+#' then \code{reftime} is set to be the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 #' the pooled assemblage. Default is \code{NULL}.
 #' @return Returns a table of phylogenetic data information, including reference sample size (\code{n}), number of sampling units (\code{nT}),
 #' number of observed species (\code{S.obs}), observed total branch length, i.e., Faith’s PD (\code{PD.obs}), the first two rare species
 #' frequency counts and their branch length sums, at specified/default reference time specified in the argument \code{reftime}.
+#' See Chao et al. (2010, 2015) and Hsieh and Chao (2017) for formulas and interpretations.
 #' @examples
 #' \donttest{
 #' # Datatype: abundance data
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- PDInfo(data = data,datatype = "abundance", tree = tree)
+#' out <- PDInfo(data = data, datatype = "abundance", tree = tree)
 #'
 #' # Datatype: incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- PDInfo(data = data, nT = nT,datatype = "incidence_raw",tree = tree)
+#' out <- PDInfo(data = data, nT = nT, datatype = "incidence_raw", tree = tree)
 #' }
 #' @references
-#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
-#' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
-#' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
+#' Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. \emph{Philosophical Transactions of the Royal Society B.}, 365, 3599-3609. \cr\cr
+#' Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015). Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
+#' Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology} 66, 100-111.
 #' @export
 PDInfo <- function(data,nT,datatype = "abundance", tree,reftime=NULL){
   if(sum(c(duplicated(tree$tip.label),duplicated(tree$node.label[tree$node.label!=""])))>0)
@@ -713,10 +711,10 @@ PDInfo <- function(data,nT,datatype = "abundance", tree,reftime=NULL){
 #' rarefaction and extrapolation curve (\code{$RE.plot.C}, \code{plot.type = 3}). Default is \code{c(1,2,3)}.
 #' @return Returns different plots of the estimated diversity curves based on the \code{ggplot2} package. Three choices of \code{plot.type}:
 #' \itemize{
-#'  \item{\code{$RE.plot.size}: sample-size-based rarefaction and extrapolation curve (\code{plot.type = 1}),
+#'  \item{\code{$RE.plot.size}: size-based rarefaction and extrapolation curve (\code{plot.type = 1}),
 #'  sampling curve depicting phylogenetic diversity estimates as a function of sample size.} \cr
 #'  \item{\code{$RE.plot.sizeC}: sample completeness curve (\code{plot.type = 2}), the curve of sample coverage as a function of sample size.} \cr
-#'  \item{\code{$RE.plot.C}: coverage-based R/E curve (\code{plot.type = 3}), sampling curve depicting phylogenetic diversity estimates as a function of
+#'  \item{\code{$RE.plot.C}: coverage-based rarefaction and extrapolation curve (\code{plot.type = 3}), sampling curve depicting phylogenetic diversity estimates as a function of
 #'  sample coverage.}
 #'  }
 #' @examples
@@ -725,7 +723,7 @@ PDInfo <- function(data,nT,datatype = "abundance", tree,reftime=NULL){
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- iNEXTPD(data = data,tree = tree,datatype = "abundance",q = c(0,1,2))
+#' out <- iNEXTPD(data = data, tree = tree, datatype = "abundance", q = c(0, 1, 2))
 #' ggiNEXTPD(out)
 #'
 #' # Datatype: incidence_raw data
@@ -733,7 +731,7 @@ PDInfo <- function(data,nT,datatype = "abundance", tree,reftime=NULL){
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- iNEXTPD(data = data,nT = nT,datatype = "incidence_raw",tree = tree,q = c(0,1,2))
+#' out <- iNEXTPD(data = data, nT = nT, datatype = "incidence_raw", tree = tree, q = c(0, 1, 2))
 #' ggiNEXTPD(out)
 #' }
 #' @export
@@ -754,40 +752,41 @@ ggiNEXTPD <- function(outcome,plot.type = 1:3){
 #' \code{PhdObs} or \code{PhdAsy} using the \code{ggplot2} package.
 #' @param outcome the outcome of the functions \code{PhdObs} or \code{PhdAsy}.
 #' @param profile specifying the type of profile: \code{profile = "q"} for order q profile and \code{profile = "time"} for time profile.
+#' Default is \code{"q"}.
 #' @return plot of the PD or meanPD empirical or estimated asymptotic curves using the \code{ggplot2} package.
 #' @examples
 #' \donttest{
-#' # Observed q profile plot for abundance data
+#' # Observed q-profile plot for abundance data
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- PhdObs(data = data,datatype = "abundance",tree = tree,q = seq(0, 2, by = 0.25))
-#' ggtqplotPD(out,profile = "q")
+#' out <- PhdObs(data = data, datatype = "abundance", tree = tree, q = seq(0, 2, by = 0.25))
+#' ggtqplotPD(out, profile = "q")
 #'
-#' # Observed time profile plot for abundance data
+#' # Observed time-profile plot for abundance data
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- PhdObs(data = data,datatype = "abundance",tree = tree,q = c(0,1,2),
-#' reftime = seq(0.1,325,length.out = 40))
-#' ggtqplotPD(out,profile = "time")
+#' out <- PhdObs(data = data, datatype = "abundance", tree = tree, q = c(0, 1, 2),
+#' reftime = seq(0.1, 325, length.out = 40))
+#' ggtqplotPD(out, profile = "time")
 #'
-#' # Asymptotic q profile plot for incidence_raw data
+#' # Asymptotic q-profile plot for incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- PhdAsy(data = data,datatype = "incidence_raw",nT = nT,tree = tree,q = seq(0, 2, by = 0.25))
-#' ggtqplotPD(out,profile = "q")
+#' out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree, q = seq(0, 2, by = 0.25))
+#' ggtqplotPD(out, profile = "q")
 #'
-#' # Asymptotic time profile plot for incidence_raw data
+#' # Asymptotic time-profile plot for incidence_raw data
 #' data(data.inc)
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- PhdAsy(data = data,datatype = "incidence_raw",nT = nT,tree = tree,q = c(0,1,2),
-#' reftime = seq(0.1,82.8575,length.out = 40))
-#' ggtqplotPD(out,profile = "time")
+#' out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree, q = c(0, 1, 2),
+#' reftime = seq(0.1, 82.8575, length.out = 40))
+#' ggtqplotPD(out, profile = "time")
 #' }
 #' @export
 ggtqplotPD <- function(outcome,profile = 'q'){

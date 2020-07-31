@@ -14,5 +14,5 @@
 #'   \item{$tree}{a phylo object giving the phylogenetic tree in Newick format.}
 #'   \item{$nT}{a vector giving the numbers of sampling units in all sites.}
 #' }
-#' @source Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.
+#' @source Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015). Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.
 "data.inc"

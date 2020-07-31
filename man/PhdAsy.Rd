@@ -2,7 +2,7 @@
 % Please edit documentation in R/MainFun.R
 \name{PhdAsy}
 \alias{PhdAsy}
-\title{Compute asymptotic estimates for phylogenetic diversity and mean phylogenetic diversity (phylogenetic Hill numbers)}
+\title{Computes asymptotic estimates for phylogenetic diversity and mean phylogenetic diversity (phylogenetic Hill numbers)}
 \usage{
 PhdAsy(
   data,
@@ -21,7 +21,7 @@ PhdAsy(
 See the function \code{\link{iNEXTPD}} for details.}
 
 \item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
-If \code{names(nT) = NULL}, automatically assigns "site1", "site2",..., as assemblage names. Ignored if \code{datatype = "abundance"}.}
+If \code{names(nT) = NULL}, then assemblage are automatically named as "assemblage1", "assemblage2",..., etc. Ignored if \code{datatype = "abundance"}.}
 
 \item{datatype}{data type of input data: individual-based abundance data (\code{datatype = "abundance"}),
 or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Default is \code{"abundance"}.}
@@ -30,8 +30,8 @@ or species-by-site raw incidence matrix (\code{datatype = "incidence_raw"}). Def
 
 \item{q}{a nonnegative value or sequence specifying the diversity order. Default is \code{seq(0, 2, by = 0.25)}.}
 
-\item{reftime}{a positive value or sequence specifying the reference time for diversity computation. If \code{NULL},
-then \code{reftime} is set as the tree depth of the phylogenetic tree, which is spanned by all the observed species in
+\item{reftime}{a positive value or sequence specifying the reference times for diversity computation. If \code{NULL},
+then \code{reftime} is set to be the tree depth of the phylogenetic tree, which is spanned by all the observed species in
 the pooled assemblage. Default is \code{NULL}.}
 
 \item{type}{desired diversity type: \code{type = "PD"} for Chao et al. (2010) phylogenetic diversity
@@ -49,7 +49,7 @@ reference time specified in the argument \code{reftime}.
 }
 \description{
 \code{PhdAsy} computes asymptotic phylogenetic diversity estimates with respect to specified/default
-diversity order q and reference time to infer true phylogenetic diversity (PD) or phylogenetic Hill numbers (meanPD).
+diversity order q and reference time to infer true phylogenetic diversity (PD) or phylogenetic Hill numbers (meanPD). See Chao et al. (2015) and Hsieh and Chao (2017) for the statistical estimation detail.
 }
 \examples{
 \donttest{
@@ -64,11 +64,10 @@ data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
-out <- PhdAsy(data = data, nT = nT,datatype = "incidence_raw", tree = tree,q = seq(0, 2, by = 0.25))
+out <- PhdAsy(data = data, nT = nT, datatype = "incidence_raw", tree = tree, q = seq(0, 2, by = 0.25))
 }
 }
 \references{
-Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. Philosophical Transactions of the Royal Society B., 365, 3599-3609. \cr\cr
-Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. Methods in Ecology and Evolution, 6, 380-388.\cr\cr
-Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. Systematic Biology 66, 100-111.
+Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
+Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology} 66, 100-111.
 }

@@ -17,10 +17,10 @@ rarefaction and extrapolation curve (\code{$RE.plot.C}, \code{plot.type = 3}). D
 \value{
 Returns different plots of the estimated diversity curves based on the \code{ggplot2} package. Three choices of \code{plot.type}:
 \itemize{
- \item{\code{$RE.plot.size}: sample-size-based rarefaction and extrapolation curve (\code{plot.type = 1}),
+ \item{\code{$RE.plot.size}: size-based rarefaction and extrapolation curve (\code{plot.type = 1}),
  sampling curve depicting phylogenetic diversity estimates as a function of sample size.} \cr
  \item{\code{$RE.plot.sizeC}: sample completeness curve (\code{plot.type = 2}), the curve of sample coverage as a function of sample size.} \cr
- \item{\code{$RE.plot.C}: coverage-based R/E curve (\code{plot.type = 3}), sampling curve depicting phylogenetic diversity estimates as a function of
+ \item{\code{$RE.plot.C}: coverage-based rarefaction and extrapolation curve (\code{plot.type = 3}), sampling curve depicting phylogenetic diversity estimates as a function of
  sample coverage.}
  }
 }
@@ -33,7 +33,7 @@ Returns different plots of the estimated diversity curves based on the \code{ggp
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- iNEXTPD(data = data,tree = tree,datatype = "abundance",q = c(0,1,2))
+out <- iNEXTPD(data = data, tree = tree, datatype = "abundance", q = c(0, 1, 2))
 ggiNEXTPD(out)
 
 # Datatype: incidence_raw data
@@ -41,7 +41,7 @@ data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
-out <- iNEXTPD(data = data,nT = nT,datatype = "incidence_raw",tree = tree,q = c(0,1,2))
+out <- iNEXTPD(data = data, nT = nT, datatype = "incidence_raw", tree = tree, q = c(0, 1, 2))
 ggiNEXTPD(out)
 }
 }

@@ -9,7 +9,8 @@ ggtqplotPD(outcome, profile = "q")
 \arguments{
 \item{outcome}{the outcome of the functions \code{PhdObs} or \code{PhdAsy}.}
 
-\item{profile}{specifying the type of profile: \code{profile = "q"} for order q profile and \code{profile = "time"} for time profile.}
+\item{profile}{specifying the type of profile: \code{profile = "q"} for order q profile and \code{profile = "time"} for time profile.
+Default is \code{"q"}.}
 }
 \value{
 plot of the PD or meanPD empirical or estimated asymptotic curves using the \code{ggplot2} package.
@@ -21,36 +22,36 @@ plot of the PD or meanPD empirical or estimated asymptotic curves using the \cod
 }
 \examples{
 \donttest{
-# Observed q profile plot for abundance data
+# Observed q-profile plot for abundance data
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- PhdObs(data = data,datatype = "abundance",tree = tree,q = seq(0, 2, by = 0.25))
-ggtqplotPD(out,profile = "q")
+out <- PhdObs(data = data, datatype = "abundance", tree = tree, q = seq(0, 2, by = 0.25))
+ggtqplotPD(out, profile = "q")
 
-# Observed time profile plot for abundance data
+# Observed time-profile plot for abundance data
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- PhdObs(data = data,datatype = "abundance",tree = tree,q = c(0,1,2),
-reftime = seq(0.1,325,length.out = 40))
-ggtqplotPD(out,profile = "time")
+out <- PhdObs(data = data, datatype = "abundance", tree = tree, q = c(0, 1, 2),
+reftime = seq(0.1, 325, length.out = 40))
+ggtqplotPD(out, profile = "time")
 
-# Asymptotic q profile plot for incidence_raw data
+# Asymptotic q-profile plot for incidence_raw data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
-out <- PhdAsy(data = data,datatype = "incidence_raw",nT = nT,tree = tree,q = seq(0, 2, by = 0.25))
-ggtqplotPD(out,profile = "q")
+out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree, q = seq(0, 2, by = 0.25))
+ggtqplotPD(out, profile = "q")
 
-# Asymptotic time profile plot for incidence_raw data
+# Asymptotic time-profile plot for incidence_raw data
 data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
-out <- PhdAsy(data = data,datatype = "incidence_raw",nT = nT,tree = tree,q = c(0,1,2),
-reftime = seq(0.1,82.8575,length.out = 40))
-ggtqplotPD(out,profile = "time")
+out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree, q = c(0, 1, 2),
+reftime = seq(0.1, 82.8575, length.out = 40))
+ggtqplotPD(out, profile = "time")
 }
 }
