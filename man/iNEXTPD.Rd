@@ -20,10 +20,10 @@ iNEXTPD(
 )
 }
 \arguments{
-\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).\cr
+\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site incidence raw matrix/data.frame (for incidence data).\cr
 Abundance data: a species-by-site matrix/data.frame of species abundances. The row (species) names of
 data must match the species names in the phylogenetic tree and thus cannot be missing.\cr
-Raw incidence data: species-by-site raw incidence matrix/data.frame. When there are N assemblages
+Incidence raw data: species-by-site raw incidence matrix/data.frame. When there are N assemblages
 and thus N matrices, users must first merge the N matrices by species identity to obtain a large
 merged incidence matrix, where the rows of the matrix refer to all species presented in the merged
 data. The row (species) names of data must match the species names in the phylogenetic tree and
@@ -58,7 +58,7 @@ and \code{knots}.}
 \item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 Enter 0 to skip the bootstrap procedures. Default is 50.}
 
-\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
+\item{conf}{a positive number < 1 specifying the level of confidence interval. Default is 0.95.}
 }
 \value{
 Returns a list containing two tables:
@@ -82,6 +82,7 @@ data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
 out <- iNEXTPD(data = data, tree = tree, datatype = "abundance", q = c(0, 1, 2))
+out
 
 # Datatype: incidence_raw data
 data(data.inc)
@@ -89,12 +90,13 @@ data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
 out <- iNEXTPD(data = data, nT = nT, datatype = "incidence_raw", tree = tree, q = c(0, 1, 2))
+out
 }
 }
 \references{
 Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. \emph{Philosophical Transactions of the Royal Society B.}, 365, 3599-3609. \cr\cr
-Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
+Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015). Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
 Chao, A., Chiu C.-H. and Jost L. (2016). Phylogenetic diversity measures and their decomposition: a framework based on Hill numbers. pp. 141-172 in Pellens R. and Grandcolas P. (eds)
 \emph{Biodiversity Conservation and Phylogenetic Systematics: Preserving our Evolutionary Heritage in an Extinction Crisis}, Springer. \cr\cr
-Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology} 66, 100-111.
+Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology}, 66, 100-111.
 }

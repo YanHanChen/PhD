@@ -11,5 +11,5 @@
 #'   \item{$tree}{a phylo object giving the phylogenetic tree in Newick format.}
 #' }
 #' @source Carboni M, Santoro R, Acosta A. T. R. (2010). Are some communities of the coastal dune zonation more susceptible to alien plant invasion? \emph{Journal of Plant Ecology}, 3, 139–147.\cr\cr
-#' Carboni M, Santoro R, Acosta A. T. R. (2011). Dealing with scarce data to understand how environmental gradients and propagule pressure shape fine‐scale alien distribution patterns on coastal dunes.\emph{Journal of Vegetation Science}, 22, 751–765.
+#' Carboni M, Santoro R, Acosta A. T. R. (2011). Dealing with scarce data to understand how environmental gradients and propagule pressure shape fine‐scale alien distribution patterns on coastal dunes. \emph{Journal of Vegetation Science}, 22, 751–765.
 "data.abu"

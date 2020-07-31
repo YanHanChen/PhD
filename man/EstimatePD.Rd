@@ -18,7 +18,7 @@ estimatePD(
 )
 }
 \arguments{
-\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data). See the function \code{\link{iNEXTPD}} for details.}
+\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site incidence raw matrix/data.frame (for incidence data). See the function \code{\link{iNEXTPD}} for details.}
 
 \item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
 If \code{names(nT) = NULL}, then assemblage are automatically named as "assemblage1", "assemblage2",..., etc. Ignored if \code{datatype = "abundance"}.}
@@ -43,7 +43,7 @@ If \code{NULL}, then \code{level} is set to be the minimum coverage value among 
 \item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 Enter 0 to skip the bootstrap procedures. Default is 50.}
 
-\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
+\item{conf}{a positive number < 1 specifying the level of confidence interval. Default is 0.95.}
 }
 \value{
 Returns a table of the computed phylogenetic diversity (PD or meanPD) for specified/default diversity orders \code{q} and reference times
@@ -62,6 +62,7 @@ data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
 out <- estimatePD(data = data, datatype = "abundance", tree = tree)
+out
 
 # Datatype: incidence_raw data
 data(data.inc)
@@ -69,12 +70,13 @@ data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
 out <- estimatePD(data = data, nT = nT, datatype = "incidence_raw", tree = tree)
+out
 }
 }
 \references{
 Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. \emph{Philosophical Transactions of the Royal Society B.}, 365, 3599-3609. \cr\cr
 Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015). Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
 Chao, A., Chiu C.-H. and Jost L. (2016). Phylogenetic diversity measures and their decomposition: a framework based on Hill numbers. pp. 141-172 in Pellens R. and Grandcolas P. (eds)
-\emph{Biodiversity Conservation and Phylogenetic Systematics: Preserving our Evolutionary Heritage in an Extinction Crisis, Springer}. \cr\cr
-Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation:  making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology} 66, 100-111.
+\emph{Biodiversity Conservation and Phylogenetic Systematics: Preserving our Evolutionary Heritage in an Extinction Crisis}, Springer. \cr\cr
+Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology}, 66, 100-111.
 }

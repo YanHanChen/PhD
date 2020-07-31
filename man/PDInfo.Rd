@@ -7,7 +7,7 @@
 PDInfo(data, nT, datatype = "abundance", tree, reftime = NULL)
 }
 \arguments{
-\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).
+\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site incidence raw matrix/data.frame (for incidence data).
 See the function \code{\link{iNEXTPD}} for details.}
 
 \item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
@@ -38,6 +38,7 @@ data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
 out <- PDInfo(data = data, datatype = "abundance", tree = tree)
+out
 
 # Datatype: incidence_raw data
 data(data.inc)
@@ -45,10 +46,11 @@ data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
 out <- PDInfo(data = data, nT = nT, datatype = "incidence_raw", tree = tree)
+out
 }
 }
 \references{
 Chao, A., Chiu C.-H. and Jost, L. (2010). Phylogenetic diversity measures based on Hill numbers. \emph{Philosophical Transactions of the Royal Society B.}, 365, 3599-3609. \cr\cr
-Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
-Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology} 66, 100-111.
+Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015). Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
+Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology}, 66, 100-111.
 }

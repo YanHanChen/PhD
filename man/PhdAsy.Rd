@@ -17,7 +17,7 @@ PhdAsy(
 )
 }
 \arguments{
-\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).
+\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site incidence raw matrix/data.frame (for incidence data).
 See the function \code{\link{iNEXTPD}} for details.}
 
 \item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
@@ -40,7 +40,7 @@ and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill nu
 \item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 Enter 0 to skip the bootstrap procedures. Default is 50.}
 
-\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
+\item{conf}{a positive number < 1 specifying the level of confidence interval. Default is 0.95.}
 }
 \value{
 Returns a table of estimated asymptotic phylogenetic diversity estimates (\code{type = "PD"}) or
@@ -58,6 +58,7 @@ data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
 out <- PhdAsy(data = data, datatype = "abundance", tree = tree, q = seq(0, 2, by = 0.25))
+out
 
 # Datatype: incidence_raw data
 data(data.inc)
@@ -65,9 +66,10 @@ data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
 out <- PhdAsy(data = data, nT = nT, datatype = "incidence_raw", tree = tree, q = seq(0, 2, by = 0.25))
+out
 }
 }
 \references{
-Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015) Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
-Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology} 66, 100-111.
+Chao, A., Chiu, C.-H., Hsieh, T. C., Davis, T., Nipperess, D., and Faith, D. (2015). Rarefaction and extrapolation of phylogenetic diversity. \emph{Methods in Ecology and Evolution}, 6, 380-388.\cr\cr
+Hsieh, T. C. and Chao, A. (2017). Rarefaction and extrapolation: making fair comparison of abundance-sensitive phylogenetic diversity among multiple assemblages. \emph{Systematic Biology}, 66, 100-111.
 }

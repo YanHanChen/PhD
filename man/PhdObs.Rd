@@ -17,7 +17,7 @@ PhdObs(
 )
 }
 \arguments{
-\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site raw incidence matrix (for incidence data).
+\item{data}{a matrix/data.frame of species abundances (for abundance data) or species-by-site incidence raw matrix/data.frame (for incidence data).
 See the function \code{\link{iNEXTPD}} for details.}
 
 \item{nT}{needed only when \code{datatype = "incidence_raw"}, a sequence of named nonnegative integers specifying the number of sampling units in each assemblage.
@@ -40,7 +40,7 @@ and \code{type = "meanPD"} for mean phylogenetic diversity (phylogenetic Hill nu
 \item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals.
 Enter 0 to skip the bootstrap procedures. Default is 50.}
 
-\item{conf}{a positive number < 1 specifying the level of confidence interval, default is 0.95.}
+\item{conf}{a positive number < 1 specifying the level of confidence interval. Default is 0.95.}
 }
 \value{
 Returns a table of empirical (observed) phylogenetic diversity (\code{type = "PD"}) or phylogenetic Hill number (\code{type= "meanPD"})
@@ -59,6 +59,7 @@ data <- data.abu$data
 tree <- data.abu$tree
 out <- PhdObs(data = data, datatype = "abundance", tree = tree,
 q = seq(0, 2, by = 0.25))
+out
 
 # Datatype: incidence_raw data
 data(data.inc)
@@ -67,6 +68,7 @@ tree <- data.inc$tree
 nT <- data.inc$nT
 out <- PhdObs(data = data, nT = nT, datatype = "incidence_raw",
 tree = tree, q = seq(0, 2, by = 0.25))
+out
 }
 }
 \references{
