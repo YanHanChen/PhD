@@ -57,7 +57,8 @@ diversity order q and reference time to infer true phylogenetic diversity (PD) o
 data(data.abu)
 data <- data.abu$data
 tree <- data.abu$tree
-out <- PhdAsy(data = data, datatype = "abundance", tree = tree, q = seq(0, 2, by = 0.25))
+out <- PhdAsy(data = data, datatype = "abundance", tree = tree,
+q = seq(0, 2, by = 0.25))
 out
 
 # Datatype: incidence_raw data
@@ -65,7 +66,8 @@ data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
-out <- PhdAsy(data = data, nT = nT, datatype = "incidence_raw", tree = tree, q = seq(0, 2, by = 0.25))
+out <- PhdAsy(data = data, nT = nT, datatype = "incidence_raw",
+tree = tree, q = seq(0, 2, by = 0.25))
 out
 }
 }

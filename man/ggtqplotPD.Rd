@@ -42,7 +42,8 @@ data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
-out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree, q = seq(0, 2, by = 0.25))
+out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree,
+q = seq(0, 2, by = 0.25))
 ggtqplotPD(out, profile = "q")
 
 # Asymptotic time-profile plot for incidence_raw data
@@ -50,8 +51,8 @@ data(data.inc)
 data <- data.inc$data
 tree <- data.inc$tree
 nT <- data.inc$nT
-out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree, q = c(0, 1, 2),
-reftime = seq(0.1, 82.8575, length.out = 40))
+out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree,
+q = c(0, 1, 2), reftime = seq(0.1, 82.8575, length.out = 40))
 ggtqplotPD(out, profile = "time")
 }
 }

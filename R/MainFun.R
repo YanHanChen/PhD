@@ -251,7 +251,8 @@ iNEXTPD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=NUL
 #' data(data.abu)
 #' data <- data.abu$data
 #' tree <- data.abu$tree
-#' out <- PhdAsy(data = data, datatype = "abundance", tree = tree, q = seq(0, 2, by = 0.25))
+#' out <- PhdAsy(data = data, datatype = "abundance", tree = tree,
+#' q = seq(0, 2, by = 0.25))
 #' out
 #'
 #' # Datatype: incidence_raw data
@@ -259,7 +260,8 @@ iNEXTPD <- function(data,nT,datatype = "abundance",tree,q = c(0,1,2),reftime=NUL
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- PhdAsy(data = data, nT = nT, datatype = "incidence_raw", tree = tree, q = seq(0, 2, by = 0.25))
+#' out <- PhdAsy(data = data, nT = nT, datatype = "incidence_raw",
+#' tree = tree, q = seq(0, 2, by = 0.25))
 #' out
 #' }
 #' @references
@@ -786,7 +788,8 @@ ggiNEXTPD <- function(outcome,plot.type = 1:3){
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree, q = seq(0, 2, by = 0.25))
+#' out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree,
+#' q = seq(0, 2, by = 0.25))
 #' ggtqplotPD(out, profile = "q")
 #'
 #' # Asymptotic time-profile plot for incidence_raw data
@@ -794,8 +797,8 @@ ggiNEXTPD <- function(outcome,plot.type = 1:3){
 #' data <- data.inc$data
 #' tree <- data.inc$tree
 #' nT <- data.inc$nT
-#' out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree, q = c(0, 1, 2),
-#' reftime = seq(0.1, 82.8575, length.out = 40))
+#' out <- PhdAsy(data = data, datatype = "incidence_raw", nT = nT, tree = tree,
+#' q = c(0, 1, 2), reftime = seq(0.1, 82.8575, length.out = 40))
 #' ggtqplotPD(out, profile = "time")
 #' }
 #' @export
